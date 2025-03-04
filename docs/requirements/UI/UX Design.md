@@ -13,12 +13,13 @@ Each component has specific features designed to enhance efficiency, security, a
 
 | Feature | Description |
 |---------|------------|
+|**🆕 First-Time User Introduction** | On the first app launch, displays an intro screen explaining the app’s purpose, key features, and security measures. Users can swipe through or skip. |
 | **🔐 Secure Login** | Supports username/password authentication. Two-Factor Authentication (2FA) for enhanced security. |
 | **🏠 Dashboard** | Displays quick **stats** (number of vehicles scanned, alerts received, wanted vehicles detected, etc.). Quick access to **scan license plates**. |
 | **📷 License Plate Recognition (OCR)** | Uses the camera to **scan and recognize** vehicle license plates in real-time. Matches plate numbers with the database for verification. |
 | **🔍 Manual Search** | Allows officers to manually enter a plate number to retrieve vehicle details. |
 | **🚨 Real-Time Alerts** | Alerts officers if a scanned vehicle is **stolen, wanted, or flagged**. |
-| **📍 Location Tracking** | Displays the **last known location** of a suspicious vehicle (if integrated with GPS). |
+| **📍 Location Tracking** | Displays the **last known location** of a suspicious vehicle. |
 | **📑 Driver License Verification** | **manual input** to check license validity and status. |
 | **🔔 Notifications Center** | Receives real-time alerts when a vehicle matches a wanted list or suspicious activity is detected. |
 | **📩 Report Submission** | Officers can submit reports on suspicious vehicles directly from the app, with photos and location info. |
