@@ -8,16 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const datastore_1 = require("./datastore");
-const app = (0, express_1.default)();
-dotenv_1.default.config();
-app.listen(process.env.PORT || 8080, () => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, datastore_1.initDb)();
-    console.log(`server work http://localhost:${process.env.PORT}`);
-}));
+exports.db = void 0;
+exports.initDb = initDb;
+const sql_1 = require("./sql");
+function initDb() {
+    return __awaiter(this, void 0, void 0, function* () {
+        exports.db = yield new sql_1.SqlDataStore().openDb();
+    });
+}

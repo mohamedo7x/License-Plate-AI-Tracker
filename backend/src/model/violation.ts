@@ -11,7 +11,6 @@ export enum ViolationStatus {
   PartiallyPaid = 'Partially Paid',
 }
 
-
 export interface Violation {
   id: string;
   scan_id: string;
