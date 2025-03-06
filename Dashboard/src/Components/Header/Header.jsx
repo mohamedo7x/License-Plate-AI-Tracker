@@ -3,8 +3,11 @@ import { IoIosSearch } from 'react-icons/io';
 
 import pfpImg from '../../assets/Images/pfp.jpg';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function Header() {
+
+    const {t} = useTranslation();
 
     return <React.Fragment>
 
@@ -19,7 +22,7 @@ export default function Header() {
                     className='
                         w-full text-base text-[var(--black-color)] placeholder:text-[var(--gray-color)] outline-0
                     '
-                    type="text" placeholder='Search...' 
+                    type="text" placeholder={`${t('searchWord')}...`}
                 />
             </form>
 

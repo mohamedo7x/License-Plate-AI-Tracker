@@ -3,22 +3,25 @@ import { Link, NavLink } from 'react-router-dom';
 
 import logo from '../../assets/Images/logo.png'
 import { GoHome } from 'react-icons/go';
-import { MdElectricBolt } from 'react-icons/md';
-import { IoSettingsOutline, IoWarningOutline } from 'react-icons/io5';
+import { IoCarSportOutline, IoSettingsOutline, IoWarningOutline } from 'react-icons/io5';
 import { HiOutlineDocumentReport } from 'react-icons/hi';
 import { LuClipboardList, LuUsers } from 'react-icons/lu';
+import Translate from '../Translate-Btn/Translate';
+import { useTranslation } from 'react-i18next';
 
 export default function SideBar() {
 
+    const {t} = useTranslation();
+
     const links = [
 
-        {id: 1, icon: <GoHome className='text-xl' />, link: '/', title: 'Home'},
-        {id: 2, icon: <MdElectricBolt className='text-xl' />, link: '/V-Management', title: 'Vehicle Management'},
-        {id: 3, icon: <IoWarningOutline className='text-xl' />, link: '/W-Vehicle', title: 'Wanted Vehicle'},
-        {id: 4, icon: <LuUsers className='text-xl' />, link: '/officers', title: 'Officers'},
-        {id: 5, icon: <HiOutlineDocumentReport className='text-xl' />, link: '/V-Reports', title: 'Violation Reports'},
-        {id: 6, icon: <LuClipboardList className='text-xl' />, link: '/adult-logs', title: 'Adult Logs'},
-        {id: 7, icon: <IoSettingsOutline className='text-xl' />, link: '/setting', title: 'Setting'},
+        {id: 1, icon: <GoHome className='text-xl' />, link: '/', title: t('homeWord')},
+        {id: 2, icon: <IoCarSportOutline className='text-xl' />, link: '/V-Management', title: t('vehicleManagementWord')},
+        {id: 3, icon: <IoWarningOutline className='text-xl' />, link: '/W-Vehicle', title: t('wantedVehicle')},
+        {id: 4, icon: <LuUsers className='text-xl' />, link: '/officers', title: t('officersWord')},
+        {id: 5, icon: <HiOutlineDocumentReport className='text-xl' />, link: '/V-Reports', title: t('violationReportsWord')},
+        {id: 6, icon: <LuClipboardList className='text-xl' />, link: '/adult-logs', title: t('adultLogWord')},
+        {id: 7, icon: <IoSettingsOutline className='text-xl' />, link: '/setting', title: t('settingWord')},
 
     ];
 
@@ -42,6 +45,8 @@ export default function SideBar() {
                         <p className='font-medium'>{link.title}</p>
                     </NavLink>
                 </li>)}
+
+                <Translate />
 
             </ul>
 

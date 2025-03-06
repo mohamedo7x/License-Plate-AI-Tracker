@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import Filter from '../../Components/Filter-Button/Filter'
 import { FiEdit } from 'react-icons/fi';
-import { IoIosArrowForward, IoMdWifi } from 'react-icons/io';
+import { IoIosArrowForward, IoIosInformationCircleOutline } from 'react-icons/io';
 import { Link } from 'react-router-dom';
-import { IoLocationOutline } from 'react-icons/io5';
-import { GiRank3 } from 'react-icons/gi';
-import OfficersData from '../../assets/Data/Officers.json';
+import { IoBanSharp, IoLocationOutline } from 'react-icons/io5';
+import VehicleData from '../../assets/Data/VehicleData.json';
+import { MdSecurity } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 
-export default function Officers() {
+export default function VehicleM() {
 
     const {t, i18n} = useTranslation();
 
@@ -16,20 +16,20 @@ export default function Officers() {
 
     const [dataFiltered, setDataFiltered] = useState('');
     const [filteredType, setFilteredType] = useState(null);
-    const [filteredArray, setFilteredArray] = useState(OfficersData);
+    const [filteredArray, setFilteredArray] = useState(VehicleData);
 
-    const statusFilter = ['allStatusWord', ...new Set(OfficersData.map(item => item.status))];
+    const statusFilter = ['allStatusWord', ...new Set(VehicleData.map(item => item.status))];
 
-    const locationFilter = ['allLocationsWord', ...new Set(OfficersData.map(item => item.location))];
+    const locationFilter = ['allLocationsWord', ...new Set(VehicleData.map(item => item.location))];
 
-    const rankFilter = ['allRanksWord', ...new Set(OfficersData.map(item => item.rank))];
+    const violationsFilter = ['allViolationsWord', ...new Set(VehicleData.map(item => item.violations))];
 
     useEffect(() => {
 
         if(dataFiltered.length > 0 && filteredType){
-            setFilteredArray(OfficersData.filter(items => items[filteredType] === dataFiltered))
+            setFilteredArray(VehicleData.filter(items => items[filteredType] === dataFiltered))
         } else{
-            setFilteredArray(OfficersData);
+            setFilteredArray(VehicleData);
         }
 
     }, [dataFiltered]);
@@ -39,8 +39,8 @@ export default function Officers() {
         <section className='w-full flex flex-col gap-5'>
 
             <div>
-                <h3 className='text-4xl font-medium text-[var(--black-color)]'>{t('officersTitle')}</h3>
-                <p className='pt-0.5 text-base text-[var(--gray-color-2)]'>{t('officersSlogan')}</p>
+                <h3 className='text-4xl font-medium text-[var(--black-color)]'>{t('vehicleManagementWord')}</h3>
+                <p className='pt-0.5 text-base text-[var(--gray-color-2)]'>{t('vmSlogan')}</p>
             </div>
 
             <div className='w-full flex items-center justify-end gap-5'>
@@ -52,13 +52,13 @@ export default function Officers() {
                 />
 
                 <Filter 
-                    icon={<GiRank3 className='text-2xl text-[var(--gray-color-2)]' />} 
-                    data={rankFilter} setDataFiltered={setDataFiltered} 
-                    setFilteredType={setFilteredType} filterType={'rank'}
+                    icon={<IoIosInformationCircleOutline className='text-2xl text-[var(--gray-color-2)]' />} 
+                    data={violationsFilter} setDataFiltered={setDataFiltered} 
+                    setFilteredType={setFilteredType} filterType={'violations'}
                 />
 
                 <Filter 
-                    icon={<IoMdWifi className='text-2xl text-[var(--gray-color-2)]' />} 
+                    icon={<MdSecurity className='text-2xl text-[var(--gray-color-2)]' />} 
                     data={statusFilter} setDataFiltered={setDataFiltered} 
                     setFilteredType={setFilteredType} filterType={'status'}
                 />
@@ -73,10 +73,10 @@ export default function Officers() {
 
                         <tr className="text-base text-[var(--black-color)] text-center">
 
-                            <th className="px-5 py-2.5">{t('officerWord')}</th>
+                            <th className="px-5 py-2.5">{t('plateNumWord')}</th>
+                            <th className="px-5 py-2.5">{t('ownerNameWord')}</th>
                             <th className="px-5 py-2.5">{t('locationWord')}</th>
-                            <th className="px-5 py-2.5">{t('rankWord')}</th>
-                            <th className="px-5 py-2.5">{t('violationsWord')}</th>
+                            <th className="px-5 py-2.5">{t('violationWord')}</th>
                             <th className="px-5 py-2.5">{t('statusWord')}</th>
                             <th className="px-5 py-2.5">{t('actionsWord')}</th>
 
@@ -91,9 +91,9 @@ export default function Officers() {
                             text-base font-normal text-[var(--gray-color-2)] text-center
                         '>
 
-                            <td className='py-2.5'>{officer.name}</td>
+                            <td className='py-2.5'>{officer.plateNum}</td>
+                            <td className='py-2.5'>{officer.owner}</td>
                             <td className='py-2.5'>{officer.location}</td>
-                            <td className='py-2.5'>{officer.rank}</td>
                             <td className='py-2.5'>
                                 <Link className='flex items-center justify-center gap-1 cursor-pointer text-[var(--blue-color)]'>
                                     <p>{officer.violations}</p>
@@ -101,19 +101,29 @@ export default function Officers() {
                                 </Link>
                             </td>
                             <td className='py-2.5'>
-                                {officer.status === 'Online' && 
-                                    <p className='font-medium text-[var(--green-color)]'>{officer.status}</p>
+                                {officer.status === 'Wanted' && 
+                                    <p className='font-medium text-[var(--red-color)]'>{officer.status}</p>
                                 }
-                                {officer.status === 'Offline' &&
+                                {officer.status === 'Impounded' &&
                                     <p className='font-medium opacity-55'>{officer.status}</p>
                                 }
                             </td>
                             <td className='py-2.5'>
-                                <button className='
-                                    p-2.5 rounded-md bg-[var(--gray-color-1)]
-                                    text-[var(--blue-color)] cursor-pointer duration-300
-                                    hover:bg-[var(--blue-color)] hover:text-[var(--white-color)]
-                                '><FiEdit /></button>
+                                <div className='flex items-center justify-center gap-2.5'>
+
+                                    <button className='
+                                        p-2.5 rounded-md bg-[var(--gray-color-3)]
+                                        text-[var(--blue-color)] cursor-pointer duration-300
+                                        hover:bg-[var(--blue-color)] hover:text-[var(--white-color)]
+                                    '><FiEdit /></button>
+
+                                    <button className='
+                                        p-2.5 rounded-md bg-[var(--gray-color-3)]
+                                        text-[var(--red-color)] cursor-pointer duration-300
+                                        hover:bg-[var(--red-color)] hover:text-[var(--white-color)]
+                                    '><IoBanSharp /></button>
+
+                                </div>
                             </td>
 
                         </tr>)}

@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CiFilter } from 'react-icons/ci';
 import { IoIosArrowForward } from 'react-icons/io';
 import { AnimatePresence, motion } from 'framer-motion';
 import Animations from '../../Animations/Animations';
-import OfficersData from '../../assets/Data/Officers.json';
 import { PropTypes } from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
-export default function Filter({icon, filterType, data, setDataFiltered}) {
+export default function Filter({icon, filterType, setFilteredType, data, setDataFiltered}) {
+
+    const {t, i18n} = useTranslation();
 
     const [displayList, setDisplayList] = useState(false);
     const [selectedType, setSelectedType] = useState(data[0]);
@@ -33,12 +34,12 @@ export default function Filter({icon, filterType, data, setDataFiltered}) {
     const handleSelectType = (type) => {
 
         if(type !== data[0]){
-            setDataFiltered(OfficersData.filter(items => items[filterType] === type));
-        }
-        else{
-            setDataFiltered(OfficersData)
+            setDataFiltered(type);
+        } else{
+            setDataFiltered('');
         }
 
+        setFilteredType(filterType);
         setSelectedType(type);
         setDisplayList(false);
 
@@ -56,8 +57,12 @@ export default function Filter({icon, filterType, data, setDataFiltered}) {
                 className='h-12 px-5 py-2.5 flex items-center justify-between gap-2.5 cursor-pointer'
             >
                 {icon}
-                <p>{selectedType}</p>
-                <IoIosArrowForward className={`text-2xl duration-300 text-[var(--gray-color-2)] ${displayList ? 'rotate-90' : ''}`} />
+                <p>{t(selectedType)}</p>
+                <IoIosArrowForward className={`
+                    text-2xl duration-300 text-[var(--gray-color-2)] 
+                    ${displayList ? i18n.language === 'en' ? 'rotate-90' : '-rotate-90' : ''}
+                    ${i18n.language === 'ar' ? 'rotate-y-180' : ''}
+                `} />
             </div>
 
             <AnimatePresence>
@@ -81,7 +86,7 @@ export default function Filter({icon, filterType, data, setDataFiltered}) {
                                         'bg-[var(--blue-color)] text-[var(--white-color)]' 
                                         : 'bg-[var(--white-color)] text-[var(--gray-color-2)]'
                                     }`}
-                            >{type}</li>
+                            >{t(type)}</li>
                         ))}
                     </motion.ul>
                 }
@@ -97,5 +102,6 @@ Filter.propTypes = {
     data: PropTypes.array.isRequired,
     icon: PropTypes.func.isRequired,
     setDataFiltered: PropTypes.func.isRequired,
+    setFilteredType: PropTypes.func.isRequired,
     filterType: PropTypes.string.isRequired,
 };

@@ -15,8 +15,6 @@
     --gray-color-2: #6c757d;
     --gray-color-3: #e9ecef;
     --black-color-2: #383838;
-    
-    --blue-opacity-color: rgba(1, 1, 1, 0.01);
 
 }
 
@@ -70,5 +68,11 @@ body{
 
     background-color: var(--blue-color);
     color: var(--white-color);
+
+}
+
+.list_top{
+
+    top: calc(100% + 0.625rem);
 
 }

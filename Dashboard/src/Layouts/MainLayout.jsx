@@ -15,7 +15,10 @@ export default function MainLayout() {
 
             <section className='dashboard_width h-full overflow-hidden'>
 
-                <header className='h-[4.375rem] w-full bg-[var(--white-color)] shadow-[0_0px_10px_var(--gray-color-3)]'>
+                <header className='
+                    h-[4.375rem] w-full bg-[var(--white-color)] 
+                    border-b border-solid border-[var(--gray-color-3)] shadow-[0_0px_10px_var(--gray-color-3)]
+                '>
                     <Header />
                 </header>
 
