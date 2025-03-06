@@ -7,7 +7,6 @@ export interface ScanDao {
   findScansByScannerId(scannerId: string): Promise<Scan[]>;
   listAllScans(): Promise<Scan[]>;
   deleteScan(id: string): Promise<boolean>;
-  findScansByLocation(latitude: number, longitude: number, radius: number): Promise<Scan[]>;
   countScansByPlateId(plateId: string): Promise<number>;
   listRecentScans(limit: number): Promise<Scan[]>;
 }

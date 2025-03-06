@@ -15,8 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const datastore_1 = require("./datastore");
+const loggerMiddleWare_1 = require("./middleware/loggerMiddleWare");
 const app = (0, express_1.default)();
 dotenv_1.default.config();
+app.use(loggerMiddleWare_1.loggerMiddleware);
+app.use(express_1.default.json());
+app.get('/', (_req, res) => {
+    res.send('Welcome');
+});
 app.listen(process.env.PORT || 8080, () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, datastore_1.initDb)();
     console.log(`server work http://localhost:${process.env.PORT}`);
