@@ -5,8 +5,9 @@ import { IoIosArrowForward } from 'react-icons/io'
 import { IoLanguage } from 'react-icons/io5'
 import Flag from 'react-world-flags'
 import Animations from '../../Animations/Animations';
+import { PropTypes } from 'prop-types';
 
-export default function Translate() {
+export default function Translate({setDisplayNan}) {
 
     // ====== display-langs ====== //
 
@@ -53,20 +54,30 @@ export default function Translate() {
 
     };
 
+    // ====== languages-data ====== //
+
+    const languagesData = [
+
+        {id: 1, name: 'arWord', code: 'eg', lang: 'ar'},
+        {id: 2, name: 'enWord', code: 'us', lang: 'en'}
+
+    ]
+
     return <React.Fragment>
 
         <div ref={langListRef} onClick={toggleLangsList} className='relative w-full rounded-md bg-[var(--gray-color-3)]'>
 
             <button className='
                 py-2.5 px-5 w-full flex items-center justify-between 
+                max-[1120px]:justify-center max-[940px]:justify-between
                 gap-2.5 text-[var(--blue-color)] cursor-pointer
             '>
                 <div className='flex items-center gap-2.5'>
-                    <IoLanguage className='text-xl' />
-                    <p className='text-base font-medium'>{t('languageWord')}</p>
+                    <IoLanguage className='text-xl max-[1120px]:text-2xl max-[940px]:text-xl' />
+                    <p className='text-base font-medium max-[1120px]:hidden max-[940px]:block'>{t('languageWord')}</p>
                 </div>
                 <IoIosArrowForward className={`
-                    text-xl duration-300
+                    text-xl duration-300 max-[1120px]:text-2xl max-[940px]:text-xl
                     ${i18n.language === 'ar' ? 'rotate-y-180' : ''}
                     ${displayLangs ? i18n.language === 'en' ? 'rotate-90' : '-rotate-90' : ''}
                 `} />
@@ -79,28 +90,17 @@ export default function Translate() {
                     className='list_top left-0 w-full absolute rounded-md bg-[var(--gray-color-3)] overflow-hidden'
                 >
 
-                    <li className={`
-                            w-full px-5 py-2.5 flex items-center gap-2.5 cursor-pointer duration-300
+                    {languagesData.map(language => <li key={language.id} onClick={() => setDisplayNan(false)} className={`
+                            w-full px-5 py-2.5 flex items-center gap-2.5 cursor-pointer duration-300 
+                            max-[1120px]:justify-center max-[940px]:justify-start
                             text-[var(--gray-color-2)] hover:bg-[var(--blue-color)] hover:text-[var(--white-color)]
-                            ${i18n.language === 'ar' ? 'bg-[var(--blue-color)] text-[var(--white-color)]' : ''}
+                            ${i18n.language === language.lang ? 'bg-[var(--blue-color)] text-[var(--white-color)]' : ''}
                         `}
-                        onClick={() => changeLanguage('ar')}
+                        onClick={() => changeLanguage(language.lang)}
                     >
-                        <Flag className='w-7' code="eg" />
-                        <p className='text-base font-medium'>{t('arWord')}</p>
-                    </li>
-
-                    <li className={`
-                            w-full px-5 py-2.5 flex items-center gap-2.5 cursor-pointer
-                            border-t border-solid border-[var(--gray-color-1)] duration-300
-                            text-[var(--gray-color-2)] hover:bg-[var(--blue-color)] hover:text-[var(--white-color)]
-                            ${i18n.language === 'en' ? 'bg-[var(--blue-color)] text-[var(--white-color)]' : ''}
-                        `}
-                        onClick={() => changeLanguage('en')}
-                    >
-                        <Flag className='w-7' code="us" />
-                        <p className='text-base font-medium'>{t('enWord')}</p>
-                    </li>
+                        <Flag className='w-7' code={language.code} />
+                        <p className='text-base font-medium max-[1120px]:hidden max-[940px]:block'>{t(language.name)}</p>
+                    </li>)}
 
                 </motion.ul>}
 
@@ -110,4 +110,8 @@ export default function Translate() {
 
     </React.Fragment>
 
+}
+
+Translate.propTypes = {
+    setDisplayNan: PropTypes.func.isRequired,
 }

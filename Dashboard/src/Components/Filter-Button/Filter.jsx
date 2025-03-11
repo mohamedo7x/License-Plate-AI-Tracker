@@ -5,7 +5,7 @@ import Animations from '../../Animations/Animations';
 import { PropTypes } from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
-export default function Filter({icon, filterType, setFilteredType, data, setDataFiltered}) {
+export default function Filter({icon, data, filterKey, onFilterChange}) {
 
     const {t, i18n} = useTranslation();
 
@@ -32,17 +32,9 @@ export default function Filter({icon, filterType, setFilteredType, data, setData
     }, [handleClickOutside]);
 
     const handleSelectType = (type) => {
-
-        if(type !== data[0]){
-            setDataFiltered(type);
-        } else{
-            setDataFiltered('');
-        }
-
-        setFilteredType(filterType);
+        onFilterChange(filterKey, type);
         setSelectedType(type);
         setDisplayList(false);
-
     }
 
     return <React.Fragment>
@@ -101,7 +93,6 @@ export default function Filter({icon, filterType, setFilteredType, data, setData
 Filter.propTypes = {
     data: PropTypes.array.isRequired,
     icon: PropTypes.func.isRequired,
-    setDataFiltered: PropTypes.func.isRequired,
-    setFilteredType: PropTypes.func.isRequired,
-    filterType: PropTypes.string.isRequired,
+    filterKey: PropTypes.string.isRequired,
+    onFilterChange: PropTypes.func.isRequired,
 };

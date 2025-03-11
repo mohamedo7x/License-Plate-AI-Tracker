@@ -16,6 +16,8 @@
     --gray-color-3: #e9ecef;
     --black-color-2: #383838;
 
+    --white-opacity-color: rgba(255, 255, 255, 0.75);
+
 }
 
 html[lang="en"] *,
@@ -74,5 +76,37 @@ body{
 .list_top{
 
     top: calc(100% + 0.625rem);
+
+}
+
+.hidden_scroll{
+
+    &::-webkit-scrollbar{
+
+        display: none;
+
+    }
+
+}
+
+/* ====== responsive-style ====== */
+
+@media only screen and (max-width: 1120px){
+
+    .dashboard_width{
+
+        width: calc(100% - 7rem);
+
+    }
+
+}
+
+@media only screen and (max-width: 940px){
+
+    .dashboard_width{
+
+        width: 100%;
+
+    }
 
 }

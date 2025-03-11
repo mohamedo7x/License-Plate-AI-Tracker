@@ -5,6 +5,8 @@ import Home from './Pages/Home/Home';
 import Officers from './Pages/Officers/Officers';
 import VehicleM from './Pages/Vehicle-Management/VehicleM';
 import { useTranslation } from 'react-i18next';
+import Login from './Authentication/Login';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const routes = createBrowserRouter([
 
@@ -14,13 +16,16 @@ const routes = createBrowserRouter([
         {path: '/officers', element: <Officers />},
         {path: '/V-Management', element: <VehicleM />},
 
-    ]}
+    ]},
+
+    {path: '/login', element: <Login />}
 
 ]);
 
 export default function App() {
 
     const {i18n} = useTranslation();
+    const queryClient = new QueryClient();
 
     // ====== save-language ====== //
 
@@ -39,7 +44,9 @@ export default function App() {
 
     return <React.Fragment>
 
-        <RouterProvider router={routes} />
+        <QueryClientProvider client={queryClient}>
+            <RouterProvider router={routes} />
+        </QueryClientProvider>
 
     </React.Fragment>
 

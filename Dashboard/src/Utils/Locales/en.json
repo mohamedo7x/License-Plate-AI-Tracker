@@ -59,6 +59,12 @@
     "sepMonth": "Sep",
     "octMonth": "Oct",
     "novMonth": "Nov",
-    "decMonth": "Dec"
+    "decMonth": "Dec",
+
+    "addOfficerWord": "Add Officer",
+    "addVehicleWord": "Add Vehicle",
+    "errorTableMsg": "Error on fetching data",
+    "officersMatchedError": "No Officers matched",
+    "vehiclesMatchedError": "No vehicles matched"
 
 }

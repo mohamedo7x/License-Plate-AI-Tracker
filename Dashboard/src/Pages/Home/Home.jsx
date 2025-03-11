@@ -13,6 +13,11 @@ import {
     LineElement,
 } from "chart.js";
 import { useTranslation } from 'react-i18next';
+import { Axios, getAllHomeData } from '../../API/API';
+import { useQuery } from '@tanstack/react-query';
+import StatisticLoading from './StatisticLoading';
+import ChartsLoading from './ChartsLoading';
+import StatisticError from './StatisticError';
 
 ChartJS.register(
     CategoryScale,
@@ -30,15 +35,26 @@ export default function Home() {
 
     const {t, i18n} = useTranslation();
 
+    // ====== get-all-home-data ====== //
+
+    const getApiData = async() => {
+        const {data} = await Axios.get(getAllHomeData);
+        return data
+    }
+
+    const { data, error, isLoading } = useQuery({queryKey: ["getAllHomeData"], queryFn: getApiData});
+
+    console.log(data);
+
     // ====== statistics-data ====== //
 
-    const statisticsData = [
+    // const statisticsData = [
 
-        {id: 1, title: 'totalViolationsWord', rate: 12.5, rateUp: true, num: 2547},
-        {id: 2, title: 'detectedViolationsWord', rate: 8.2, rateUp: true, num: 1923},
-        {id: 3, title: 'underInvestigationWord', rate: 3.1, rateUp: false, num: 624}
+    //     {id: 1, title: 'totalViolationsWord', rate: 12.5, rateUp: true, num: 2547},
+    //     {id: 2, title: 'detectedViolationsWord', rate: 8.2, rateUp: true, num: 1923},
+    //     {id: 3, title: 'underInvestigationWord', rate: 3.1, rateUp: false, num: 624}
 
-    ];
+    // ];
 
     // ====== charts-data ====== //
 
@@ -48,7 +64,7 @@ export default function Home() {
 
         datasets: [
             {
-                data: [70, 30],
+                data: data?.pieData,
                 backgroundColor: ["#305FA2", "#dee2e6"],
             },
         ],
@@ -62,12 +78,12 @@ export default function Home() {
         datasets: [
             {
                 label: t("correctReportsWord"),
-                data: [80, 60, 75, 85, 90, 70],
+                data: data?.barData.correct,
                 backgroundColor: "#305FA2",
             },
             {
                 label: t("falseReportsWord"),
-                data: [20, 40, 25, 15, 10, 30],
+                data: data?.barData.false,
                 backgroundColor: "#dee2e6",
             },
         ],
@@ -81,7 +97,7 @@ export default function Home() {
         datasets: [
             {
                 label: t("violationsWord"),
-                data: [50, 60, 80, 90, 70, 60],
+                data: data?.lineData,
                 borderColor: "#305FA2",
                 backgroundColor: "rgba(65, 105, 225, 0.2)",
                 fill: true,
@@ -97,11 +113,15 @@ export default function Home() {
 
     return <React.Fragment>
 
-        <section className='w-full flex flex-col gap-5'>
+        <section className={`w-full ${error ? 'h-full' : ''} flex flex-col gap-5`}>
 
-            <div className='w-full grid grid-cols-3 gap-5'>
+            {!isLoading && error && <StatisticError />}
 
-                {statisticsData.map(sta => <div key={sta.id} className='
+            {!error && <div className='w-full grid grid-cols-3 gap-5 max-[880px]:grid-cols-2 max-[610px]:grid-cols-1'>
+
+                {isLoading && Array.from({length: 3}).map((_, idx) => <StatisticLoading key={idx} />)}
+
+                {data?.statisticsData.map(sta => <div key={sta.id} className='
                     p-5 rounded-md bg-[var(--white-color)] shadow-[0_0px_10px_var(--gray-color-3)]
                     flex flex-col gap-2.5
                 '>
@@ -122,27 +142,31 @@ export default function Home() {
 
                 </div>)}
 
-            </div>
+            </div>}
 
-            <div className='w-full grid grid-cols-2 gap-5'>
+            {!error &&<div className='w-full grid grid-cols-2 gap-5 max-[770px]:grid-cols-1'>
 
                 <div className='
-                    p-5 rounded-md bg-[var(--white-color)] shadow-[0_0px_10px_var(--gray-color-3)]
-                    flex flex-col gap-2.5
+                    relative p-5 rounded-md bg-[var(--white-color)] shadow-[0_0px_10px_var(--gray-color-3)]
+                    flex flex-col gap-2.5 overflow-hidden
                 '>
+
+                    {isLoading && <ChartsLoading />}
 
                     <h3 className="text-3xl font-medium mb-2">{t('violationsDistributionWord')}</h3>
 
-                    <div className='max-h-80 m-auto'>
+                    <div className='max-h-80 m-auto flex items-center justify-center max-[770px]:h-fit  max-[770px]:w-full'>
                         <Pie data={pieData} />
                     </div>
 
                 </div>
 
                 <div className='
-                    p-5 rounded-md bg-[var(--white-color)] shadow-[0_0px_10px_var(--gray-color-3)]
-                    flex flex-col gap-2.5
+                    relative p-5 rounded-md bg-[var(--white-color)] shadow-[0_0px_10px_var(--gray-color-3)]
+                    flex flex-col gap-2.5 overflow-hidden
                 '>
+
+                    {isLoading && <ChartsLoading />}
 
                     <h3 className="text-3xl font-medium mb-2">{t('reportAccuracyWord')}</h3>
 
@@ -153,9 +177,11 @@ export default function Home() {
                 </div>
 
                 <div className='
-                    p-5 rounded-md bg-[var(--white-color)] shadow-[0_0px_10px_var(--gray-color-3)]
-                    flex flex-col gap-2.5 col-span-2
+                    relative p-5 rounded-md bg-[var(--white-color)] shadow-[0_0px_10px_var(--gray-color-3)]
+                    flex flex-col gap-2.5 col-span-2 max-[770px]:col-span-1 overflow-hidden
                 '>
+
+                    {isLoading && <ChartsLoading />}
 
                     <h3 className="text-3xl font-medium mb-2">{t('violationTrendsWord')}</h3>
 
@@ -165,7 +191,7 @@ export default function Home() {
 
                 </div>
 
-            </div>
+            </div>}
 
         </section>
 

@@ -32,7 +32,7 @@
     "allRanksWord": "جميع الرتب",
 
     "totalViolationsWord": "إجمالي المخالفات",
-    "detectedViolationsWord": "المخالفات المكتشفة",
+    "detectedViolationsWord": "المخالفات المضبوطة",
     "underInvestigationWord": "قيد التحقيق",
     "lastDaysWord": "آخر 30 يومًا",
 
@@ -59,6 +59,12 @@
     "sepMonth": "سبتمبر",
     "octMonth": "أكتوبر",
     "novMonth": "نوفمبر",
-    "decMonth": "ديسمبر"
+    "decMonth": "ديسمبر",
+
+    "addOfficerWord": "إضافة ضابط",
+    "addVehicleWord": "إضافة مركبة",
+    "errorTableMsg": "خطأ في جلب البيانات",
+    "officersMatchedError": "لم يتم العثور على أي ضباط",
+    "vehiclesMatchedError": "لم يتم العثور على أي مركبات"
 
 }
