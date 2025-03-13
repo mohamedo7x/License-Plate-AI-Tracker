@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  traffic-backend_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    volumes:
+      - ./src:/usr/src/app/src
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+
+  mysql_db:
+    image: mysql:latest
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: traffic_db
+      MYSQL_USER: deuser
+      MYSQL_PASSWORD: default@2025!
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mysql_data:
+  
+#CMD : [docker-compose -f docker-compose.yml up --build -d] 
