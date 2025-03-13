@@ -1,77 +1,100 @@
 <p align="center">
-  <a target="blank"><img src="https://raw.githubusercontent.com/mohamedo7x/Traffic/refs/heads/front-end/Dashboard/src/assets/Images/mini-logo.png?token=GHSAT0AAAAAADAF7SWPQM4RIFJ75JMMPKACZ6TFZAQ" width="120" alt="Nest Logo" /></a>
+  <a target="blank">
+    <img src="./mini-logo.png" width="120" alt="PR" />
+  </a>
 </p>
-<h3 align="center">Backend License Plate AI Tracker📷</h3>
+<h3 align="center">Backend License Plate AI Tracker 📷</h3>
 
-# Running a Container with Dummy Data
+# Running the Project with Docker 
 
-This guide explains how to start a Docker container with dummy data for testing or development purposes.
+##  Prerequisites
+Before starting the project, ensure you have the following installed:
+- [Docker ](https://www.docker.com/get-started)
 
-## Prerequisites
+---
 
-- [Docker](https://docs.docker.com/get-docker/) installed on your machine.
-- A sample Docker image (e.g., MySQL, PostgreSQL, MongoDB, or a custom application).
+## Running the Project in Development Mode 
 
-## Steps to Start a Container with Dummy Data
+Follow these steps to set up the development environment:
 
-### 1. Pull the Required Docker Image
+1. **Clone the Repository** 🔽  
+   Download the project to your device:
+   ```sh
+   git clone https://github.com/mohamedo7x/Traffic.git
+   ```
 
-Before starting, ensure you have the necessary Docker image:
+2. **Navigate to the Project Directory** 📂  
+   Change into the project folder:
+   ```sh
+   cd Traffic
+   ```
 
+3. **Build and Start the Containers** 
+
+   Build the images and run the containers:
+   ```sh
+   docker-compose -f docker-compose.yml up --build -d
+   ```
+
+4. **Access the Application** 🌐  
+   - **Backend Server:** [http://localhost:8080](http://localhost:8080)  
+   - **MySQL Database:** Accessible on port `3307`
+
+5. **Stopping the Containers** 🛑  
+   When you need to stop the services:
+   ```sh
+   docker-compose -f docker-compose.yml down
+   ```
+
+---
+
+## Running the Project in Production Mode 
+
+For a production-ready setup, use these steps:
+
+1. **Navigate to the Project Directory** 📂  
+   ```sh
+   cd /path/to/project
+   ```
+
+2. **Build and Start the Containers**   
+   Use the production configuration:
+   ```sh
+   docker-compose -f docker-compose.prod.yml up --build -d
+   ```
+
+3. **Access the Production Application** 🌐  
+   - **Production Server:** [http://localhost:3001](http://localhost:3001)  
+   - **MySQL Database:** Accessible on port `3307`
+
+4. **Stopping the Containers** 🛑  
+   Stop the production services when needed:
+   ```sh
+   docker-compose -f docker-compose.prod.yml down
+   ```
+
+---
+
+## ⚠️ Important Notes
+
+- **Environment:**  
+  - Development mode runs with `NODE_ENV=development` on port `8080`.  
+  - Production mode runs with `NODE_ENV=production` on port `3001`.
+
+- **Configuration:**  
+  Make sure your `.env` file (if applicable) is set up correctly before starting the services.
+
+- **Database Credentials:**  
+  The credentials are pre-configured in the respective `docker-compose` files.
+
+---
+
+##  Checking Logs
+
+To view logs for the backend service, run:
 ```sh
-# Example: Pull a MySQL image
-docker pull mysql:latest
+docker logs -f <container_id>
 ```
-
-### 2. Create a Dummy Data Script
-
-For databases, create an SQL file with dummy data. Example (`dummy_data.sql`):
-
-```sql
-CREATE DATABASE testdb;
-USE testdb;
-
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    email VARCHAR(50) UNIQUE NOT NULL
-);
-
-INSERT INTO users (name, email) VALUES
-    ('Alice', 'alice@example.com'),
-    ('Bob', 'bob@example.com');
-```
-
-### 3. Start the Container and Load Dummy Data
-
+Find the container ID with:
 ```sh
-# Start a MySQL container
-docker run --name mysql_container -e MYSQL_ROOT_PASSWORD=root -d mysql:latest
-
-# Copy the dummy data script into the container
-docker cp dummy_data.sql mysql_container:/dummy_data.sql
-
-# Execute the script inside the container
-docker exec -i mysql_container mysql -uroot -proot < dummy_data.sql
-```
-
-### 4. Verify the Data
-
-You can verify the inserted data by connecting to the database:
-
-```sh
-docker exec -it mysql_container mysql -uroot -proot -e "SELECT * FROM testdb.users;"
-```
-
-### 5. Stop and Remove the Container
-
-When done, clean up by stopping and removing the container:
-
-```sh
-docker stop mysql_container
-docker rm mysql_container
-```
-
-## Conclusion
-
-Now, you have a running container populated with dummy data. You can use this setup for testing and development. Adjust the data as needed for your use case!
+docker ps
