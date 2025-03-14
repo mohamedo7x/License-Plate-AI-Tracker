@@ -10,8 +10,16 @@ services:
     environment:
       - PORT=3000
       - NODE_ENV=development
+      - MYSQL_HOST=mysql_db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=deuser
+      - MYSQL_PASSWORD=default@2025!
+      - MYSQL_DBNAME=traffic_db
     volumes:
       - ./src:/usr/src/app/src
+      - ./package.json:/usr/src/app/package.json
+      - ./package-lock.json:/usr/src/app/package-lock.json 
+      # - ./node_modules:/usr/src/app/node_modules  Dont Prefare to enable 
     depends_on:
       mysql_db:
         condition: service_healthy
