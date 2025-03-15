@@ -18,10 +18,12 @@ services:
     volumes:
       - ./src:/usr/src/app/src
       - ./package.json:/usr/src/app/package.json
-      - ./package-lock.json:/usr/src/app/package-lock.json 
+      # - ./package-lock.json:/usr/src/app/package-lock.json 
       # - ./node_modules:/usr/src/app/node_modules  Dont Prefare to enable 
     depends_on:
       mysql_db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
   mysql_db:
     image: mysql:latest
@@ -39,8 +41,20 @@ services:
       interval: 10s
       retries: 5
       start_period: 30s
-
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - redis_data:/data
 volumes:
   mysql_data:
+  redis_data:
 
 #CMD : [docker-compose -f docker-compose.yml up --build -d] 

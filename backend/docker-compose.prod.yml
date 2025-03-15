@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   traffic-backend_prod:
+    image: mohamedo2003/backend_traffic
     build:
       context: .
       dockerfile: Dockerfile.prod
@@ -10,10 +11,17 @@ services:
     environment:
       - PORT=3001
       - NODE_ENV=production
+      - MYSQL_HOST=mysql_db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=deuser
+      - MYSQL_PASSWORD=default@2025!
+      - MYSQL_DBNAME=traffic_db
     volumes:
       - ./src:/usr/src/app/src
     depends_on:
       mysql_db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   mysql_db:
@@ -33,7 +41,21 @@ services:
       retries: 5
       start_period: 30s
 
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - redis_data:/data
+
 volumes:
   mysql_data:
-  
-#CMD : [docker-compose -f docker-compose.yml up --build -d] 
+  redis_data:
+
+# Start with: docker-compose -f docker-compose.prod.yml up --build -d

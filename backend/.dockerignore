@@ -4,4 +4,6 @@ test
 .git
 .prettierrc
 Dockerfile
+Dockerfile.prod
 README.md
+.png
