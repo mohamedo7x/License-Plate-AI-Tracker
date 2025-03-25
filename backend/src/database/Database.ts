@@ -40,4 +40,18 @@ class Database {
   }
 }
 
+// export default Database
+
+const databaseInstance = Database.getInstance()
+
+const StartConnectionToDb = async () => {
+  await databaseInstance.connect()
+}
+
+const getConnection = async (): Promise<Connection> => {
+  return databaseInstance.getConnection()
+}
+
+export { StartConnectionToDb, getConnection }
+
 export default Database
