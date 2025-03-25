@@ -1,5 +1,22 @@
+-- Active: 1742868206282@@127.0.0.1@3306@traffic_db
+/*
+
+
+   _____ _____.___. _________________  .____      __________                   __               __   
+  /     \\__  |   |/   _____/\_____  \ |    |     \______   \_______  ____    |__| ____   _____/  |_ 
+ /  \ /  \/   |   |\_____  \  /  / \  \|    |      |     ___/\_  __ \/  _ \   |  |/ __ \_/ ___\   __\
+/    Y    \____   |/        \/   \_/.  \    |___   |    |     |  | \(  <_> )  |  \  ___/\  \___|  |  
+\____|__  / ______/_______  /\_____\ \_/_______ \  |____|     |__|   \____/\__|  |\___  >\___  >__|  
+        \/\/              \/        \__>       \/                         \______|    \/     \/      
+
+
+  Built with Passion by mohamedo7x
+  Database : 
+  Created on: 2025-02-13
+*/
+
 CREATE TABLE `Users` (
-  `id` VARCHAR(255) PRIMARY KEY,
+  `id` INT PRIMARY KEY,
   `name` VARCHAR(100) NOT NULL,
   `last_login` TIMESTAMP DEFAULT null,
   `active` BOOL,
@@ -7,6 +24,7 @@ CREATE TABLE `Users` (
   `password_hash` VARCHAR(255) NOT NULL,
   `role_id` INT NOT NULL,
   `phone_number` VARCHAR(50),
+  `img_profile` VARCHAR(255),
   `created_at` TIMESTAMP DEFAULT (now()),
   `updated_at` TIMESTAMP DEFAULT (now())
 );
@@ -34,6 +52,7 @@ CREATE TABLE `DriverVehicles` (
 CREATE TABLE `Drivers` (
   `id` INT PRIMARY KEY,
   `name` VARCHAR(100) NOT NULL,
+  `profile_img` VARCHAR(255),
   `dob` DATE NOT NULL,
   `issued_date` DATE NOT NULL,
   `expiry_date` DATE NOT NULL COMMENT 'Must be after issued_date',
@@ -120,7 +139,7 @@ CREATE TABLE `admin_users` (
   `email` VARCHAR(150) UNIQUE NOT NULL,
   `password_hash` VARCHAR(255) NOT NULL,
   `role` VARCHAR(255),
-  `status` ENUM(active,inactive,suspended) NOT NULL DEFAULT 'active',
+  `status` VARCHAR(255),
   `last_login` TIMESTAMP DEFAULT null,
   `created_at` TIMESTAMP DEFAULT (now()),
   `updated_at` TIMESTAMP

@@ -6,23 +6,23 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:3000"
+      - "8080:8080"
     environment:
-      - PORT=3000
+      - PORT=8080
       - NODE_ENV=development
       - MYSQL_HOST=mysql_db
       - MYSQL_PORT=3306
       - MYSQL_USER=deuser
       - MYSQL_PASSWORD=default@2025!
       - MYSQL_DBNAME=traffic_db
-    volumes:
-      - ./src:/usr/src/app/src
-      - ./package.json:/usr/src/app/package.json
-      - ./package-lock.json:/usr/src/app/package-lock.json 
-      # - ./node_modules:/usr/src/app/node_modules  Dont Prefare to enable 
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       mysql_db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+
   mysql_db:
     image: mysql:latest
     ports:
@@ -40,7 +40,21 @@ services:
       retries: 5
       start_period: 30s
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+
 volumes:
   mysql_data:
+  redis_data:
 
-#CMD : [docker-compose -f docker-compose.yml up --build -d] 
+# Start the services with:
+# docker-compose -f docker-compose.yml up --build -d
