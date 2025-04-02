@@ -1,10 +1,7 @@
 import express, { Response } from 'express'
 import errorHandler from 'errorhandler'
 import dotenv from 'dotenv'
-import {
-  getConnection,
-  StartConnectionToDb,
-} from './database/Database'
+import { getConnection, StartConnectionToDb } from './database/Database'
 import mainRoute from './routes/index'
 import cors from 'cors'
 import path from 'path'
