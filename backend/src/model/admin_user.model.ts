@@ -3,6 +3,7 @@ export interface AdminUser {
   name: string
   img_profile?: string // insert it to DB
   email: string
+  password?: string
   password_hash: string
   role?: string | null
   status?: string | null

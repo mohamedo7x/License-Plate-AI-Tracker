@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateLoginBody = exports.validateAdminId = exports.validateUpdateAdminBody = exports.validateCreateAdminBody = exports.validateAdminToken = void 0;
+exports.adminAuth = exports.validateLoginBody = exports.validateAdminId = exports.validateUpdateAdminBody = exports.validateCreateAdminBody = exports.validateAdminToken = void 0;
 const auth_access_1 = require("../auth/auth.access");
-const auth_access_2 = require("../auth/auth.access");
+const admin_access_1 = require("../auth/admin.access");
 const validateAdminToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (0, auth_access_1.extractJWTToken)(req);
@@ -24,8 +24,9 @@ const validateAdminToken = (req, res, next) => __awaiter(void 0, void 0, void 0,
             res.status(401).json({ error: 'Invalid token format' });
             return;
         }
-        const isUserAdmin = yield (0, auth_access_2.isAdmin)(decoded.id);
-        if (!isUserAdmin) {
+        const isUserAdmin = yield (0, admin_access_1.isAdmin)(decoded.id);
+        const isUserSuperAdmin = yield (0, admin_access_1.isSuperAdmin)(decoded.id);
+        if (!isUserAdmin && !isUserSuperAdmin) {
             res
                 .status(403)
                 .json({ error: 'Access denied. Admin privileges required.' });
@@ -82,7 +83,7 @@ const validateCreateAdminBody = (req, res, next) => {
             .json({ error: 'Email extension must be at least 2 characters' });
         return;
     }
-    if (typeof password_hash !== 'string' || password_hash.length < 60) {
+    if (typeof password_hash !== 'string' || password_hash.length < 6) {
         res.status(400).json({ error: 'Invalid password hash format' });
         return;
     }
@@ -195,9 +196,35 @@ const validateLoginBody = (req, res, next) => {
         return;
     }
     if (typeof password !== 'string' || password.length < 6) {
-        res.status(400).json({ error: 'Password must be at least 6 characters long' });
+        res
+            .status(400)
+            .json({ error: 'Password must be at least 6 characters long' });
         return;
     }
     next();
 };
 exports.validateLoginBody = validateLoginBody;
+const adminAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const token = (0, admin_access_1.extractAdminJWTToken)(req);
+        if (!token) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+        const decoded = (0, admin_access_1.validateAdminJWTToken)(token);
+        if (!decoded) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+        const isUserAdmin = yield (0, admin_access_1.isAdmin)(decoded.id);
+        if (!isUserAdmin) {
+            return res.status(403).json({ error: 'User is not an admin' });
+        }
+        // Add admin info to request
+        req.admin = decoded;
+        next();
+    }
+    catch (error) {
+        console.error('Admin auth error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+exports.adminAuth = adminAuth;

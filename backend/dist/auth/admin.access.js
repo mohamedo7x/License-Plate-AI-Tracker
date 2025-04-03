@@ -12,39 +12,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isUserExist = isUserExist;
-exports.extractJWTToken = extractJWTToken;
-exports.validateJWTToken = validateJWTToken;
-exports.checkUserPrivilege = checkUserPrivilege;
+exports.isAdminExist = isAdminExist;
+exports.extractAdminJWTToken = extractAdminJWTToken;
+exports.validateAdminJWTToken = validateAdminJWTToken;
+exports.checkAdminPrivilege = checkAdminPrivilege;
+exports.isSuperAdmin = isSuperAdmin;
 exports.isAdmin = isAdmin;
-exports.isModerator = isModerator;
-exports.isUser = isUser;
-exports.generateJWTToken = generateJWTToken;
+exports.generateAdminJWTToken = generateAdminJWTToken;
 const query_util_1 = require("../utils/query.util");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const JWT_SECRET = process.env.JWT_SECRET || '';
-function isUserExist(username) {
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const JWT_SECRET = process.env.JWT_SECRET || "";
+console.log(JWT_SECRET);
+function isAdminExist(email) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const result = yield (0, query_util_1.executeSingleQuery)('SELECT * FROM users WHERE username = ?', [username]);
+            const result = yield (0, query_util_1.executeSingleQuery)('SELECT * FROM admin_users WHERE email = ?', [email]);
             return result.success && result.data && result.data.length > 0
                 ? result.data[0]
                 : false;
         }
         catch (error) {
-            console.error('Error checking user existence:', error);
+            console.error('Error checking admin existence:', error);
             return false;
         }
     });
 }
-function extractJWTToken(req) {
+function extractAdminJWTToken(req) {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return null;
     }
     return authHeader.split(' ')[1];
 }
-function validateJWTToken(token) {
+function validateAdminJWTToken(token) {
     try {
         return jsonwebtoken_1.default.verify(token, JWT_SECRET);
     }
@@ -52,40 +54,35 @@ function validateJWTToken(token) {
         return null;
     }
 }
-function checkUserPrivilege(userId, requiredRoleId) {
+function checkAdminPrivilege(adminId, requiredRole) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const result = yield (0, query_util_1.executeSingleQuery)('SELECT role_id FROM users WHERE id = ?', [userId]);
+            const result = yield (0, query_util_1.executeSingleQuery)('SELECT role FROM admin_users WHERE id = ?', [adminId]);
             if (!result.success || !result.data || result.data.length === 0)
                 return false;
-            const userRoleId = result.data[0].role_id;
-            return userRoleId === requiredRoleId;
+            const adminRole = result.data[0].role;
+            return adminRole === requiredRole;
         }
         catch (error) {
-            console.error('Error checking user privilege:', error);
+            console.error('Error checking admin privilege:', error);
             return false;
         }
     });
 }
-function isAdmin(userId) {
+function isSuperAdmin(adminId) {
     return __awaiter(this, void 0, void 0, function* () {
-        return checkUserPrivilege(userId, 1);
+        return checkAdminPrivilege(adminId, 'superadmin');
     });
 }
-function isModerator(userId) {
+function isAdmin(adminId) {
     return __awaiter(this, void 0, void 0, function* () {
-        return checkUserPrivilege(userId, 2);
+        return checkAdminPrivilege(adminId, 'admin');
     });
 }
-function isUser(userId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return checkUserPrivilege(userId, 3);
-    });
-}
-function generateJWTToken(user) {
+function generateAdminJWTToken(admin) {
     return jsonwebtoken_1.default.sign({
-        id: user.id,
-        username: user.username,
-        role_id: user.role_id,
+        id: admin.id,
+        email: admin.email,
+        role: admin.role,
     }, JWT_SECRET, { expiresIn: '24h' });
 }
