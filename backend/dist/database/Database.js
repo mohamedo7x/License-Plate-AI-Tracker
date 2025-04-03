@@ -49,7 +49,6 @@ class Database {
         return this.connection;
     }
 }
-// export default Database
 const databaseInstance = Database.getInstance();
 const StartConnectionToDb = () => __awaiter(void 0, void 0, void 0, function* () {
     yield databaseInstance.connect();

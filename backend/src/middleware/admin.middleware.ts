@@ -1,18 +1,22 @@
 import { Request, Response, NextFunction } from 'express'
 import { extractJWTToken, validateJWTToken } from '../auth/auth.access'
-import { isAdmin } from '../auth/auth.access'
-
+import {
+  isAdmin,
+  isSuperAdmin,
+  extractAdminJWTToken,
+  validateAdminJWTToken,
+} from '../auth/admin.access'
 
 interface JWTDecoded {
-  id: number;
-  username: string;
-  role_id: number;
+  id: number
+  username: string
+  role_id: number
 }
 
 interface ResponseWithUser extends Response {
   locals: {
-    user?: JWTDecoded;
-  };
+    user?: JWTDecoded
+  }
 }
 
 export const validateAdminToken = async (
@@ -33,8 +37,9 @@ export const validateAdminToken = async (
       return
     }
 
-    const isUserAdmin = await isAdmin(decoded.id)
-    if (!isUserAdmin) {
+    const isUserAdmin = await isAdmin(decoded.id);
+    const isUserSuperAdmin = await isSuperAdmin(decoded.id);
+    if (!isUserAdmin && !isUserSuperAdmin) {
       res
         .status(403)
         .json({ error: 'Access denied. Admin privileges required.' })
@@ -106,8 +111,7 @@ export const validateCreateAdminBody = (
     return
   }
 
-
-  if (typeof password_hash !== 'string' || password_hash.length < 60) {
+  if (typeof password_hash !== 'string' || password_hash.length < 6) {
     res.status(400).json({ error: 'Invalid password hash format' })
     return
   }
@@ -130,12 +134,10 @@ export const validateUpdateAdminBody = (
     return
   }
 
-
   if (name && (typeof name !== 'string' || name.trim().length < 2)) {
     res.status(400).json({ error: 'Name must be at least 2 characters long' })
     return
   }
-
 
   if (email) {
     if (!email.includes('@')) {
@@ -176,7 +178,6 @@ export const validateUpdateAdminBody = (
       return
     }
   }
-
 
   if (status && !['active', 'inactive'].includes(status)) {
     res.status(400).json({
@@ -221,7 +222,6 @@ export const validateLoginBody = (
     return
   }
 
-
   if (!email.includes('@')) {
     res.status(400).json({ error: 'Email must contain @ symbol' })
     return
@@ -261,9 +261,54 @@ export const validateLoginBody = (
   }
 
   if (typeof password !== 'string' || password.length < 6) {
-    res.status(400).json({ error: 'Password must be at least 6 characters long' })
+    res
+      .status(400)
+      .json({ error: 'Password must be at least 6 characters long' })
     return
   }
 
   next()
+}
+
+export const adminAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const token = extractAdminJWTToken(req)
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' })
+    }
+
+    const decoded = validateAdminJWTToken(token)
+    if (!decoded) {
+      return res.status(401).json({ error: 'Invalid token' })
+    }
+
+    const isUserAdmin = await isAdmin(decoded.id)
+    if (!isUserAdmin) {
+      return res.status(403).json({ error: 'User is not an admin' })
+    }
+
+    // Add admin info to request
+    req.admin = decoded
+    next()
+  } catch (error) {
+    console.error('Admin auth error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
+// Extend Express Request type to include admin
+declare global {
+  namespace Express {
+    interface Request {
+      admin?: {
+        id: number
+        email: string
+        role: string
+      }
+    }
+  }
 }

@@ -5,14 +5,14 @@ import {
   getAllAdmins,
   updateAdmin,
   deleteAdmin,
-  loginAdmin
+  loginAdmin,
 } from '../controller/admin.controller'
 import {
   validateAdminToken,
   validateCreateAdminBody,
   validateUpdateAdminBody,
   validateAdminId,
-  validateLoginBody
+  validateLoginBody,
 } from '../middleware/admin.middleware'
 
 const router = Router()

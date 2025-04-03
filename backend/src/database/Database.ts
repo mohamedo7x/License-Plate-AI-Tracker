@@ -40,8 +40,6 @@ class Database {
   }
 }
 
-// export default Database
-
 const databaseInstance = Database.getInstance()
 
 const StartConnectionToDb = async () => {
