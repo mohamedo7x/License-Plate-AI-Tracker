@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginAdmin = exports.deleteAdmin = exports.updateAdmin = exports.getAllAdmins = exports.getAdmin = exports.createAdmin = void 0;
+exports.createUser = exports.loginAdmin = exports.deleteAdmin = exports.updateAdmin = exports.getAllAdmins = exports.getAdmin = exports.createAdmin = void 0;
 const asyncHandler_1 = __importDefault(require("../middleware/asyncHandler"));
-const query_util_1 = require("../utils/query.util");
+const orm_util_1 = require("../utils/orm.util");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const admin_access_1 = require("../auth/admin.access");
 const createAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -31,7 +31,7 @@ const createAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, 
         'active',
         new Date(),
     ];
-    const result = yield (0, query_util_1.executeNonQuery)(query, values);
+    const result = yield (0, orm_util_1.executeNonQuery)(query, values);
     if (result.success) {
         res.status(201).json({
             message: 'Admin created successfully',
@@ -45,7 +45,7 @@ const createAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, 
 exports.createAdmin = createAdmin;
 const getAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield (0, query_util_1.executeSingleQuery)('SELECT * FROM admin_users WHERE id = ?', [id]);
+    const result = yield (0, orm_util_1.executeSingleQuery)('SELECT * FROM admin_users WHERE id = ?', [id]);
     if (result.success && result.data && result.data.length > 0) {
         res.json(result.data[0]);
     }
@@ -58,21 +58,23 @@ const getAllAdmins = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0,
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const countResult = yield (0, query_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM admin_users');
-    // Get paginated data
-    const result = yield (0, query_util_1.executeQuery)(`SELECT id, name, email, role, status, img_profile, last_login, created_at, updated_at 
+    const countResult = yield (0, orm_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM admin_users');
+    const result = yield (0, orm_util_1.executeQuery)(`SELECT id, name, email, role, status, img_profile, last_login, created_at, updated_at 
      FROM admin_users 
      ORDER BY created_at  
      LIMIT ? OFFSET ?`, [limit, offset]);
-    if (result.success && result.data && countResult.success && countResult.data) {
+    if (result.success &&
+        result.data &&
+        countResult.success &&
+        countResult.data) {
         res.json({
             data: result.data,
             pagination: {
                 total: countResult.data[0].total,
                 page,
                 limit,
-                totalPages: Math.ceil(countResult.data[0].total / limit)
-            }
+                totalPages: Math.ceil(countResult.data[0].total / limit),
+            },
         });
     }
     else {
@@ -111,7 +113,7 @@ const updateAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, 
     const query = `UPDATE admin_users 
                  SET ${updates.join(', ')}
                  WHERE id = ?`;
-    const result = yield (0, query_util_1.executeNonQuery)(query, values);
+    const result = yield (0, orm_util_1.executeNonQuery)(query, values);
     if (result.success) {
         res.json({
             message: 'Admin updated successfully',
@@ -125,7 +127,7 @@ const updateAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, 
 exports.updateAdmin = updateAdmin;
 const deleteAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield (0, query_util_1.executeNonQuery)('DELETE FROM admin_users WHERE id = ?', [
+    const result = yield (0, orm_util_1.executeNonQuery)('DELETE FROM admin_users WHERE id = ?', [
         id,
     ]);
     if (result.success) {
@@ -141,7 +143,7 @@ const deleteAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, 
 exports.deleteAdmin = deleteAdmin;
 const loginAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
-    const result = yield (0, query_util_1.executeSingleQuery)('SELECT * FROM admin_users WHERE email = ?', [email]);
+    const result = yield (0, orm_util_1.executeSingleQuery)('SELECT * FROM admin_users WHERE email = ?', [email]);
     if (!result.success || !result.data || result.data.length === 0) {
         res.status(401).json({ error: 'Invalid credentials' });
         return;
@@ -156,7 +158,7 @@ const loginAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
         res.status(401).json({ error: 'Invalid credentials' });
         return;
     }
-    yield (0, query_util_1.executeNonQuery)('UPDATE admin_users SET last_login = ? WHERE id = ?', [
+    yield (0, orm_util_1.executeNonQuery)('UPDATE admin_users SET last_login = ? WHERE id = ?', [
         new Date(),
         admin.id,
     ]);
@@ -174,3 +176,7 @@ const loginAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
     });
 }));
 exports.loginAdmin = loginAdmin;
+const createUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.status(200).json({ message: 'User created successfully' });
+}));
+exports.createUser = createUser;

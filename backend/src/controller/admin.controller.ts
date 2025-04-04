@@ -5,7 +5,7 @@ import {
   executeNonQuery,
   executeQuery,
   executeSingleQuery,
-} from '../utils/query.util'
+} from '../utils/orm.util'
 import { RowDataPacket } from 'mysql2'
 import bcrypt from 'bcrypt'
 import { generateAdminJWTToken } from '../auth/admin.access'
@@ -68,27 +68,32 @@ const getAllAdmins = asyncHandler(async (req: Request, res: Response) => {
   const offset = (page - 1) * limit
 
   const countResult = await executeSingleQuery<CountResult>(
-    'SELECT COUNT(*) as total FROM admin_users'
+    'SELECT COUNT(*) as total FROM admin_users',
   )
 
-  // Get paginated data
+
   const result = await executeQuery<AdminUserRow>(
     `SELECT id, name, email, role, status, img_profile, last_login, created_at, updated_at 
      FROM admin_users 
      ORDER BY created_at  
      LIMIT ? OFFSET ?`,
-    [limit, offset]
+    [limit, offset],
   )
 
-  if (result.success && result.data && countResult.success && countResult.data) {
+  if (
+    result.success &&
+    result.data &&
+    countResult.success &&
+    countResult.data
+  ) {
     res.json({
       data: result.data,
       pagination: {
         total: countResult.data[0].total,
         page,
         limit,
-        totalPages: Math.ceil(countResult.data[0].total / limit)
-      }
+        totalPages: Math.ceil(countResult.data[0].total / limit),
+      },
     })
   } else {
     res.status(500).json({ error: result.error || countResult.error })
@@ -207,6 +212,11 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
   })
 })
 
+
+const createUser = asyncHandler(async (req: Request, res: Response) => {
+   res.status(200).json({ message: 'User created successfully' });
+})
+
 export {
   createAdmin,
   getAdmin,
@@ -214,4 +224,5 @@ export {
   updateAdmin,
   deleteAdmin,
   loginAdmin,
+  createUser,
 }

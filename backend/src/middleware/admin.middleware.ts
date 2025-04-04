@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
-import { extractJWTToken, validateJWTToken } from '../auth/auth.access'
+import { extractJWTToken, validateJWTToken } from '../auth/user.access'
+import { isAdmin, isSuperAdmin } from '../auth/admin.access'
 import {
-  isAdmin,
-  isSuperAdmin,
-  extractAdminJWTToken,
-  validateAdminJWTToken,
-} from '../auth/admin.access'
+  UnauthorizedError,
+  ForbiddenError,
+  ValidationError,
+} from './errorHandler'
 
 interface JWTDecoded {
   id: number
@@ -27,29 +27,24 @@ export const validateAdminToken = async (
   try {
     const token = extractJWTToken(req)
     if (!token) {
-      res.status(401).json({ error: 'No token provided' })
-      return
+      throw new UnauthorizedError('No token provided')
     }
 
     const decoded = validateJWTToken(token) as JWTDecoded
     if (!decoded || !decoded.id) {
-      res.status(401).json({ error: 'Invalid token format' })
-      return
+      throw new UnauthorizedError('Invalid token format')
     }
 
-    const isUserAdmin = await isAdmin(decoded.id);
-    const isUserSuperAdmin = await isSuperAdmin(decoded.id);
+    const isUserAdmin = await isAdmin(decoded.id)
+    const isUserSuperAdmin = await isSuperAdmin(decoded.id)
     if (!isUserAdmin && !isUserSuperAdmin) {
-      res
-        .status(403)
-        .json({ error: 'Access denied. Admin privileges required.' })
-      return
+      throw new ForbiddenError('Access denied. Admin privileges required.')
     }
 
     res.locals.user = decoded
     next()
   } catch (error) {
-    res.status(401).json({ error: 'Authentication failed' })
+    next(error)
   }
 }
 
@@ -58,65 +53,57 @@ export const validateCreateAdminBody = (
   res: Response,
   next: NextFunction,
 ): void => {
-  const { name, email, password_hash } = req.body
+  try {
+    const { name, email, password_hash } = req.body
 
-  if (!name || !email || !password_hash) {
-    res.status(400).json({
-      error: 'Missing required fields',
-      required: ['name', 'email', 'password_hash'],
-    })
-    return
+    if (!name || !email || !password_hash) {
+      throw new ValidationError(
+        'Missing required fields: name, email, password_hash',
+      )
+    }
+
+    if (typeof name !== 'string' || name.trim().length < 2) {
+      throw new ValidationError('Name must be at least 2 characters long')
+    }
+
+    if (!email.includes('@')) {
+      throw new ValidationError('Email must contain @ symbol')
+    }
+
+    const [localPart, domain] = email.split('@')
+
+    if (!localPart || !domain) {
+      throw new ValidationError('Invalid email format')
+    }
+
+    if (localPart.length < 2) {
+      throw new ValidationError(
+        'Email local part must be at least 2 characters',
+      )
+    }
+
+    if (!domain.includes('.')) {
+      throw new ValidationError('Email domain must contain a dot (.)')
+    }
+
+    const [domainName, extension] = domain.split('.')
+
+    if (!domainName || !extension) {
+      throw new ValidationError('Invalid email domain format')
+    }
+
+    if (extension.length < 2) {
+      throw new ValidationError('Email extension must be at least 2 characters')
+    }
+
+    if (typeof password_hash !== 'string' || password_hash.length < 6) {
+      throw new ValidationError('Password must be at least 6 characters long')
+    }
+
+    next()
+  } catch (error) {
+    next(error)
   }
-
-  if (typeof name !== 'string' || name.trim().length < 2) {
-    res.status(400).json({ error: 'Name must be at least 2 characters long' })
-    return
-  }
-
-  if (!email.includes('@')) {
-    res.status(400).json({ error: 'Email must contain @ symbol' })
-    return
-  }
-
-  const [localPart, domain] = email.split('@')
-
-  if (!localPart || !domain) {
-    res.status(400).json({ error: 'Invalid email format' })
-    return
-  }
-
-  if (localPart.length < 2) {
-    res
-      .status(400)
-      .json({ error: 'Email local part must be at least 2 characters' })
-    return
-  }
-
-  if (!domain.includes('.')) {
-    res.status(400).json({ error: 'Email domain must contain a dot (.)' })
-    return
-  }
-
-  const [domainName, extension] = domain.split('.')
-
-  if (!domainName || !extension) {
-    res.status(400).json({ error: 'Invalid email domain format' })
-    return
-  }
-
-  if (extension.length < 2) {
-    res
-      .status(400)
-      .json({ error: 'Email extension must be at least 2 characters' })
-    return
-  }
-
-  if (typeof password_hash !== 'string' || password_hash.length < 6) {
-    res.status(400).json({ error: 'Invalid password hash format' })
-    return
-  }
-
-  next()
 }
 
 export const validateUpdateAdminBody = (
@@ -124,70 +111,61 @@ export const validateUpdateAdminBody = (
   res: Response,
   next: NextFunction,
 ): void => {
-  const { name, email, status } = req.body
+  try {
+    const { name, email, status } = req.body
 
-  if (!name && !email && !status) {
-    res.status(400).json({
-      error: 'At least one field is required for update',
-      allowed: ['name', 'email', 'status'],
-    })
-    return
+    if (!name && !email && !status) {
+      throw new ValidationError('At least one field is required for update')
+    }
+
+    if (name && (typeof name !== 'string' || name.trim().length < 2)) {
+      throw new ValidationError('Name must be at least 2 characters long')
+    }
+
+    if (email) {
+      if (!email.includes('@')) {
+        throw new ValidationError('Email must contain @ symbol')
+      }
+
+      const [localPart, domain] = email.split('@')
+
+      if (!localPart || !domain) {
+        throw new ValidationError('Invalid email format')
+      }
+
+      if (localPart.length < 2) {
+        throw new ValidationError(
+          'Email local part must be at least 2 characters',
+        )
+      }
+
+      if (!domain.includes('.')) {
+        throw new ValidationError('Email domain must contain a dot (.)')
+      }
+
+      const [domainName, extension] = domain.split('.')
+
+      if (!domainName || !extension) {
+        throw new ValidationError('Invalid email domain format')
+      }
+
+      if (extension.length < 2) {
+        throw new ValidationError(
+          'Email extension must be at least 2 characters',
+        )
+      }
+    }
+
+    if (status && !['active', 'inactive'].includes(status)) {
+      throw new ValidationError(
+        'Invalid status value. Allowed values: active, inactive',
+      )
+    }
+
+    next()
+  } catch (error) {
+    next(error)
   }
-
-  if (name && (typeof name !== 'string' || name.trim().length < 2)) {
-    res.status(400).json({ error: 'Name must be at least 2 characters long' })
-    return
-  }
-
-  if (email) {
-    if (!email.includes('@')) {
-      res.status(400).json({ error: 'Email must contain @ symbol' })
-      return
-    }
-
-    const [localPart, domain] = email.split('@')
-
-    if (!localPart || !domain) {
-      res.status(400).json({ error: 'Invalid email format' })
-      return
-    }
-
-    if (localPart.length < 2) {
-      res
-        .status(400)
-        .json({ error: 'Email local part must be at least 2 characters' })
-      return
-    }
-
-    if (!domain.includes('.')) {
-      res.status(400).json({ error: 'Email domain must contain a dot (.)' })
-      return
-    }
-
-    const [domainName, extension] = domain.split('.')
-
-    if (!domainName || !extension) {
-      res.status(400).json({ error: 'Invalid email domain format' })
-      return
-    }
-
-    if (extension.length < 2) {
-      res
-        .status(400)
-        .json({ error: 'Email extension must be at least 2 characters' })
-      return
-    }
-  }
-
-  if (status && !['active', 'inactive'].includes(status)) {
-    res.status(400).json({
-      error: 'Invalid status value',
-      allowed: ['active', 'inactive'],
-    })
-    return
-  }
-
-  next()
 }
 
 export const validateAdminId = (
@@ -195,16 +173,19 @@ export const validateAdminId = (
   res: Response,
   next: NextFunction,
 ): void => {
-  const { id } = req.params
-  const adminId = parseInt(id)
+  try {
+    const { id } = req.params
+    const adminId = parseInt(id)
 
-  if (isNaN(adminId) || adminId <= 0) {
-    res.status(400).json({ error: 'Invalid admin ID format' })
-    return
+    if (isNaN(adminId) || adminId <= 0) {
+      throw new ValidationError('Invalid admin ID format')
+    }
+
+    req.params.id = adminId.toString()
+    next()
+  } catch (error) {
+    next(error)
   }
-
-  req.params.id = adminId.toString()
-  next()
 }
 
 export const validateLoginBody = (
@@ -212,103 +193,49 @@ export const validateLoginBody = (
   res: Response,
   next: NextFunction,
 ): void => {
-  const { email, password } = req.body
-
-  if (!email || !password) {
-    res.status(400).json({
-      error: 'Missing required fields',
-      required: ['email', 'password'],
-    })
-    return
-  }
-
-  if (!email.includes('@')) {
-    res.status(400).json({ error: 'Email must contain @ symbol' })
-    return
-  }
-
-  const [localPart, domain] = email.split('@')
-
-  if (!localPart || !domain) {
-    res.status(400).json({ error: 'Invalid email format' })
-    return
-  }
-
-  if (localPart.length < 2) {
-    res
-      .status(400)
-      .json({ error: 'Email local part must be at least 2 characters' })
-    return
-  }
-
-  if (!domain.includes('.')) {
-    res.status(400).json({ error: 'Email domain must contain a dot (.)' })
-    return
-  }
-
-  const [domainName, extension] = domain.split('.')
-
-  if (!domainName || !extension) {
-    res.status(400).json({ error: 'Invalid email domain format' })
-    return
-  }
-
-  if (extension.length < 2) {
-    res
-      .status(400)
-      .json({ error: 'Email extension must be at least 2 characters' })
-    return
-  }
-
-  if (typeof password !== 'string' || password.length < 6) {
-    res
-      .status(400)
-      .json({ error: 'Password must be at least 6 characters long' })
-    return
-  }
-
-  next()
-}
-
-export const adminAuth = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
   try {
-    const token = extractAdminJWTToken(req)
-    if (!token) {
-      return res.status(401).json({ error: 'No token provided' })
+    const { email, password } = req.body
+
+    if (!email || !password) {
+      throw new ValidationError('Missing required fields: email, password')
     }
 
-    const decoded = validateAdminJWTToken(token)
-    if (!decoded) {
-      return res.status(401).json({ error: 'Invalid token' })
+    if (!email.includes('@')) {
+      throw new ValidationError('Email must contain @ symbol')
     }
 
-    const isUserAdmin = await isAdmin(decoded.id)
-    if (!isUserAdmin) {
-      return res.status(403).json({ error: 'User is not an admin' })
+    const [localPart, domain] = email.split('@')
+
+    if (!localPart || !domain) {
+      throw new ValidationError('Invalid email format')
     }
 
-    // Add admin info to request
-    req.admin = decoded
+    if (localPart.length < 2) {
+      throw new ValidationError(
+        'Email local part must be at least 2 characters',
+      )
+    }
+
+    if (!domain.includes('.')) {
+      throw new ValidationError('Email domain must contain a dot (.)')
+    }
+
+    const [domainName, extension] = domain.split('.')
+
+    if (!domainName || !extension) {
+      throw new ValidationError('Invalid email domain format')
+    }
+
+    if (extension.length < 2) {
+      throw new ValidationError('Email extension must be at least 2 characters')
+    }
+
+    if (typeof password !== 'string' || password.length < 6) {
+      throw new ValidationError('Password must be at least 6 characters long')
+    }
+
     next()
   } catch (error) {
-    console.error('Admin auth error:', error)
-    res.status(500).json({ error: 'Internal server error' })
-  }
-}
-
-// Extend Express Request type to include admin
-declare global {
-  namespace Express {
-    interface Request {
-      admin?: {
-        id: number
-        email: string
-        role: string
-      }
-    }
+    next(error)
   }
 }

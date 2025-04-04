@@ -1,14 +1,15 @@
-import { executeSingleQuery } from '../utils/query.util'
+import { executeSingleQuery } from '../utils/orm.util'
 import { AdminUser } from '../model/admin_user.model'
-import { Request } from 'express'
 import jwt from 'jsonwebtoken'
 import { RowDataPacket } from 'mysql2'
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'
+import { UnauthorizedError } from '../middleware/errorHandler'
 
-dotenv.config();
+dotenv.config()
 
-const JWT_SECRET = process.env.JWT_SECRET || "";
-console.log(JWT_SECRET);
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+console.log(JWT_SECRET)
+
 interface AdminUserRow extends AdminUser, RowDataPacket {}
 
 export async function isAdminExist(email: string): Promise<AdminUser | false> {
@@ -26,19 +27,37 @@ export async function isAdminExist(email: string): Promise<AdminUser | false> {
   }
 }
 
-export function extractAdminJWTToken(req: Request): string | null {
+export const extractAdminJWTToken = (req: any): string | null => {
   const authHeader = req.headers.authorization
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
+  if (!authHeader) {
+    throw new UnauthorizedError(
+      'Authorization header is missing. Please provide a valid token.',
+    )
   }
-  return authHeader.split(' ')[1]
+
+  const [bearer, token] = authHeader.split(' ')
+  if (bearer !== 'Bearer' || !token) {
+    throw new UnauthorizedError(
+      'Invalid authorization header format. Expected format: Bearer <token>',
+    )
+  }
+
+  return token
 }
 
-export function validateAdminJWTToken(token: string): any {
+export const validateAdminJWTToken = (token: string): any => {
   try {
     return jwt.verify(token, JWT_SECRET)
   } catch (error) {
-    return null
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new UnauthorizedError('Token has expired. Please login again.')
+    }
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw new UnauthorizedError(
+        'Invalid token. Please provide a valid authentication token.',
+      )
+    }
+    throw new UnauthorizedError('Failed to verify token. Please try again.')
   }
 }
 
