@@ -42,4 +42,10 @@ router
  * @access  Private (Super Admin only)
  */
 router.route('/:id').delete(admin_middleware_1.validateAdminToken, admin_middleware_1.validateAdminId, admin_controller_1.deleteAdmin);
+/**
+ * @route   POST /api/admin/user
+ * @desc    Create a new user
+ * @access  Private (Super Admin only)
+ */
+router.route('/create-user').post(admin_middleware_1.validateAdminToken, admin_controller_1.createUser);
 exports.default = router;

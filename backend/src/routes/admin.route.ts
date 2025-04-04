@@ -6,6 +6,7 @@ import {
   updateAdmin,
   deleteAdmin,
   loginAdmin,
+  createUser,
 } from '../controller/admin.controller'
 import {
   validateAdminToken,
@@ -65,5 +66,15 @@ router
  * @access  Private (Super Admin only)
  */
 router.route('/:id').delete(validateAdminToken, validateAdminId, deleteAdmin)
+
+
+/**
+ * @route   POST /api/admin/user
+ * @desc    Create a new user
+ * @access  Private (Super Admin only)
+ */
+router.route('/create-user').post(validateAdminToken, createUser);
+
+
 
 export default router
