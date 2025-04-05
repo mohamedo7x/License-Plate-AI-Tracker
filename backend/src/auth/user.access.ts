@@ -1,6 +1,5 @@
 import { executeSingleQuery } from '../utils/orm.util'
 import { User } from '../model/user.model'
-import { Request } from 'express'
 import jwt from 'jsonwebtoken'
 import { UnauthorizedError, ForbiddenError } from '../middleware/errorHandler'
 import { RowDataPacket } from 'mysql2'
@@ -12,10 +11,10 @@ interface UserRow extends RowDataPacket {
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
-export async function isUserExist(username: string): Promise<User | false> {
+export async function isPoliceUserExist(username: string): Promise<User | false> {
   try {
     const result = await executeSingleQuery<User>(
-      'SELECT * FROM users WHERE username = ?',
+      'SELECT * FROM police_users WHERE username = ?',
       [username],
     )
     return result.success && result.data && result.data.length > 0

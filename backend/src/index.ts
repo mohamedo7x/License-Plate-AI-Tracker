@@ -7,31 +7,57 @@ import cors from 'cors'
 import path from 'path'
 import { errorHandler as customErrorHandler } from './middleware/errorHandler'
 import logger from './utils/logger'
+
 const app = express()
 
 app.use(express.json())
 app.use(cors())
 app.use(express.static(path.join(__dirname, 'images')))
 
+app.use('/uploads/images', express.static(path.join(__dirname, 'uploads', 'images')))
 
 app.use((req, res, next) => {
   const startTime = new Date()
   res.on('finish', () => {
     const endTime = new Date()
     const responseTime = endTime.getTime() - startTime.getTime()
-    
-    logger.http('HTTP Request', {
+
+    interface LogData {
+      method: string
+      url: string
+      status: number
+      responseTime: string
+      userAgent: string | undefined
+      ip: string | undefined
+      requestBody?: any
+      requestQuery?: any
+      requestParams?: any
+    }
+
+    const logData: LogData = {
       method: req.method,
       url: req.url,
       status: res.statusCode,
       responseTime: `${responseTime}ms`,
       userAgent: req.get('user-agent'),
       ip: req.ip,
-      requestBody: req.method !== 'GET' ? req.body : undefined,
-      requestQuery: Object.keys(req.query).length > 0 ? req.query : undefined,
-      requestParams: Object.keys(req.params).length > 0 ? req.params : undefined
-    })
+    }
+
+    if (req.method !== 'GET' && req.body && Object.keys(req.body).length > 0) {
+      logData.requestBody = req.body
+    }
+
+    if (req.query && Object.keys(req.query).length > 0) {
+      logData.requestQuery = req.query
+    }
+
+    if (req.params && Object.keys(req.params).length > 0) {
+      logData.requestParams = req.params
+    }
+
+    logger.http('HTTP Request', logData)
   })
+
   next()
 })
 
@@ -48,12 +74,11 @@ if (process.env.NODE_ENV === 'development') {
 // ************** ROUTES ************** //
 app.use(mainRoute)
 
-
 app.use(customErrorHandler)
 
 const startServer = async () => {
   try {
-    const db = await StartConnectionToDb()
+     await StartConnectionToDb()
 
     app.get('/isDbAlive', async (req, res) => {
       try {

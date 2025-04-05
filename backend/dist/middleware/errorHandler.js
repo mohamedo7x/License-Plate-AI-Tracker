@@ -45,7 +45,7 @@ const errorHandler = (err, req, res, next) => {
         userId: ((_a = req.user) === null || _a === void 0 ? void 0 : _a.id) || null,
         requestBody: req.body,
         requestQuery: req.query,
-        requestParams: req.params
+        requestParams: req.params,
     };
     if (err instanceof ValidationError) {
         logger_1.default.http('Validation Error', Object.assign(Object.assign({}, errorMeta), { statusCode: err.statusCode, errorType: 'ValidationError' }));

@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isVehicleUser = exports.isUser = exports.validateJWTToken = exports.extractJWTToken = void 0;
-exports.isUserExist = isUserExist;
+exports.isPoliceUserExist = isPoliceUserExist;
 exports.checkUserPrivilege = checkUserPrivilege;
 exports.isAdmin = isAdmin;
 exports.isModerator = isModerator;
@@ -22,10 +22,10 @@ const orm_util_1 = require("../utils/orm.util");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const errorHandler_1 = require("../middleware/errorHandler");
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-function isUserExist(username) {
+function isPoliceUserExist(username) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const result = yield (0, orm_util_1.executeSingleQuery)('SELECT * FROM users WHERE username = ?', [username]);
+            const result = yield (0, orm_util_1.executeSingleQuery)('SELECT * FROM police_users WHERE username = ?', [username]);
             return result.success && result.data && result.data.length > 0
                 ? result.data[0]
                 : false;

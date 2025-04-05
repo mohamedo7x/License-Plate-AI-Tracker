@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateLoginBody = exports.validateAdminId = exports.validateUpdateAdminBody = exports.validateCreateAdminBody = exports.validateAdminToken = void 0;
+exports.validateLoginBody = exports.validateAdminId = exports.validateAdminToken = void 0;
 const user_access_1 = require("../auth/user.access");
 const admin_access_1 = require("../auth/admin.access");
 const errorHandler_1 = require("./errorHandler");
@@ -36,86 +36,6 @@ const validateAdminToken = (req, res, next) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.validateAdminToken = validateAdminToken;
-const validateCreateAdminBody = (req, res, next) => {
-    try {
-        const { name, email, password_hash } = req.body;
-        if (!name || !email || !password_hash) {
-            throw new errorHandler_1.ValidationError('Missing required fields: name, email, password_hash');
-        }
-        if (typeof name !== 'string' || name.trim().length < 2) {
-            throw new errorHandler_1.ValidationError('Name must be at least 2 characters long');
-        }
-        if (!email.includes('@')) {
-            throw new errorHandler_1.ValidationError('Email must contain @ symbol');
-        }
-        const [localPart, domain] = email.split('@');
-        if (!localPart || !domain) {
-            throw new errorHandler_1.ValidationError('Invalid email format');
-        }
-        if (localPart.length < 2) {
-            throw new errorHandler_1.ValidationError('Email local part must be at least 2 characters');
-        }
-        if (!domain.includes('.')) {
-            throw new errorHandler_1.ValidationError('Email domain must contain a dot (.)');
-        }
-        const [domainName, extension] = domain.split('.');
-        if (!domainName || !extension) {
-            throw new errorHandler_1.ValidationError('Invalid email domain format');
-        }
-        if (extension.length < 2) {
-            throw new errorHandler_1.ValidationError('Email extension must be at least 2 characters');
-        }
-        if (typeof password_hash !== 'string' || password_hash.length < 6) {
-            throw new errorHandler_1.ValidationError('Password must be at least 6 characters long');
-        }
-        next();
-    }
-    catch (error) {
-        next(error);
-    }
-};
-exports.validateCreateAdminBody = validateCreateAdminBody;
-const validateUpdateAdminBody = (req, res, next) => {
-    try {
-        const { name, email, status } = req.body;
-        if (!name && !email && !status) {
-            throw new errorHandler_1.ValidationError('At least one field is required for update');
-        }
-        if (name && (typeof name !== 'string' || name.trim().length < 2)) {
-            throw new errorHandler_1.ValidationError('Name must be at least 2 characters long');
-        }
-        if (email) {
-            if (!email.includes('@')) {
-                throw new errorHandler_1.ValidationError('Email must contain @ symbol');
-            }
-            const [localPart, domain] = email.split('@');
-            if (!localPart || !domain) {
-                throw new errorHandler_1.ValidationError('Invalid email format');
-            }
-            if (localPart.length < 2) {
-                throw new errorHandler_1.ValidationError('Email local part must be at least 2 characters');
-            }
-            if (!domain.includes('.')) {
-                throw new errorHandler_1.ValidationError('Email domain must contain a dot (.)');
-            }
-            const [domainName, extension] = domain.split('.');
-            if (!domainName || !extension) {
-                throw new errorHandler_1.ValidationError('Invalid email domain format');
-            }
-            if (extension.length < 2) {
-                throw new errorHandler_1.ValidationError('Email extension must be at least 2 characters');
-            }
-        }
-        if (status && !['active', 'inactive'].includes(status)) {
-            throw new errorHandler_1.ValidationError('Invalid status value. Allowed values: active, inactive');
-        }
-        next();
-    }
-    catch (error) {
-        next(error);
-    }
-};
-exports.validateUpdateAdminBody = validateUpdateAdminBody;
 const validateAdminId = (req, res, next) => {
     try {
         const { id } = req.params;

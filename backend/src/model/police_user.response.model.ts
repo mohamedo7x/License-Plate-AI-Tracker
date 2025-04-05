@@ -1,0 +1,28 @@
+import { User } from './user.model'
+
+export interface PoliceUserResponse {
+  id: number
+  badgeNum: string
+  name: string
+  rank: string
+  department: string
+  city: string
+  active: boolean
+  online: boolean
+  username: string
+  phone_number?: string | null
+  img_profile?: string | null
+  last_login?: Date | null
+  created_at?: Date
+  updated_at?: Date
+}
+
+export interface PoliceUserListResponse {
+  data: PoliceUserResponse[]
+  pagination: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
+} 

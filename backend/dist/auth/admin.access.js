@@ -24,7 +24,6 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const errorHandler_1 = require("../middleware/errorHandler");
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-console.log(JWT_SECRET);
 function isAdminExist(email) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

@@ -7,16 +7,28 @@ import {
   deleteAdmin,
   loginAdmin,
   createUser,
+  getAllUsers,
+  getUser,
+  deleteUser,
+  updateUser,
 } from '../controller/admin.controller'
 import {
   validateAdminToken,
-  validateCreateAdminBody,
-  validateUpdateAdminBody,
   validateAdminId,
   validateLoginBody,
 } from '../middleware/admin.middleware'
+import { uploadFile } from '../middleware/multer.middleware'
 
 const router = Router()
+
+
+/**
+ * @route   POST /api/admin
+ * @desc    Create a new admin user
+ * @access  Private ( Admin only)
+ */
+router.route('/').post(validateAdminToken, uploadFile , createAdmin)
+
 
 /**
  * @route   POST /api/admin/login
@@ -25,12 +37,7 @@ const router = Router()
  */
 router.route('/login').post(validateLoginBody, loginAdmin)
 
-/**
- * @route   POST /api/admin
- * @desc    Create a new admin user
- * @access  Private (Super Admin only)
- */
-router.route('/').post(validateAdminToken, validateCreateAdminBody, createAdmin)
+
 
 /**
  * @route   GET /api/admin
@@ -56,24 +63,61 @@ router
   .put(
     validateAdminToken,
     validateAdminId,
-    validateUpdateAdminBody,
+    uploadFile,
     updateAdmin,
   )
 
 /**
  * @route   DELETE /api/admin/:id
  * @desc    Delete an admin user
- * @access  Private (Super Admin only)
+ * @access  Private ( Admin only)
  */
 router.route('/:id').delete(validateAdminToken, validateAdminId, deleteAdmin)
+
+
+
+// User Routes
 
 
 /**
  * @route   POST /api/admin/user
  * @desc    Create a new user
- * @access  Private (Super Admin only)
+ * @access  Private ( Admin )
  */
-router.route('/create-user').post(validateAdminToken, createUser);
+router.route('/police/create-user').post(validateAdminToken, uploadFile , createUser)
+
+
+
+/**
+ * @route   GET /api/admin/users
+ * @desc    Get all users
+ * @access  Private ( Admin )
+ */
+router.route('/police/users').get(validateAdminToken , getAllUsers)
+
+
+/**
+ * @route   GET /api/admin/user/:id
+ * @desc    Get a single user by ID
+ * @access  Private ( Admin )
+ */
+router.route('/police/user/:id').get(validateAdminToken, getUser)
+
+
+/**
+ * @route   DELETE /api/admin/user/:id
+ * @desc    Delete a user by ID
+ * @access  Private ( Admin )
+ */
+router.route('/police/user/:id').delete(validateAdminToken, deleteUser)
+
+
+/**
+ * @route   PUT /api/admin/user/:id
+ * @desc    Update a user by ID
+ * @access  Private ( Admin )
+ */
+router.route('/police/user/:id').put(validateAdminToken, uploadFile , updateUser)
 
 
 
