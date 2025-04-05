@@ -15,10 +15,10 @@ class MySQLTransport extends Transport {
     try {
       const connection = await getConnection()
       const { level, message, ...meta } = info
-      
+
       await connection.execute(
         'INSERT INTO AuditLogs (level, message, meta) VALUES (?, ?, ?)',
-        [level, message, JSON.stringify(meta)]
+        [level, message, JSON.stringify(meta)],
       )
 
       callback()
@@ -29,14 +29,12 @@ class MySQLTransport extends Transport {
   }
 }
 
-
 const levels = {
-  http: 0
+  http: 0,
 }
 
-
 const colors = {
-  http: 'green'
+  http: 'green',
 }
 
 winston.addColors(colors)
@@ -45,18 +43,15 @@ const format = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.colorize({ all: true }),
   winston.format.printf(
-    (info) => `${info.timestamp} ${info.level}: ${info.message}`
-  )
+    (info) => `${info.timestamp} ${info.level}: ${info.message}`,
+  ),
 )
 
 const logger = winston.createLogger({
   level: 'http',
   levels,
   format,
-  transports: [
-    new winston.transports.Console(),
-    new MySQLTransport()
-  ]
+  transports: [new winston.transports.Console(), new MySQLTransport()],
 })
 
 export default logger

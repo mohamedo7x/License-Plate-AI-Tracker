@@ -8,7 +8,6 @@ import { UnauthorizedError } from '../middleware/errorHandler'
 dotenv.config()
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
-console.log(JWT_SECRET)
 
 interface AdminUserRow extends AdminUser, RowDataPacket {}
 

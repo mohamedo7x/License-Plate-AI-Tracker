@@ -49,10 +49,10 @@ class MySQLTransport extends winston_transport_1.default {
     }
 }
 const levels = {
-    http: 0
+    http: 0,
 };
 const colors = {
-    http: 'green'
+    http: 'green',
 };
 winston_1.default.addColors(colors);
 const format = winston_1.default.format.combine(winston_1.default.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }), winston_1.default.format.colorize({ all: true }), winston_1.default.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`));
@@ -60,9 +60,6 @@ const logger = winston_1.default.createLogger({
     level: 'http',
     levels,
     format,
-    transports: [
-        new winston_1.default.transports.Console(),
-        new MySQLTransport()
-    ]
+    transports: [new winston_1.default.transports.Console(), new MySQLTransport()],
 });
 exports.default = logger;

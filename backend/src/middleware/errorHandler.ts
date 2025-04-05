@@ -47,14 +47,14 @@ export const errorHandler = (
     userId: (req as any).user?.id || null,
     requestBody: req.body,
     requestQuery: req.query,
-    requestParams: req.params
+    requestParams: req.params,
   }
 
   if (err instanceof ValidationError) {
-    logger.http('Validation Error', { 
-      ...errorMeta, 
+    logger.http('Validation Error', {
+      ...errorMeta,
       statusCode: err.statusCode,
-      errorType: 'ValidationError'
+      errorType: 'ValidationError',
     })
     res.status(err.statusCode).json({
       error: {
@@ -67,10 +67,10 @@ export const errorHandler = (
   }
 
   if (err instanceof NotFoundError) {
-    logger.http('Not Found Error', { 
-      ...errorMeta, 
+    logger.http('Not Found Error', {
+      ...errorMeta,
       statusCode: 404,
-      errorType: 'NotFoundError'
+      errorType: 'NotFoundError',
     })
     res.status(404).json({
       error: {
@@ -83,10 +83,10 @@ export const errorHandler = (
   }
 
   if (err instanceof UnauthorizedError) {
-    logger.http('Unauthorized Error', { 
-      ...errorMeta, 
+    logger.http('Unauthorized Error', {
+      ...errorMeta,
       statusCode: 401,
-      errorType: 'UnauthorizedError'
+      errorType: 'UnauthorizedError',
     })
     res.status(401).json({
       error: {
@@ -99,10 +99,10 @@ export const errorHandler = (
   }
 
   if (err instanceof ForbiddenError) {
-    logger.http('Forbidden Error', { 
-      ...errorMeta, 
+    logger.http('Forbidden Error', {
+      ...errorMeta,
       statusCode: 403,
-      errorType: 'ForbiddenError'
+      errorType: 'ForbiddenError',
     })
     res.status(403).json({
       error: {
@@ -115,10 +115,10 @@ export const errorHandler = (
   }
 
   // For unexpected errors
-  logger.http('Internal Server Error', { 
-    ...errorMeta, 
+  logger.http('Internal Server Error', {
+    ...errorMeta,
     statusCode: 500,
-    errorType: 'InternalServerError'
+    errorType: 'InternalServerError',
   })
   res.status(500).json({
     error: {
