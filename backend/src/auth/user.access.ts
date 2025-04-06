@@ -11,7 +11,9 @@ interface UserRow extends RowDataPacket {
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
-export async function isPoliceUserExist(username: string): Promise<User | false> {
+export async function isPoliceUserExist(
+  username: string,
+): Promise<User | false> {
   try {
     const result = await executeSingleQuery<User>(
       'SELECT * FROM police_users WHERE username = ?',

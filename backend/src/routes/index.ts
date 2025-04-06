@@ -6,10 +6,6 @@ const route = Router()
 
 route.use(`/admin`, AdminRoute)
 
-
-
-
-
-route.use(`/auditlogs`, validateAdminToken , AuditLogsRoute)
+route.use(`/auditlogs`, validateAdminToken, AuditLogsRoute)
 
 export default route

@@ -15,29 +15,42 @@ import {
 import {
   validateAdminToken,
   validateAdminId,
-  validateLoginBody,
 } from '../middleware/admin.middleware'
 import { uploadFile } from '../middleware/multer.middleware'
+import {
+  createAdminValidation,
+  loginAdminValidation,
+  updateAdminValidation,
+} from '../validation/admin.validation'
+import {
+  createPoliceUserValidation,
+  updatePoliceUserValidation,
+} from '../validation/police.validation'
+import { validateRequest } from '../middleware/validateRequest'
 
 const router = Router()
-
 
 /**
  * @route   POST /api/admin
  * @desc    Create a new admin user
  * @access  Private ( Admin only)
  */
-router.route('/').post(validateAdminToken, uploadFile , createAdmin)
-
+router
+  .route('/')
+  .post(
+    validateAdminToken,
+    uploadFile,
+    createAdminValidation,
+    validateRequest,
+    createAdmin,
+  )
 
 /**
  * @route   POST /api/admin/login
  * @desc    Login admin user
  * @access  Public
  */
-router.route('/login').post(validateLoginBody, loginAdmin)
-
-
+router.route('/login').post(loginAdminValidation, validateRequest, loginAdmin)
 
 /**
  * @route   GET /api/admin
@@ -64,6 +77,8 @@ router
     validateAdminToken,
     validateAdminId,
     uploadFile,
+    updateAdminValidation,
+    validateRequest,
     updateAdmin,
   )
 
@@ -74,51 +89,57 @@ router
  */
 router.route('/:id').delete(validateAdminToken, validateAdminId, deleteAdmin)
 
-
-
 // User Routes
 
-
 /**
- * @route   POST /api/admin/user
- * @desc    Create a new user
+ * @route   POST /api/admin/police/create-user
+ * @desc    Create a new police user
  * @access  Private ( Admin )
  */
-router.route('/police/create-user').post(validateAdminToken, uploadFile , createUser)
-
-
+router
+  .route('/police/create-user')
+  .post(
+    validateAdminToken,
+    uploadFile,
+    createPoliceUserValidation,
+    validateRequest,
+    createUser,
+  )
 
 /**
- * @route   GET /api/admin/users
- * @desc    Get all users
+ * @route   GET /api/admin/police/users
+ * @desc    Get all police users
  * @access  Private ( Admin )
  */
-router.route('/police/users').get(validateAdminToken , getAllUsers)
-
+router.route('/police/users').get(validateAdminToken, getAllUsers)
 
 /**
- * @route   GET /api/admin/user/:id
- * @desc    Get a single user by ID
+ * @route   GET /api/admin/police/user/:id
+ * @desc    Get a single police user by ID
  * @access  Private ( Admin )
  */
 router.route('/police/user/:id').get(validateAdminToken, getUser)
 
-
 /**
- * @route   DELETE /api/admin/user/:id
- * @desc    Delete a user by ID
+ * @route   DELETE /api/admin/police/user/:id
+ * @desc    Delete a police user by ID
  * @access  Private ( Admin )
  */
 router.route('/police/user/:id').delete(validateAdminToken, deleteUser)
 
-
 /**
- * @route   PUT /api/admin/user/:id
- * @desc    Update a user by ID
+ * @route   PUT /api/admin/police/user/:id
+ * @desc    Update a police user by ID
  * @access  Private ( Admin )
  */
-router.route('/police/user/:id').put(validateAdminToken, uploadFile , updateUser)
-
-
+router
+  .route('/police/user/:id')
+  .put(
+    validateAdminToken,
+    uploadFile,
+    updatePoliceUserValidation,
+    validateRequest,
+    updateUser,
+  )
 
 export default router

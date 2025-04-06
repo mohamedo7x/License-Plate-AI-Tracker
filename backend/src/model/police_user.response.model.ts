@@ -25,4 +25,4 @@ export interface PoliceUserListResponse {
     limit: number
     totalPages: number
   }
-} 
+}

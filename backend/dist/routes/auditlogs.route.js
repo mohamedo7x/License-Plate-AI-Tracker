@@ -28,7 +28,7 @@ router.get('/', function (req, res) {
                 data: auditLogs,
                 total: ((_b = (_a = totalResult.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b['COUNT(*)']) || 0,
                 page: pageNumber,
-                limit: limitNumber
+                limit: limitNumber,
             });
         }
         catch (error) {

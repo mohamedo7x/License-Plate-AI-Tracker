@@ -4,19 +4,24 @@ const express_1 = require("express");
 const admin_controller_1 = require("../controller/admin.controller");
 const admin_middleware_1 = require("../middleware/admin.middleware");
 const multer_middleware_1 = require("../middleware/multer.middleware");
+const admin_validation_1 = require("../validation/admin.validation");
+const police_validation_1 = require("../validation/police.validation");
+const validateRequest_1 = require("../middleware/validateRequest");
 const router = (0, express_1.Router)();
 /**
  * @route   POST /api/admin
  * @desc    Create a new admin user
  * @access  Private ( Admin only)
  */
-router.route('/').post(admin_middleware_1.validateAdminToken, multer_middleware_1.uploadFile, admin_controller_1.createAdmin);
+router
+    .route('/')
+    .post(admin_middleware_1.validateAdminToken, multer_middleware_1.uploadFile, admin_validation_1.createAdminValidation, validateRequest_1.validateRequest, admin_controller_1.createAdmin);
 /**
  * @route   POST /api/admin/login
  * @desc    Login admin user
  * @access  Public
  */
-router.route('/login').post(admin_middleware_1.validateLoginBody, admin_controller_1.loginAdmin);
+router.route('/login').post(admin_validation_1.loginAdminValidation, validateRequest_1.validateRequest, admin_controller_1.loginAdmin);
 /**
  * @route   GET /api/admin
  * @desc    Get all admin users
@@ -36,7 +41,7 @@ router.route('/:id').get(admin_middleware_1.validateAdminToken, admin_middleware
  */
 router
     .route('/:id')
-    .put(admin_middleware_1.validateAdminToken, admin_middleware_1.validateAdminId, multer_middleware_1.uploadFile, admin_controller_1.updateAdmin);
+    .put(admin_middleware_1.validateAdminToken, admin_middleware_1.validateAdminId, multer_middleware_1.uploadFile, admin_validation_1.updateAdminValidation, validateRequest_1.validateRequest, admin_controller_1.updateAdmin);
 /**
  * @route   DELETE /api/admin/:id
  * @desc    Delete an admin user
@@ -45,33 +50,37 @@ router
 router.route('/:id').delete(admin_middleware_1.validateAdminToken, admin_middleware_1.validateAdminId, admin_controller_1.deleteAdmin);
 // User Routes
 /**
- * @route   POST /api/admin/user
- * @desc    Create a new user
+ * @route   POST /api/admin/police/create-user
+ * @desc    Create a new police user
  * @access  Private ( Admin )
  */
-router.route('/police/create-user').post(admin_middleware_1.validateAdminToken, multer_middleware_1.uploadFile, admin_controller_1.createUser);
+router
+    .route('/police/create-user')
+    .post(admin_middleware_1.validateAdminToken, multer_middleware_1.uploadFile, police_validation_1.createPoliceUserValidation, validateRequest_1.validateRequest, admin_controller_1.createUser);
 /**
- * @route   GET /api/admin/users
- * @desc    Get all users
+ * @route   GET /api/admin/police/users
+ * @desc    Get all police users
  * @access  Private ( Admin )
  */
 router.route('/police/users').get(admin_middleware_1.validateAdminToken, admin_controller_1.getAllUsers);
 /**
- * @route   GET /api/admin/user/:id
- * @desc    Get a single user by ID
+ * @route   GET /api/admin/police/user/:id
+ * @desc    Get a single police user by ID
  * @access  Private ( Admin )
  */
 router.route('/police/user/:id').get(admin_middleware_1.validateAdminToken, admin_controller_1.getUser);
 /**
- * @route   DELETE /api/admin/user/:id
- * @desc    Delete a user by ID
+ * @route   DELETE /api/admin/police/user/:id
+ * @desc    Delete a police user by ID
  * @access  Private ( Admin )
  */
 router.route('/police/user/:id').delete(admin_middleware_1.validateAdminToken, admin_controller_1.deleteUser);
 /**
- * @route   PUT /api/admin/user/:id
- * @desc    Update a user by ID
+ * @route   PUT /api/admin/police/user/:id
+ * @desc    Update a police user by ID
  * @access  Private ( Admin )
  */
-router.route('/police/user/:id').put(admin_middleware_1.validateAdminToken, multer_middleware_1.uploadFile, admin_controller_1.updateUser);
+router
+    .route('/police/user/:id')
+    .put(admin_middleware_1.validateAdminToken, multer_middleware_1.uploadFile, police_validation_1.updatePoliceUserValidation, validateRequest_1.validateRequest, admin_controller_1.updateUser);
 exports.default = router;
