@@ -53,14 +53,25 @@ const admin_access_1 = require("../auth/admin.access");
 const user_access_1 = require("../auth/user.access");
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
+const multer_middleware_1 = require("../middleware/multer.middleware");
 const createAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, img_profile, email, password_hash } = req.body;
+    const { name, email, password_hash } = req.body;
     const hashedPassword = yield bcrypt_1.default.hash(password_hash || '', parseInt(process.env.SALT_PASSWORD || '10'));
+    let img_profile = 'default.png';
+    if (req.file) {
+        try {
+            img_profile = yield (0, multer_middleware_1.saveUploadedFile)(req);
+        }
+        catch (error) {
+            res.status(500).json({ error: 'Failed to save profile image' });
+            return;
+        }
+    }
     const query = `INSERT INTO admin_users (name, img_profile, email, password_hash, role, status, created_at) 
                    VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const values = [
         name,
-        img_profile || 'default.png',
+        img_profile,
         email,
         hashedPassword,
         'admin',
@@ -75,6 +86,12 @@ const createAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, 
         });
     }
     else {
+        if (req.file && img_profile !== 'default.png') {
+            const img_path = path.join(__dirname, '..', 'uploads', 'images', 'admin_users', img_profile);
+            if (fs.existsSync(img_path)) {
+                fs.unlinkSync(img_path);
+            }
+        }
         res.status(500).json({ error: result.error });
     }
 }));
@@ -90,10 +107,14 @@ const getAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, voi
             email: admin.email,
             role: admin.role,
             status: admin.status,
-            img_profile: (req.protocol + '://' + req.get('host') + '/uploads/images/admin_users/' + admin.img_profile),
+            img_profile: req.protocol +
+                '://' +
+                req.get('host') +
+                '/uploads/images/admin_users/' +
+                admin.img_profile,
             last_login: admin.last_login,
             created_at: admin.created_at,
-            updated_at: admin.updated_at
+            updated_at: admin.updated_at,
         };
         res.json(response);
     }
@@ -116,16 +137,20 @@ const getAllAdmins = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0,
         countResult.success &&
         countResult.data) {
         const response = {
-            data: result.data.map(admin => ({
+            data: result.data.map((admin) => ({
                 id: admin.id,
                 name: admin.name,
                 email: admin.email,
                 role: admin.role,
                 status: admin.status,
-                img_profile: req.protocol + '://' + req.get('host') + '/uploads/images/admin_users/' + admin.img_profile,
+                img_profile: req.protocol +
+                    '://' +
+                    req.get('host') +
+                    '/uploads/images/admin_users/' +
+                    admin.img_profile,
                 last_login: admin.last_login,
                 created_at: admin.created_at,
-                updated_at: admin.updated_at
+                updated_at: admin.updated_at,
             })),
             pagination: {
                 total: countResult.data[0].total,
@@ -142,26 +167,36 @@ const getAllAdmins = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0,
 }));
 exports.getAllAdmins = getAllAdmins;
 const updateAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { id } = req.params;
-    const { name, img_profile, email, status } = req.body;
+    const { name, email, status } = req.body;
     const updates = [];
     const values = [];
     if (name !== undefined) {
         updates.push('name = ?');
         values.push(name);
     }
-    if (img_profile !== undefined) {
-        const UserData = yield (0, orm_util_1.executeSingleQuery)('SELECT * FROM admin_users WHERE id = ?', [id]);
-        if (UserData.success && UserData.data && UserData.data.length > 0) {
-            const img_profile_old = UserData.data[0].img_profile;
-            if (img_profile_old && img_profile_old !== 'default.png') {
-                const img_path = path.join(__dirname, '..', 'uploads', 'images', 'admin_users', img_profile_old);
-                if (fs.existsSync(img_path)) {
-                    fs.unlinkSync(img_path);
+    let newImgProfile;
+    let oldImgProfile = null;
+    if (req.file) {
+        try {
+            const UserData = yield (0, orm_util_1.executeSingleQuery)('SELECT img_profile FROM admin_users WHERE id = ?', [id]);
+            if (UserData.success && UserData.data && UserData.data.length > 0) {
+                oldImgProfile = (_a = UserData.data[0].img_profile) !== null && _a !== void 0 ? _a : null;
+                newImgProfile = yield (0, multer_middleware_1.saveUploadedFile)(req);
+                updates.push('img_profile = ?');
+                values.push(newImgProfile);
+                if (oldImgProfile && oldImgProfile !== 'default.png') {
+                    const oldImgPath = path.join(__dirname, '..', 'uploads', 'images', 'admin_users', oldImgProfile);
+                    if (fs.existsSync(oldImgPath)) {
+                        fs.unlinkSync(oldImgPath);
+                    }
                 }
             }
-            updates.push('img_profile = ?');
-            values.push(img_profile);
+        }
+        catch (error) {
+            res.status(500).json({ error: 'Failed to save profile image' });
+            return;
         }
     }
     if (email !== undefined) {
@@ -190,6 +225,12 @@ const updateAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, 
         });
     }
     else {
+        if (newImgProfile) {
+            const newImgPath = path.join(__dirname, '..', 'uploads', 'images', 'admin_users', newImgProfile);
+            if (fs.existsSync(newImgPath)) {
+                fs.unlinkSync(newImgPath);
+            }
+        }
         res.status(500).json({ error: result.error });
     }
 }));
@@ -256,19 +297,46 @@ const loginAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
 }));
 exports.loginAdmin = loginAdmin;
 const createUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { military_id, name, rank, department, active, username, password, phone_number, img_profile, city } = req.body;
+    const { military_id, name, rank, department, active, username, password, phone_number, city, } = req.body;
     const existingUser = yield (0, user_access_1.isPoliceUserExist)(username);
     if (existingUser) {
         res.status(400).json({ error: 'Police User already exists' });
         return;
     }
+    let img_profile = null;
+    if (req.file) {
+        try {
+            img_profile = yield (0, multer_middleware_1.saveUploadedFile)(req);
+        }
+        catch (error) {
+            res.status(500).json({ error: 'Failed to save profile image' });
+            return;
+        }
+    }
     const hashedPassword = yield bcrypt_1.default.hash(password, parseInt(process.env.SALT_PASSWORD || '10'));
     const query = `INSERT INTO police_users (military_id, name, \`rank\`, department, active, username, city, password_hash, phone_number, img_profile) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const result = yield (0, orm_util_1.executeNonQuery)(query, [military_id, name, rank, department, active, username, city, hashedPassword, phone_number, img_profile]);
+    const result = yield (0, orm_util_1.executeNonQuery)(query, [
+        military_id,
+        name,
+        rank,
+        department,
+        active,
+        username,
+        city,
+        hashedPassword,
+        phone_number,
+        img_profile,
+    ]);
     if (result.success) {
         res.status(200).json({ message: 'Police User created successfully' });
     }
     else {
+        if (img_profile) {
+            const img_path = path.join(__dirname, '..', 'uploads', 'images', 'police_users', img_profile);
+            if (fs.existsSync(img_path)) {
+                fs.unlinkSync(img_path);
+            }
+        }
         res.status(500).json({ error: result.error });
     }
 }));
@@ -282,9 +350,12 @@ const getAllUsers = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, 
      FROM police_users 
      ORDER BY created_at ASC 
      LIMIT ? OFFSET ?`, [limit, offset]);
-    if (result.success && result.data && countResult.success && countResult.data) {
+    if (result.success &&
+        result.data &&
+        countResult.success &&
+        countResult.data) {
         const response = {
-            data: result.data.map(user => ({
+            data: result.data.map((user) => ({
                 id: user.id,
                 badgeNum: user.military_id,
                 name: user.name,
@@ -294,18 +365,22 @@ const getAllUsers = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, 
                 active: user.active,
                 username: user.username,
                 phone_number: user.phone_number,
-                img_profile: req.protocol + '://' + req.get('host') + '/uploads/images/police_users/' + user.img_profile,
+                img_profile: req.protocol +
+                    '://' +
+                    req.get('host') +
+                    '/uploads/images/police_users/' +
+                    user.img_profile,
                 last_login: user.last_login,
                 online: user.online,
                 created_at: user.created_at,
-                updated_at: user.updated_at
+                updated_at: user.updated_at,
             })),
             pagination: {
                 total: countResult.data[0].total,
                 page,
                 limit,
-                totalPages: Math.ceil(countResult.data[0].total / limit)
-            }
+                totalPages: Math.ceil(countResult.data[0].total / limit),
+            },
         };
         res.json(response);
     }
@@ -329,11 +404,15 @@ const getUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void
             active: user.active,
             username: user.username,
             phone_number: user.phone_number,
-            img_profile: req.protocol + '://' + req.get('host') + '/uploads/images/police_users/' + user.img_profile,
+            img_profile: req.protocol +
+                '://' +
+                req.get('host') +
+                '/uploads/images/police_users/' +
+                user.img_profile,
             last_login: user.last_login,
             online: user.online,
             created_at: user.created_at,
-            updated_at: user.updated_at
+            updated_at: user.updated_at,
         };
         res.json(response);
     }
@@ -367,8 +446,9 @@ const deleteUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
 }));
 exports.deleteUser = deleteUser;
 const updateUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { id } = req.params;
-    const { military_id, name, rank, department, city, active, username, phone_number, img_profile } = req.body;
+    const { military_id, name, rank, department, active, username, phone_number, city, } = req.body;
     const updates = [];
     const values = [];
     if (military_id !== undefined) {
@@ -380,16 +460,12 @@ const updateUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
         values.push(name);
     }
     if (rank !== undefined) {
-        updates.push('`rank` = ?');
+        updates.push('rank = ?');
         values.push(rank);
     }
     if (department !== undefined) {
         updates.push('department = ?');
         values.push(department);
-    }
-    if (city !== undefined) {
-        updates.push('city = ?');
-        values.push(city);
     }
     if (active !== undefined) {
         updates.push('active = ?');
@@ -399,30 +475,43 @@ const updateUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
         updates.push('username = ?');
         values.push(username);
     }
+    if (city !== undefined) {
+        updates.push('city = ?');
+        values.push(city);
+    }
     if (phone_number !== undefined) {
         updates.push('phone_number = ?');
         values.push(phone_number);
     }
-    if (img_profile !== undefined) {
-        const UserData = yield (0, orm_util_1.executeSingleQuery)('SELECT * FROM police_users WHERE id = ?', [id]);
-        if (UserData.success && UserData.data && UserData.data.length > 0) {
-            const img_profile_old = UserData.data[0].img_profile;
-            if (img_profile_old && img_profile_old !== 'default.png') {
-                const img_path = path.join(__dirname, '..', 'uploads', 'images', 'police_users', img_profile_old);
-                if (fs.existsSync(img_path)) {
-                    fs.unlinkSync(img_path);
+    let newImgProfile;
+    let oldImgProfile = null;
+    if (req.file) {
+        try {
+            const UserData = yield (0, orm_util_1.executeSingleQuery)('SELECT img_profile FROM police_users WHERE id = ?', [id]);
+            if (UserData.success && UserData.data && UserData.data.length > 0) {
+                oldImgProfile = (_a = UserData.data[0].img_profile) !== null && _a !== void 0 ? _a : null;
+                newImgProfile = yield (0, multer_middleware_1.saveUploadedFile)(req);
+                updates.push('img_profile = ?');
+                values.push(newImgProfile);
+                if (oldImgProfile && oldImgProfile !== 'default.png') {
+                    const oldImgPath = path.join(__dirname, '..', 'uploads', 'images', 'police_users', oldImgProfile);
+                    if (fs.existsSync(oldImgPath)) {
+                        fs.unlinkSync(oldImgPath);
+                    }
                 }
             }
-            updates.push('img_profile = ?');
-            values.push(img_profile);
         }
-    }
-    if (updates.length === 0) {
-        res.status(400).json({ error: 'No fields to update' });
-        return;
+        catch (error) {
+            res.status(500).json({ error: 'Failed to save profile image' });
+            return;
+        }
     }
     updates.push('updated_at = ?');
     values.push(new Date());
+    if (updates.length === 1) {
+        res.status(400).json({ error: 'No fields to update' });
+        return;
+    }
     values.push(id);
     const query = `UPDATE police_users 
                  SET ${updates.join(', ')}
@@ -435,6 +524,12 @@ const updateUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
         });
     }
     else {
+        if (newImgProfile) {
+            const newImgPath = path.join(__dirname, '..', 'uploads', 'images', 'police_users', newImgProfile);
+            if (fs.existsSync(newImgPath)) {
+                fs.unlinkSync(newImgPath);
+            }
+        }
         res.status(500).json({ error: result.error });
     }
 }));

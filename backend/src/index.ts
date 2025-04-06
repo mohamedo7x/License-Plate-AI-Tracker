@@ -14,7 +14,10 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static(path.join(__dirname, 'images')))
 
-app.use('/uploads/images', express.static(path.join(__dirname, 'uploads', 'images')))
+app.use(
+  '/uploads/images',
+  express.static(path.join(__dirname, 'uploads', 'images')),
+)
 
 app.use((req, res, next) => {
   const startTime = new Date()
@@ -78,7 +81,7 @@ app.use(customErrorHandler)
 
 const startServer = async () => {
   try {
-     await StartConnectionToDb()
+    await StartConnectionToDb()
 
     app.get('/isDbAlive', async (req, res) => {
       try {

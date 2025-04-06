@@ -20,4 +20,4 @@ export interface AdminListResponse {
     limit: number
     totalPages: number
   }
-} 
+}

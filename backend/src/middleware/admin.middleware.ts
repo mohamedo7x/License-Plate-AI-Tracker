@@ -48,7 +48,6 @@ export const validateAdminToken = async (
   }
 }
 
-
 export const validateAdminId = (
   req: Request,
   res: Response,
@@ -63,58 +62,6 @@ export const validateAdminId = (
     }
 
     req.params.id = adminId.toString()
-    next()
-  } catch (error) {
-    next(error)
-  }
-}
-
-export const validateLoginBody = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
-  try {
-    const { email, password } = req.body
-
-    if (!email || !password) {
-      throw new ValidationError('Missing required fields: email, password')
-    }
-
-    if (!email.includes('@')) {
-      throw new ValidationError('Email must contain @ symbol')
-    }
-
-    const [localPart, domain] = email.split('@')
-
-    if (!localPart || !domain) {
-      throw new ValidationError('Invalid email format')
-    }
-
-    if (localPart.length < 2) {
-      throw new ValidationError(
-        'Email local part must be at least 2 characters',
-      )
-    }
-
-    if (!domain.includes('.')) {
-      throw new ValidationError('Email domain must contain a dot (.)')
-    }
-
-    const [domainName, extension] = domain.split('.')
-
-    if (!domainName || !extension) {
-      throw new ValidationError('Invalid email domain format')
-    }
-
-    if (extension.length < 2) {
-      throw new ValidationError('Email extension must be at least 2 characters')
-    }
-
-    if (typeof password !== 'string' || password.length < 6) {
-      throw new ValidationError('Password must be at least 6 characters long')
-    }
-
     next()
   } catch (error) {
     next(error)

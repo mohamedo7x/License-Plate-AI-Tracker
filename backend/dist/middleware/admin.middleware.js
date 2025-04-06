@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateLoginBody = exports.validateAdminId = exports.validateAdminToken = void 0;
+exports.validateAdminId = exports.validateAdminToken = void 0;
 const user_access_1 = require("../auth/user.access");
 const admin_access_1 = require("../auth/admin.access");
 const errorHandler_1 = require("./errorHandler");
@@ -51,39 +51,3 @@ const validateAdminId = (req, res, next) => {
     }
 };
 exports.validateAdminId = validateAdminId;
-const validateLoginBody = (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            throw new errorHandler_1.ValidationError('Missing required fields: email, password');
-        }
-        if (!email.includes('@')) {
-            throw new errorHandler_1.ValidationError('Email must contain @ symbol');
-        }
-        const [localPart, domain] = email.split('@');
-        if (!localPart || !domain) {
-            throw new errorHandler_1.ValidationError('Invalid email format');
-        }
-        if (localPart.length < 2) {
-            throw new errorHandler_1.ValidationError('Email local part must be at least 2 characters');
-        }
-        if (!domain.includes('.')) {
-            throw new errorHandler_1.ValidationError('Email domain must contain a dot (.)');
-        }
-        const [domainName, extension] = domain.split('.');
-        if (!domainName || !extension) {
-            throw new errorHandler_1.ValidationError('Invalid email domain format');
-        }
-        if (extension.length < 2) {
-            throw new errorHandler_1.ValidationError('Email extension must be at least 2 characters');
-        }
-        if (typeof password !== 'string' || password.length < 6) {
-            throw new errorHandler_1.ValidationError('Password must be at least 6 characters long');
-        }
-        next();
-    }
-    catch (error) {
-        next(error);
-    }
-};
-exports.validateLoginBody = validateLoginBody;
