@@ -10,16 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateAdminId = exports.validateAdminToken = void 0;
-const user_access_1 = require("../auth/user.access");
+const police_user_access_1 = require("../auth/police_user.access");
 const admin_access_1 = require("../auth/admin.access");
 const errorHandler_1 = require("./errorHandler");
 const validateAdminToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const token = (0, user_access_1.extractJWTToken)(req);
+        const token = (0, police_user_access_1.extractJWTToken)(req);
         if (!token) {
             throw new errorHandler_1.UnauthorizedError('No token provided');
         }
-        const decoded = (0, user_access_1.validateJWTToken)(token);
+        const decoded = (0, police_user_access_1.validateJWTToken)(token);
         if (!decoded || !decoded.id) {
             throw new errorHandler_1.UnauthorizedError('Invalid token format');
         }

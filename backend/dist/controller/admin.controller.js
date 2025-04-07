@@ -50,7 +50,7 @@ const asyncHandler_1 = __importDefault(require("../middleware/asyncHandler"));
 const orm_util_1 = require("../utils/orm.util");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const admin_access_1 = require("../auth/admin.access");
-const user_access_1 = require("../auth/user.access");
+const police_user_access_1 = require("../auth/police_user.access");
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 const multer_middleware_1 = require("../middleware/multer.middleware");
@@ -298,7 +298,7 @@ const loginAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
 exports.loginAdmin = loginAdmin;
 const createUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { military_id, name, rank, department, active, username, password, phone_number, city, } = req.body;
-    const existingUser = yield (0, user_access_1.isPoliceUserExist)(username);
+    const existingUser = yield (0, police_user_access_1.isPoliceUserExist)(username);
     if (existingUser) {
         res.status(400).json({ error: 'Police User already exists' });
         return;

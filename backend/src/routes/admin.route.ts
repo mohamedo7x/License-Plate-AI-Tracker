@@ -45,11 +45,6 @@ router
     createAdmin,
   )
 
-/**
- * @route   POST /api/admin/login
- * @desc    Login admin user
- * @access  Public
- */
 router.route('/login').post(loginAdminValidation, validateRequest, loginAdmin)
 
 /**
