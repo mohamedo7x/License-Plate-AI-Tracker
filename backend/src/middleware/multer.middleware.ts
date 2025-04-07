@@ -7,7 +7,11 @@ import { promisify } from 'util'
 
 const storage = multer.memoryStorage()
 
-const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = (
+  req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback,
+) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true)
   } else {
@@ -19,7 +23,7 @@ const upload_middleware = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, 
+    fileSize: 5 * 1024 * 1024,
   },
 })
 
@@ -30,12 +34,18 @@ export const saveUploadedFile = async (req: Request): Promise<string> => {
     throw new Error('No file uploaded')
   }
 
-  const filename = crypto.randomBytes(10).toString('hex') + path.extname(req.file.originalname)
-  
+  const filename =
+    crypto.randomBytes(10).toString('hex') + path.extname(req.file.originalname)
 
   let destination: string
   if (req.originalUrl.includes('/police')) {
-    destination = path.join(__dirname, '..', 'uploads', 'images', 'police_users')
+    destination = path.join(
+      __dirname,
+      '..',
+      'uploads',
+      'images',
+      'police_users',
+    )
   } else if (req.originalUrl.includes('/admin')) {
     destination = path.join(__dirname, '..', 'uploads', 'images', 'admin_users')
   } else {
@@ -50,7 +60,7 @@ export const saveUploadedFile = async (req: Request): Promise<string> => {
 
   try {
     await promisify(fs.writeFile)(filePath, req.file.buffer)
-    
+
     if (!fs.existsSync(filePath)) {
       throw new Error('File was not written successfully')
     }

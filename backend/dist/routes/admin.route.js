@@ -16,11 +16,6 @@ const router = (0, express_1.Router)();
 router
     .route('/')
     .post(admin_middleware_1.validateAdminToken, multer_middleware_1.uploadFile, admin_validation_1.createAdminValidation, validateRequest_1.validateRequest, admin_controller_1.createAdmin);
-/**
- * @route   POST /api/admin/login
- * @desc    Login admin user
- * @access  Public
- */
 router.route('/login').post(admin_validation_1.loginAdminValidation, validateRequest_1.validateRequest, admin_controller_1.loginAdmin);
 /**
  * @route   GET /api/admin

@@ -29,10 +29,6 @@ CREATE TABLE `Users` (
   `updated_at` TIMESTAMP DEFAULT (now())
 );
 
-CREATE TABLE `Roles` (
-  `id` INT PRIMARY KEY,
-  `role_name` VARCHAR(50) UNIQUE NOT NULL
-);
 
 CREATE TABLE `Vehicles` (
   `id` INT PRIMARY KEY,

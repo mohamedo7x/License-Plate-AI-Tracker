@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePoliceUserValidation = exports.createPoliceUserValidation = void 0;
+exports.loginPoliceUserValidation = exports.updatePoliceUserValidation = exports.createPoliceUserValidation = void 0;
 const express_validator_1 = require("express-validator");
 exports.createPoliceUserValidation = [
     (0, express_validator_1.body)('military_id')
@@ -75,7 +75,7 @@ exports.createPoliceUserValidation = [
     (0, express_validator_1.body)('img_profile')
         .optional()
         .isString()
-        .withMessage('Profile image must be a string')
+        .withMessage('Profile image must be a string'),
 ];
 exports.updatePoliceUserValidation = [
     (0, express_validator_1.body)('military_id')
@@ -136,5 +136,24 @@ exports.updatePoliceUserValidation = [
     (0, express_validator_1.body)('img_profile')
         .optional()
         .isString()
-        .withMessage('Profile image must be a string')
+        .withMessage('Profile image must be a string'),
+];
+exports.loginPoliceUserValidation = [
+    (0, express_validator_1.body)('username')
+        .notEmpty()
+        .withMessage('Username is required')
+        .isString()
+        .withMessage('Username must be a string')
+        .trim()
+        .isLength({ min: 3, max: 20 })
+        .withMessage('Username must be between 3 and 20 characters')
+        .matches(/^[a-zA-Z0-9_]+$/)
+        .withMessage('Username can only contain letters, numbers, and underscores'),
+    (0, express_validator_1.body)('password')
+        .notEmpty()
+        .withMessage('Password is required')
+        .isString()
+        .withMessage('Password must be a string')
+        .isLength({ min: 4 })
+        .withMessage('Password must be at least 4 characters long'),
 ];

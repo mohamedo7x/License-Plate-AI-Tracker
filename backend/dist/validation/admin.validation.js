@@ -78,5 +78,5 @@ exports.updateAdminValidation = [
         .isString()
         .withMessage('Status must be a string')
         .isIn(['active', 'inactive'])
-        .withMessage('Status must be either active or inactive')
+        .withMessage('Status must be either active or inactive'),
 ];

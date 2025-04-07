@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { extractJWTToken, validateJWTToken } from '../auth/user.access'
+import { extractJWTToken, validateJWTToken } from '../auth/police_user.access'
 import { isAdmin, isSuperAdmin } from '../auth/admin.access'
 import {
   UnauthorizedError,

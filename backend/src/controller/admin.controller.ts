@@ -14,7 +14,7 @@ import {
   PoliceUserResponse,
   PoliceUserListResponse,
 } from '../model/police_user.response.model'
-import { isPoliceUserExist } from '../auth/user.access'
+import { isPoliceUserExist } from '../auth/police_user.access'
 import * as path from 'path'
 import * as fs from 'fs'
 import { saveUploadedFile } from '../middleware/multer.middleware'
@@ -200,14 +200,12 @@ const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
 
   if (req.file) {
     try {
-    
       const UserData = await executeSingleQuery<AdminUserRow>(
         'SELECT img_profile FROM admin_users WHERE id = ?',
         [id],
       )
       if (UserData.success && UserData.data && UserData.data.length > 0) {
         oldImgProfile = UserData.data[0].img_profile ?? null
-        
 
         newImgProfile = await saveUploadedFile(req)
         updates.push('img_profile = ?')
@@ -629,7 +627,7 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
       )
       if (UserData.success && UserData.data && UserData.data.length > 0) {
         oldImgProfile = UserData.data[0].img_profile ?? null
-        
+
         newImgProfile = await saveUploadedFile(req)
         updates.push('img_profile = ?')
         values.push(newImgProfile)
@@ -675,7 +673,7 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
       affectedRows: result.affectedRows,
     })
   } else {
-      if (newImgProfile) {
+    if (newImgProfile) {
       const newImgPath = path.join(
         __dirname,
         '..',
