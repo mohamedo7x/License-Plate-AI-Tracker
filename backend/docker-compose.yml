@@ -17,6 +17,8 @@ services:
       - MYSQL_DBNAME=traffic_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+    volumes:
+      - ./src:/usr/src/app/src
     depends_on:
       mysql_db:
         condition: service_healthy

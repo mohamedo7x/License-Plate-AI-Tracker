@@ -1,3 +1,4 @@
+-- Active: 1746401990356@@127.0.0.1@3307@traffic_db
 -- phpMyAdmin SQL Dump
 -- version 5.2.2
 -- https://www.phpmyadmin.net/

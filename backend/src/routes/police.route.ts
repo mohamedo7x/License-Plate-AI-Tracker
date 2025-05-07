@@ -10,9 +10,9 @@ const router = Router()
  * @desc    Login for police user
  * @access  Public
  */
-router.route('/login').post(loginPoliceUserValidation, validateRequest, loginPoliceUser)
-
-
+router
+  .route('/login')
+  .post(loginPoliceUserValidation, validateRequest, loginPoliceUser)
 
 /**
  * @route   GET /api/police/my-details
