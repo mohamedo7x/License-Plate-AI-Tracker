@@ -4,7 +4,10 @@ import {
   executeQuery,
 } from '../utils/orm.util'
 import { Request, Response } from 'express'
-import { generatePoliceUserJWTToken, validatePoliceToken } from '../auth/police_user.access'
+import {
+  generatePoliceUserJWTToken,
+  validatePoliceToken,
+} from '../auth/police_user.access'
 import { PoliceUser } from '../model/police_user.model'
 import asyncHandler from '../middleware/asyncHandler'
 import bcrypt from 'bcrypt'
@@ -38,13 +41,11 @@ export const loginPoliceUser = asyncHandler(
         'UPDATE police_users SET last_login = ? WHERE id = ?',
         [new Date(), policeUser.id],
       )
-      res
-        .status(200)
-        .json({
-          message: 'Police user logged in successfully',
-          token,
-          user: policeUser,
-        })
+      res.status(200).json({
+        message: 'Police user logged in successfully',
+        token,
+        user: policeUser,
+      })
     } catch (error) {
       console.error('Login error:', error)
       res.status(500).json({ message: 'Internal server error' })
@@ -52,23 +53,25 @@ export const loginPoliceUser = asyncHandler(
   },
 )
 
-export const getMyDetails = asyncHandler(async (req: Request, res: Response) => {
-    const user = (req as any).user;
+export const getMyDetails = asyncHandler(
+  async (req: Request, res: Response) => {
+    const user = (req as any).user
     const result = await executeSingleQuery<PoliceUser>(
-        'SELECT * FROM police_users WHERE id = ?',
-        [user.id],
+      'SELECT * FROM police_users WHERE id = ?',
+      [user.id],
     )
     if (result.success && result.data && result.data.length > 0) {
-        const userData = result.data[0];
-        const { password_hash, ...safeUserData } = userData;
-        res.status(200).json({
-            success: true,
-            data: safeUserData
-        });
+      const userData = result.data[0]
+      const { password_hash, ...safeUserData } = userData
+      res.status(200).json({
+        success: true,
+        data: safeUserData,
+      })
     } else {
-        res.status(404).json({
-            success: false,
-            message: 'User not found'
-        });
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+      })
     }
-})
+  },
+)

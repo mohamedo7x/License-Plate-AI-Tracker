@@ -74,7 +74,7 @@ export const validatePoliceToken = (
       return next(new UnauthorizedError('Invalid token'))
     }
 
-    (req as any).user = decoded;
+    ;(req as any).user = decoded
     next()
   } catch (error) {
     next(error)
@@ -88,8 +88,8 @@ export const generatePoliceUserJWTToken = (policeUser: PoliceUser): string => {
     name: policeUser.name,
     rank: policeUser.rank,
     department: policeUser.department,
-    city: policeUser.city
+    city: policeUser.city,
   }
-  
+
   return jwt.sign(tokenData, JWT_SECRET, { expiresIn: '1h' })
 }
