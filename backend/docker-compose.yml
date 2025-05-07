@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: Backend
     ports:
       - "8080:8080"
     environment:
@@ -19,6 +20,7 @@ services:
       - REDIS_PORT=6379
     volumes:
       - ./src:/usr/src/app/src
+      - ./package.json:/usr/src/app/package.json
     depends_on:
       mysql_db:
         condition: service_healthy
@@ -27,6 +29,7 @@ services:
 
   mysql_db:
     image: mysql:latest
+    container_name: mysql
     ports:
       - "3307:3306"
     environment:
@@ -36,6 +39,7 @@ services:
       MYSQL_PASSWORD: default@2025!
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./mysql/mysqlCore.sql:/docker-entrypoint-initdb.d/mysqlCore.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -44,6 +48,7 @@ services:
 
   redis:
     image: redis:latest
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
@@ -60,3 +65,6 @@ volumes:
 
 # Start the services with:
 # docker-compose -f docker-compose.yml up --build -d
+
+
+#TODO : read env file from .env like ${ENV}

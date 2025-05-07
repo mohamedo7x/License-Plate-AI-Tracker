@@ -44,10 +44,17 @@ CREATE TABLE `admin_users` (
 --
 -- Dumping data for table `admin_users`
 --
-
 INSERT INTO `admin_users` (`id`, `name`, `email`, `password_hash`, `role`, `status`, `img_profile`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 'Oliver Weston', 'mohamedo7x@hotmail.com', '$2b$10$4fRXoIfJ43mmnuqullqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'superadmin', 'active', 'defualt.png', '2025-04-07 04:08:06', '2023-04-18 15:05:43', '2025-04-06 02:31:14');
-
+(1, 'Oliver Weston', 'mohamedo7x@hotmail.com', '$2b$10$4fRXoIfJ43mmnuqullqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'superadmin', 'active', 'default.png', '2025-04-07 04:08:06', '2023-04-18 15:05:43', '2025-04-06 02:31:14'),
+(2, 'Emily Johnson', 'emily.johnson@example.com', '$2b$10$3cRXpIfJ42mmnuqwllqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'admin', 'active', 'default.png', '2025-04-07 04:15:20', '2023-05-01 10:05:43', '2025-04-07 03:31:14'),
+(3, 'Liam Smith', 'liam.smith@example.com', '$2b$10$5dRXqIfJ41mmnuqwllqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'admin', 'inactive', 'default.png', '2025-04-06 02:11:34', '2023-05-12 14:05:43', '2025-04-06 03:31:14'),
+(4, 'Sophia Brown', 'sophia.brown@example.com', '$2b$10$6eRXrIfJ40mmnuqwllqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'editor', 'active', 'default.png', '2025-04-05 12:08:06', '2023-06-20 18:05:43', '2025-04-06 04:31:14'),
+(5, 'Noah Davis', 'noah.davis@example.com', '$2b$10$7fRXsIfJ39mmnuqwllqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'editor', 'active', 'default.png', '2025-04-04 09:15:06', '2023-07-15 08:05:43', '2025-04-06 05:31:14'),
+(6, 'Isabella Martinez', 'isabella.martinez@example.com', '$2b$10$8gRXtIfJ38mmnuqwllqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'admin', 'inactive', 'default.png', '2025-04-03 03:22:06', '2023-08-18 12:05:43', '2025-04-06 06:31:14'),
+(7, 'James Wilson', 'james.wilson@example.com', '$2b$10$9hRXuIfJ37mmnuqwllqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'admin', 'active', 'default.png', '2025-04-02 02:33:06', '2023-09-10 11:05:43', '2025-04-06 07:31:14'),
+(8, 'Mia Lee', 'mia.lee@example.com', '$2b$10$0iRXvIfJ36mmnuqwllqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'editor', 'active', 'default.png', '2025-04-01 01:08:06', '2023-10-22 09:05:43', '2025-04-06 08:31:14'),
+(9, 'William Walker', 'william.walker@example.com', '$2b$10$1jRXwIfJ35mmnuqwllqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'superadmin', 'active', 'default.png', '2025-03-31 08:08:06', '2023-11-03 06:05:43', '2025-04-06 09:31:14'),
+(10, 'Ava Harris', 'ava.harris@example.com', '$2b$10$2kRXxIfJ34mmnuqwllqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'editor', 'inactive', 'default.png', '2025-03-30 05:08:06', '2023-12-15 04:05:43', '2025-04-06 10:31:14');
 -- --------------------------------------------------------
 
 --

@@ -67,7 +67,7 @@ app.use((req, res, next) => {
 dotenv.config()
 
 app.get('/healthz', (_, response: Response): void => {
-  response.status(200).send('loong pooling')
+  response.status(200).send('server work')
 })
 
 if (process.env.NODE_ENV === 'development') {
