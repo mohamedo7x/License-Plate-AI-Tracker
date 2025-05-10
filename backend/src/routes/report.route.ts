@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { createReport } from '../controller/report.controller'
 import { validatePoliceToken } from '../auth/police_user.access'
 import { Request, Response } from 'express'
 const router = Router()

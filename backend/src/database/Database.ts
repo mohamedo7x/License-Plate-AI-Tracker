@@ -1,5 +1,7 @@
 import mysql, { Connection } from 'mysql2/promise'
+import dotenv from 'dotenv'
 
+dotenv.config()
 class Database {
   private static instance: Database
   private connection!: Connection

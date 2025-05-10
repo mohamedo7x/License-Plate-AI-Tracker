@@ -82,7 +82,6 @@ app.use(customErrorHandler)
 const startServer = async () => {
   try {
     await StartConnectionToDb()
-
     app.get('/isDbAlive', async (req, res) => {
       try {
         const connection = await getConnection()
