@@ -3,6 +3,12 @@ import { getMyDetails, loginPoliceUser } from '../controller/police.controller'
 import { loginPoliceUserValidation } from '../validation/police.validation'
 import { validateRequest } from '../middleware/validateRequest'
 import { validatePoliceToken } from '../auth/police_user.access'
+import {
+  CreateReport,
+  getMyReports,
+  getSpesificReport,
+} from '../controller/report.controller'
+import { createReportValidation } from '../validation/reports.validation'
 const router = Router()
 
 /**
@@ -20,5 +26,36 @@ router
  * @access  Private
  */
 router.route('/my-details').get(validatePoliceToken, getMyDetails)
+
+/**
+ * @route   GET /api/police/my-reports
+ * @desc    Get my reports
+ * @access  Private
+ */
+
+router.route('/my-reports').get(validatePoliceToken, getMyReports)
+
+/**
+ * @route   POST /api/police/reports
+ * @desc    Create a new Report
+ * @access  Private
+ */
+
+router
+  .route('/reports')
+  .post(
+    validatePoliceToken,
+    createReportValidation,
+    validateRequest,
+    CreateReport,
+  )
+
+/**
+ * @route   GET /api/police/reports/:id
+ * @desc    Get a specific report
+ * @access  Private
+ */
+
+router.route('/reports/:id').get(validatePoliceToken, getSpesificReport)
 
 export default router
