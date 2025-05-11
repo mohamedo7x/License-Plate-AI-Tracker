@@ -7,7 +7,7 @@ import {
   CreateReport,
   getMyReports,
   getSpesificReport,
-} from '../controller/report.controller'
+} from '../controller/report.police.controller'
 import { createReportValidation } from '../validation/reports.validation'
 const router = Router()
 

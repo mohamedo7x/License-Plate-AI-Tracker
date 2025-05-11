@@ -29,7 +29,7 @@ export const getMyReports = asyncHandler(
     } else {
       res.status(404).json({
         success: false,
-        message: 'User not found',
+        message: 'No reports found for the user',
       })
     }
   },
@@ -57,7 +57,7 @@ export const getSpesificReport = asyncHandler(
     } else {
       res.status(404).json({
         success: false,
-        message: 'User not found',
+        message: 'No reports found for the user',
       })
     }
   },
@@ -65,11 +65,11 @@ export const getSpesificReport = asyncHandler(
 
 export const CreateReport = asyncHandler(
   async (req: Request, res: Response) => {
-    const { title,type, description } = req.body
+    const { title, type, description } = req.body
     const user = (req as any).user
     const result = await executeNonQuery(
       'INSERT INTO police_reports (title,police_id, type, description) VALUES (?,?, ?, ?)',
-      [title,user.id, type, description],
+      [title, user.id, type, description],
     )
     if (result.success) {
       res.status(201).json({
