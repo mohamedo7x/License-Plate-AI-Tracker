@@ -6,7 +6,7 @@
 -- Generation Time: May 11, 2025 at 11:26 AM
 -- Server version: 9.3.0
 -- PHP Version: 8.2.28
-
+-- New mysql client version O7X Created
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
