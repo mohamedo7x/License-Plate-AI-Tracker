@@ -6,17 +6,19 @@ import {
 import asyncHandler from '../middleware/asyncHandler'
 import { Request, Response } from 'express'
 import { formatDate } from '../utils/dateFormat.util'
+import { reportScore } from '../utils/reportScore'
 
 export const getAllReports = asyncHandler(
   async (req: Request, res: Response) => {
     const result = await executeQuery(
-      'SELECT id , title , date , type , description , status FROM police_reports',
+      'SELECT rp.id, rp.title, rp.description, rp.status, rp.date, rt.name, rt.point AS SCORE FROM reports AS rp INNER JOIN police_reports AS pr ON rp.id = pr.report_id INNER JOIN report_type AS rt ON rp.type = rt.id;',
     )
     if (result.success && result.data) {
       const userData = result.data.map((report) => {
         return {
           ...report,
           date: formatDate(report.date),
+          SCORE: reportScore(report.SCORE),
         }
       })
       res.status(200).json({
@@ -29,11 +31,25 @@ export const getAllReports = asyncHandler(
 
 export const getSpesificReport = asyncHandler(
   async (req: Request, res: Response) => {
-    const reportId = Number(req.params.id)
-    const result = await executeSingleQuery(
-      'SELECT id , title , date , type , description , status FROM police_reports WHERE id = ?',
-      [reportId],
-    )
+    const reportId = req.params.id
+    const query = `
+  SELECT
+      rp.id,
+      rp.title,
+      rp.description,
+      rp.status,
+      rp.date,
+      rt.name
+  FROM
+      reports AS rp
+  INNER JOIN police_reports AS pr ON rp.id = pr.report_id
+  INNER JOIN report_type AS rt ON rp.type = rt.id
+  WHERE
+      rp.id LIKE ?;
+`
+
+    const result = await executeSingleQuery(query, [`%${reportId}%`])
+
     if (result.success && result.data) {
       const userData = result.data.map((report) => {
         return {
@@ -57,11 +73,12 @@ export const getSpesificReport = asyncHandler(
 
 export const deleteReport = asyncHandler(
   async (req: Request, res: Response) => {
-    const reportId = Number(req.params.id)
+    const reportId = req.params.id
     const result = await executeNonQuery(
       'DELETE FROM police_reports WHERE id = ?',
       [reportId],
     )
+
     if (result.success && (result.affectedRows ?? 0) > 0) {
       res.status(200).json({
         success: true,
@@ -79,7 +96,7 @@ export const deleteReport = asyncHandler(
 
 export const changeReportStatus = asyncHandler(
   async (req: Request, res: Response) => {
-    const reportId = Number(req.params.id)
+    const reportId = req.params.id
     const { status } = req.body
     const validStatuses = ['complete', 'close', 'processing']
 
@@ -106,6 +123,44 @@ export const changeReportStatus = asyncHandler(
         success: false,
         message:
           'No report found with the specified ID. Status update was not performed.',
+      })
+    }
+  },
+)
+
+export const getAllReportTypes = asyncHandler(
+  async (req: Request, res: Response) => {
+    const result = await executeQuery('SELECT * FROM report_type')
+    if (result.success && result.data) {
+      res.status(200).json({
+        success: true,
+        data: result.data || [],
+      })
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'No report types found.',
+      })
+    }
+  },
+)
+
+export const createReportType = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { name, point } = req.body
+    const result = await executeNonQuery(
+      'INSERT INTO report_type (name, point) VALUES (?, ?)',
+      [name, point],
+    )
+    if (result.success && (result.affectedRows ?? 0) > 0) {
+      res.status(201).json({
+        success: true,
+        message: '✅ The report type has been successfully created.',
+      })
+    } else {
+      res.status(400).json({
+        success: false,
+        message: '❌ Failed to create the report type.',
       })
     }
   },
