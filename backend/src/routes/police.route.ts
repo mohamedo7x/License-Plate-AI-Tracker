@@ -5,6 +5,7 @@ import { validateRequest } from '../middleware/validateRequest'
 import { validatePoliceToken } from '../auth/police_user.access'
 import {
   CreateReport,
+  getAllReportTypes,
   getMyReports,
   getSpesificReport,
 } from '../controller/report.police.controller'
@@ -49,6 +50,14 @@ router
     validateRequest,
     CreateReport,
   )
+
+/**
+ * @route   GET /api/police/reports/types
+ * @desc    get all type of reports
+ * @access  Private
+ */
+
+router.route('/reports/types').get(validatePoliceToken, getAllReportTypes)
 
 /**
  * @route   GET /api/police/reports/:id
