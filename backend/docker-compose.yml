@@ -39,6 +39,7 @@ services:
       MYSQL_PASSWORD: default@2025!
     volumes:
       - mysql_data:/var/lib/mysql
+      # - ./init.sh:/docker-entrypoint-initdb.d/init.sh
       - ./mysql/mysqlCore.sql:/docker-entrypoint-initdb.d/mysqlCore.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
