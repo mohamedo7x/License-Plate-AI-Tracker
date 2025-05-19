@@ -7,7 +7,9 @@ import cors from 'cors'
 import path from 'path'
 import { errorHandler as customErrorHandler } from './middleware/errorHandler'
 import logger from './utils/logger'
-
+import socketio from 'socket.io'
+import http from 'http'
+import { add, getClientCount, remove } from './utils/clients'
 const app = express()
 
 app.use(express.json())
@@ -18,6 +20,24 @@ app.use(
   '/uploads/images',
   express.static(path.join(__dirname, 'uploads', 'images')),
 )
+
+const httpserver = http.createServer(app)
+const io = new socketio.Server(httpserver)
+// SOCKET IO SERVER
+io.on('connection', (socket) => {
+  add(socket)
+  socket.on('disconnect', () => {
+    remove(socket)
+  })
+  socket.on('getAllClients', () => {
+    const clients = getClientCount()
+    console.log('All clients:', clients)
+  })
+  socket.on('login', (data) => {
+    console.log('User logged in:', data)
+    socket.emit('loginSuccess', { message: 'Login successful' })
+  })
+})
 
 app.use((req, res, next) => {
   const startTime = new Date()
@@ -75,6 +95,8 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // ************** ROUTES ************** //
+
+
 app.use(mainRoute)
 
 app.use(customErrorHandler)
@@ -95,7 +117,7 @@ const startServer = async () => {
     })
 
     const port = process.env.PORT
-    app.listen(port, () => {
+    httpserver.listen(port, () => {
       console.log('Server started on port', port)
     })
   } catch (error) {

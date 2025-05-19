@@ -11,7 +11,7 @@ import { reportScore } from '../utils/reportScore'
 export const getAllReports = asyncHandler(
   async (req: Request, res: Response) => {
     const result = await executeQuery(
-      'SELECT rp.id, rp.title, rp.description, rp.status, rp.date, rt.name, rt.point AS SCORE FROM reports AS rp INNER JOIN police_reports AS pr ON rp.id = pr.report_id INNER JOIN report_type AS rt ON rp.type = rt.id;',
+      'SELECT rp.id , pu.name AS officer_name, rp.title, rp.description, rp.status, rp.date, rt.name AS report_name, rt.point AS SCORE FROM reports AS rp INNER JOIN police_reports AS pr ON rp.id = pr.report_id INNER JOIN report_type AS rt ON rp.type = rt.id INNER JOIN police_users AS pu ON pu.id = pr.police_id;',
     )
     if (result.success && result.data) {
       const userData = result.data.map((report) => {
