@@ -11,7 +11,7 @@ import {
 import { PoliceUser } from '../model/police_user.model'
 import asyncHandler from '../middleware/asyncHandler'
 import bcrypt from 'bcrypt'
-import { NextFunction } from 'express'
+
 export const loginPoliceUser = asyncHandler(
   async (req: Request, res: Response) => {
     try {
@@ -33,9 +33,7 @@ export const loginPoliceUser = asyncHandler(
         res.status(401).json({ message: 'Invalid username or password' })
         return
       }
-      if (!policeUser.active) {
-        res.status(403).json({ message: 'Account is inactive' })
-      }
+      
       const token = generatePoliceUserJWTToken(policeUser)
       await executeNonQuery(
         'UPDATE police_users SET last_login = ? WHERE id = ?',

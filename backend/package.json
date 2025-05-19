@@ -19,6 +19,7 @@
     "@types/morgan": "^1.9.9",
     "@types/multer": "^1.4.12",
     "@types/node-notifier": "^8.0.5",
+    "@types/socket.io": "^3.0.1",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",
@@ -31,6 +32,7 @@
     "multer": "^1.4.5-lts.2",
     "mysql2": "^3.14.0",
     "node-notifier": "^10.0.1",
+    "socket.io": "^4.8.1",
     "winston": "^3.17.0"
   },
   "devDependencies": {
