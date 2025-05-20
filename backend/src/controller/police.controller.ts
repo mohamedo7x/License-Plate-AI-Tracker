@@ -39,6 +39,8 @@ export const loginPoliceUser = asyncHandler(
         'UPDATE police_users SET last_login = ? WHERE id = ?',
         [new Date(), policeUser.id],
       )
+      const query = "UPDATE police_users SET online = 1 WHERE id = ?";
+      await executeNonQuery(query, [policeUser.id]);
       res.status(200).json({
         message: 'Police user logged in successfully',
         token,
@@ -50,6 +52,20 @@ export const loginPoliceUser = asyncHandler(
     }
   },
 )
+
+export const logoutPoliceUser = asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user
+    const query = "UPDATE police_users SET online = 0 WHERE id = ?";
+    await executeNonQuery(query, [user.id]);
+    res.status(200).json({
+      message: `Police User logged out successfully`,
+    })
+  } catch (error) {
+    console.error('Logout error:', error)
+    res.status(500).json({ message: 'Internal server error' })
+  }
+});
 
 export const getMyDetails = asyncHandler(
   async (req: Request, res: Response) => {

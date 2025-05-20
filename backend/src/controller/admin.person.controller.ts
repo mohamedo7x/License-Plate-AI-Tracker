@@ -19,7 +19,7 @@ export const getPersonByID = asyncHandler(
             issue_date: formatDateV2(person.issue_date),
             expired_date: formatDateV2(person.expired_date),
             criminal_status:
-              person.criminal_status === 1 ? 'Wanted' : 'Not Wanted',
+              person.criminal_status === 1 ? 'مطلوب' : 'غير مطلوب',
           }
         })
       : []
@@ -43,7 +43,7 @@ export const getPersons = asyncHandler(async (req: Request, res: Response) => {
           issue_date: formatDateV2(person.issue_date),
           expired_date: formatDateV2(person.expired_date),
           criminal_status:
-            person.criminal_status === 1 ? 'Wanted' : 'Not Wanted',
+            person.criminal_status === 1 ? 'مطلوب' : 'غير مطلوب',
         }
       })
     : []

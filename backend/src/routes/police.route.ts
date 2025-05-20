@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getMyDetails, loginPoliceUser } from '../controller/police.controller'
+import { getMyDetails, loginPoliceUser, logoutPoliceUser } from '../controller/police.controller'
 import { loginPoliceUserValidation } from '../validation/police.validation'
 import { validateRequest } from '../middleware/validateRequest'
 import { validatePoliceToken } from '../auth/police_user.access'
@@ -20,6 +20,18 @@ const router = Router()
 router
   .route('/login')
   .post(loginPoliceUserValidation, validateRequest, loginPoliceUser)
+
+
+  /**
+ * @route   POST /api/police/logout
+ * @desc    Logout for police user
+ * @access  Private 
+ */
+router
+  .route('/logout')
+  .post(validatePoliceToken,logoutPoliceUser)
+
+
 
 /**
  * @route   GET /api/police/my-details
