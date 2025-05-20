@@ -5,6 +5,7 @@ import { validateAdminToken } from '../middleware/admin.middleware'
 import PoliceRoute from './police.route'
 import admiReports from './admin.reports.route'
 import adminPersonRoute from './admin.peron.route'
+import policePersonRoute from './police.person.route'
 const route = Router()
 
 route.use(`/admin`, AdminRoute)
@@ -16,5 +17,5 @@ route.use(`/police`, PoliceRoute)
 
 route.use('/person/admin', adminPersonRoute)
 
-route.use('/person/police', adminPersonRoute)
+route.use('/person/police', policePersonRoute)
 export default route
