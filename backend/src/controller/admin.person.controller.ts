@@ -1,7 +1,7 @@
 import asyncHandler from '../middleware/asyncHandler'
 import { Request, Response } from 'express'
 import { executeQuery } from '../utils/orm.util'
-import { formatDate } from '../utils/dateFormat.util'
+import { formatDate, formatDateV2 } from '../utils/dateFormat.util'
 
 export const getPersonByID = asyncHandler(
   async (req: Request, res: Response) => {
@@ -15,9 +15,9 @@ export const getPersonByID = asyncHandler(
       ? person.data.map((person) => {
           return {
             ...person,
-            date_of_birth: formatDate(person.date_of_birth),
-            issue_date: formatDate(person.issue_date),
-            expired_date: formatDate(person.expired_date),
+            date_of_birth: formatDateV2(person.date_of_birth),
+            issue_date: formatDateV2(person.issue_date),
+            expired_date: formatDateV2(person.expired_date),
             criminal_status:
               person.criminal_status === 1 ? 'Wanted' : 'Not Wanted',
           }
@@ -39,9 +39,9 @@ export const getPersons = asyncHandler(async (req: Request, res: Response) => {
     ? persons.data.map((person) => {
         return {
           ...person,
-          date_of_birth: formatDate(person.date_of_birth),
-          issue_date: formatDate(person.issue_date),
-          expired_date: formatDate(person.expired_date),
+          date_of_birth: formatDateV2(person.date_of_birth),
+          issue_date: formatDateV2(person.issue_date),
+          expired_date: formatDateV2(person.expired_date),
           criminal_status:
             person.criminal_status === 1 ? 'Wanted' : 'Not Wanted',
         }
