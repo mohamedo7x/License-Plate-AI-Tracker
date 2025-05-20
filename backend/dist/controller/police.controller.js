@@ -42,14 +42,9 @@ exports.loginPoliceUser = (0, asyncHandler_1.default)((req, res) => __awaiter(vo
             res.status(401).json({ message: 'Invalid username or password' });
             return;
         }
-        if (!policeUser.active) {
-            res.status(403).json({ message: 'Account is inactive' });
-        }
         const token = (0, police_user_access_1.generatePoliceUserJWTToken)(policeUser);
         yield (0, orm_util_1.executeNonQuery)('UPDATE police_users SET last_login = ? WHERE id = ?', [new Date(), policeUser.id]);
-        res
-            .status(200)
-            .json({
+        res.status(200).json({
             message: 'Police user logged in successfully',
             token,
             user: policeUser,
@@ -68,13 +63,13 @@ exports.getMyDetails = (0, asyncHandler_1.default)((req, res) => __awaiter(void 
         const { password_hash } = userData, safeUserData = __rest(userData, ["password_hash"]);
         res.status(200).json({
             success: true,
-            data: safeUserData
+            data: safeUserData,
         });
     }
     else {
         res.status(404).json({
             success: false,
-            message: 'User not found'
+            message: 'User not found',
         });
     }
 }));

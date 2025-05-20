@@ -33,7 +33,7 @@ export const loginPoliceUser = asyncHandler(
         res.status(401).json({ message: 'Invalid username or password' })
         return
       }
-      
+
       const token = generatePoliceUserJWTToken(policeUser)
       await executeNonQuery(
         'UPDATE police_users SET last_login = ? WHERE id = ?',

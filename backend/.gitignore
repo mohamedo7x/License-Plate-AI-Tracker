@@ -26,3 +26,5 @@ node_modules
 *.heic
 *.heif
 *.avif
+seed/seed.male.txt
+seed/seed.female.txt
