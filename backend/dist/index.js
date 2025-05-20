@@ -21,11 +21,31 @@ const cors_1 = __importDefault(require("cors"));
 const path_1 = __importDefault(require("path"));
 const errorHandler_1 = require("./middleware/errorHandler");
 const logger_1 = __importDefault(require("./utils/logger"));
+const socket_io_1 = __importDefault(require("socket.io"));
+const http_1 = __importDefault(require("http"));
+const clients_1 = require("./utils/clients");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use(express_1.default.static(path_1.default.join(__dirname, 'images')));
 app.use('/uploads/images', express_1.default.static(path_1.default.join(__dirname, 'uploads', 'images')));
+const httpserver = http_1.default.createServer(app);
+const io = new socket_io_1.default.Server(httpserver);
+// SOCKET IO SERVER
+io.on('connection', (socket) => {
+    (0, clients_1.add)(socket);
+    socket.on('disconnect', () => {
+        (0, clients_1.remove)(socket);
+    });
+    socket.on('getAllClients', () => {
+        const clients = (0, clients_1.getClientCount)();
+        console.log('All clients:', clients);
+    });
+    socket.on('login', (data) => {
+        console.log('User logged in:', data);
+        socket.emit('loginSuccess', { message: 'Login successful' });
+    });
+});
 app.use((req, res, next) => {
     const startTime = new Date();
     res.on('finish', () => {
@@ -54,7 +74,7 @@ app.use((req, res, next) => {
 });
 dotenv_1.default.config();
 app.get('/healthz', (_, response) => {
-    response.status(200).send('Server Work');
+    response.status(200).send('server work');
 });
 if (process.env.NODE_ENV === 'development') {
     app.use((0, errorhandler_1.default)());
@@ -76,7 +96,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
             }
         }));
         const port = process.env.PORT;
-        app.listen(port, () => {
+        httpserver.listen(port, () => {
             console.log('Server started on port', port);
         });
     }

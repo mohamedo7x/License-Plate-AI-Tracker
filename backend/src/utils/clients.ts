@@ -1,8 +1,8 @@
 import { Socket } from 'socket.io'
 
 interface ClientMap {
-  [key: string]: Socket;
-};
+  [key: string]: Socket
+}
 
 let clients: ClientMap = {}
 
@@ -15,15 +15,14 @@ export const remove = (client: Socket) => {
   return null
 }
 
-
 export const getClientById = (clientId: string): Socket | undefined => {
-  return clients[clientId];
-};
+  return clients[clientId]
+}
 
 export const getAllClients = (): ClientMap => {
-  return clients;
-};
+  return clients
+}
 
-export const getClientCount = ():number => {
-  return Object.keys(clients).length;
+export const getClientCount = (): number => {
+  return Object.keys(clients).length
 }

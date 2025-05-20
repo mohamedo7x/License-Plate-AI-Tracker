@@ -69,6 +69,7 @@ const validatePoliceToken = (req, res, next) => {
         if (!decoded) {
             return next(new errorHandler_1.UnauthorizedError('Invalid token'));
         }
+        ;
         req.user = decoded;
         next();
     }
@@ -84,7 +85,7 @@ const generatePoliceUserJWTToken = (policeUser) => {
         name: policeUser.name,
         rank: policeUser.rank,
         department: policeUser.department,
-        city: policeUser.city
+        city: policeUser.city,
     };
     return jsonwebtoken_1.default.sign(tokenData, JWT_SECRET, { expiresIn: '1h' });
 };

@@ -96,7 +96,6 @@ if (process.env.NODE_ENV === 'development') {
 
 // ************** ROUTES ************** //
 
-
 app.use(mainRoute)
 
 app.use(customErrorHandler)

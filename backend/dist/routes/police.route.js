@@ -5,17 +5,47 @@ const police_controller_1 = require("../controller/police.controller");
 const police_validation_1 = require("../validation/police.validation");
 const validateRequest_1 = require("../middleware/validateRequest");
 const police_user_access_1 = require("../auth/police_user.access");
+const report_police_controller_1 = require("../controller/report.police.controller");
+const reports_validation_1 = require("../validation/reports.validation");
 const router = (0, express_1.Router)();
 /**
  * @route   POST /api/police/login
  * @desc    Login for police user
  * @access  Public
  */
-router.route('/login').post(police_validation_1.loginPoliceUserValidation, validateRequest_1.validateRequest, police_controller_1.loginPoliceUser);
+router
+    .route('/login')
+    .post(police_validation_1.loginPoliceUserValidation, validateRequest_1.validateRequest, police_controller_1.loginPoliceUser);
 /**
  * @route   GET /api/police/my-details
  * @desc    Get my details
  * @access  Private
  */
 router.route('/my-details').get(police_user_access_1.validatePoliceToken, police_controller_1.getMyDetails);
+/**
+ * @route   GET /api/police/my-reports
+ * @desc    Get my reports
+ * @access  Private
+ */
+router.route('/my-reports').get(police_user_access_1.validatePoliceToken, report_police_controller_1.getMyReports);
+/**
+ * @route   POST /api/police/reports
+ * @desc    Create a new Report
+ * @access  Private
+ */
+router
+    .route('/reports')
+    .post(police_user_access_1.validatePoliceToken, reports_validation_1.createReportValidation, validateRequest_1.validateRequest, report_police_controller_1.CreateReport);
+/**
+ * @route   GET /api/police/reports/types
+ * @desc    get all type of reports
+ * @access  Private
+ */
+router.route('/reports/types').get(police_user_access_1.validatePoliceToken, report_police_controller_1.getAllReportTypes);
+/**
+ * @route   GET /api/police/reports/:id
+ * @desc    Get a specific report
+ * @access  Private
+ */
+router.route('/reports/:id').get(police_user_access_1.validatePoliceToken, report_police_controller_1.getSpesificReport);
 exports.default = router;
