@@ -42,8 +42,7 @@ export const getPersons = asyncHandler(async (req: Request, res: Response) => {
           date_of_birth: formatDateV2(person.date_of_birth),
           issue_date: formatDateV2(person.issue_date),
           expired_date: formatDateV2(person.expired_date),
-          criminal_status:
-            person.criminal_status === 1 ? 'مطلوب' : 'غير مطلوب',
+          criminal_status: person.criminal_status === 1 ? 'مطلوب' : 'غير مطلوب',
         }
       })
     : []

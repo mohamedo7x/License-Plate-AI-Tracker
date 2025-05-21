@@ -6,6 +6,7 @@ import PoliceRoute from './police.route'
 import admiReports from './admin.reports.route'
 import adminPersonRoute from './admin.peron.route'
 import policePersonRoute from './police.person.route'
+import policeViolation from './police.violation.route'
 const route = Router()
 
 route.use(`/admin`, AdminRoute)
@@ -18,4 +19,6 @@ route.use(`/police`, PoliceRoute)
 route.use('/person/admin', adminPersonRoute)
 
 route.use('/person/police', policePersonRoute)
+
+route.use('/violation', policeViolation)
 export default route
