@@ -12,3 +12,12 @@ export const formatDate = (dateString: string): string => {
 export const formatDateV2 = (dateString: string): string => {
   return dayjs(dateString).format('DD/MM/YYYY')
 }
+
+export const validDate = (dateString: Date): string => {
+  const currentDate = new Date()
+  const inputDate = new Date(dateString)
+  if (inputDate < currentDate) {
+    return 'expired'
+  }
+  return 'valid'
+}

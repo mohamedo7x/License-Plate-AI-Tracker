@@ -9,20 +9,13 @@ const router = Router()
  * @desc    get Person Using ID
  * @access  Private ( Admin only)
  **/
-router
-  .route('/:id')
-  .get(validatePoliceToken, getPersonByID)
+router.route('/:id').get(validatePoliceToken, getPersonByID)
 
-
-
-
-  /**
+/**
  * @route   GET /api/person/police/license/:id
  * @desc    get Person Using ID
  * @access  Private ( Admin only)
  **/
-router
-  .route('/license/:id')
-  .get(validatePoliceToken, getLicnseByID)
+router.route('/license/:id').get(validatePoliceToken, getLicnseByID)
 
 export default router
