@@ -1,23 +1,23 @@
-import multer from 'multer';
-import path from 'path';
-import crypto from 'crypto';
-import { Request } from 'express';
-import fs from 'fs';
-import { promisify } from 'util';
+import multer from 'multer'
+import path from 'path'
+import crypto from 'crypto'
+import { Request } from 'express'
+import fs from 'fs'
+import { promisify } from 'util'
 
-const storage = multer.memoryStorage();
+const storage = multer.memoryStorage()
 
 const fileFilter = (
   req: Request,
   file: Express.Multer.File,
-  cb: multer.FileFilterCallback
+  cb: multer.FileFilterCallback,
 ) => {
   if (file.mimetype.startsWith('image/')) {
-    cb(null, true);
+    cb(null, true)
   } else {
-    cb(new Error('Only image files are allowed'));
+    cb(new Error('Only image files are allowed'))
   }
-};
+}
 
 const uploadMiddleware = multer({
   storage,
@@ -25,95 +25,94 @@ const uploadMiddleware = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 10 MB
   },
-});
+})
 
-export const uploadFile = uploadMiddleware.single('img_profile');
-export const uploadMultiFiles = uploadMiddleware.array('attachment');
+export const uploadFile = uploadMiddleware.single('img_profile')
+export const uploadMultiFiles = uploadMiddleware.array('attachment')
 
 const getUploadDestination = (url: string): string => {
   if (url.includes('/police')) {
-    return path.join(__dirname, '..', 'uploads', 'images', 'police_users');
+    return path.join(__dirname, '..', 'uploads', 'images', 'police_users')
   }
   if (url.includes('/admin')) {
-    return path.join(__dirname, '..', 'uploads', 'images', 'admin_users');
+    return path.join(__dirname, '..', 'uploads', 'images', 'admin_users')
   }
   if (url.includes('/violation')) {
-    return path.join(__dirname, '..', 'uploads', 'images', 'violation_ticket');
+    return path.join(__dirname, '..', 'uploads', 'images', 'violation_ticket')
   }
-  throw new Error('Invalid upload destination');
-};
+  throw new Error('Invalid upload destination')
+}
 
 export const saveUploadedFile = async (req: Request): Promise<string> => {
   if (!req.file) {
-    throw new Error('No file uploaded');
+    throw new Error('No file uploaded')
   }
 
   const filename =
-    crypto.randomBytes(10).toString('hex') +
-    path.extname(req.file.originalname);
+    crypto.randomBytes(10).toString('hex') + path.extname(req.file.originalname)
 
-  const destination = getUploadDestination(req.originalUrl);
+  const destination = getUploadDestination(req.originalUrl)
 
   if (!fs.existsSync(destination)) {
-    fs.mkdirSync(destination, { recursive: true });
+    fs.mkdirSync(destination, { recursive: true })
   }
 
-  const filePath = path.join(destination, filename);
+  const filePath = path.join(destination, filename)
 
   try {
-    await promisify(fs.writeFile)(filePath, req.file.buffer);
+    await promisify(fs.writeFile)(filePath, req.file.buffer)
 
     if (!fs.existsSync(filePath)) {
-      throw new Error('File was not written successfully');
+      throw new Error('File was not written successfully')
     }
 
-    return filename;
+    return filename
   } catch (error) {
     if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath); // clean up partial file
+      fs.unlinkSync(filePath) // clean up partial file
     }
-    throw error;
+    throw error
   }
-};
+}
 
 export const saveUploadedFiles = async (req: Request): Promise<string[]> => {
-  const files = req.files as Express.Multer.File[];
+  const files = req.files as Express.Multer.File[]
 
   if (!files || !Array.isArray(files) || files.length === 0) {
-    throw new Error('No files uploaded');
+    throw new Error('No files uploaded')
   }
 
-  const destination = getUploadDestination(req.originalUrl);
+  const destination = getUploadDestination(req.originalUrl)
 
   if (!fs.existsSync(destination)) {
-    fs.mkdirSync(destination, { recursive: true });
+    fs.mkdirSync(destination, { recursive: true })
   }
 
-  const savedFilenames: string[] = [];
+  const savedFilenames: string[] = []
 
   for (const file of files) {
     const filename =
-      crypto.randomBytes(10).toString('hex') + path.extname(file.originalname);
-    const filePath = path.join(destination, filename);
+      crypto.randomBytes(10).toString('hex') + path.extname(file.originalname)
+    const filePath = path.join(destination, filename)
 
     try {
-      await promisify(fs.writeFile)(filePath, file.buffer);
+      await promisify(fs.writeFile)(filePath, file.buffer)
 
       if (!fs.existsSync(filePath)) {
-        throw new Error(`File ${file.originalname} was not saved successfully`);
+        throw new Error(`File ${file.originalname} was not saved successfully`)
       }
 
-      savedFilenames.push(filename);
+      savedFilenames.push(filename)
     } catch (error) {
       for (const f of savedFilenames) {
-        const fullPath = path.join(destination, f);
+        const fullPath = path.join(destination, f)
         if (fs.existsSync(fullPath)) {
-          fs.unlinkSync(fullPath);
+          fs.unlinkSync(fullPath)
         }
       }
-      throw error;
+      throw error
     }
   }
 
-  return savedFilenames;
-};
+  return savedFilenames
+}

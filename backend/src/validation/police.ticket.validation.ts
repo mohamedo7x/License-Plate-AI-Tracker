@@ -43,10 +43,10 @@ export const policeTicketValidation = [
     .optional()
     .isString()
     .withMessage('Attachment must be a string'),
-  body("status")
+  body('status')
     .optional()
     .isString()
-    .withMessage("Status must be a string")
-    .isIn(["paied", "unpaied", ""] )
-    .withMessage("Status must be either 'paied', 'unpaied', or ''")
+    .withMessage('Status must be a string')
+    .isIn(['paied', 'unpaied', ''])
+    .withMessage("Status must be either 'paied', 'unpaied', or ''"),
 ]
