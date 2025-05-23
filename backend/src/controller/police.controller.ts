@@ -11,6 +11,7 @@ import {
 import { PoliceUser } from '../model/police_user.model'
 import asyncHandler from '../middleware/asyncHandler'
 import bcrypt from 'bcrypt'
+import { getOTP, sendOTP } from '../utils/otp'
 
 export const loginPoliceUser = asyncHandler(
   async (req: Request, res: Response) => {
@@ -41,10 +42,13 @@ export const loginPoliceUser = asyncHandler(
       )
       const query = 'UPDATE police_users SET online = 1 WHERE id = ?'
       await executeNonQuery(query, [policeUser.id])
+      sendOTP(policeUser.phone_number, policeUser.id)
+      const otp = await getOTP(policeUser.id)
       res.status(200).json({
         message: 'Police user logged in successfully',
         token,
         user: policeUser,
+        sms_otp: otp,
       })
     } catch (error) {
       console.error('Login error:', error)
