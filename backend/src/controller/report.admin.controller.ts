@@ -109,11 +109,21 @@ export const changeReportStatus = asyncHandler(
     }
 
     const result = await executeNonQuery(
-      'UPDATE police_reports SET status = ? WHERE id = ?',
+      'UPDATE reports SET status = ? WHERE id = ?',
       [status, reportId],
     )
-
+    const policeUserQuery = await executeQuery(
+      'SELECT police_id FROM police_reports WHERE report_id = ? LIMIT 1',
+      [reportId],
+    )
+    const data = policeUserQuery.data
+    const police_id =
+      Array.isArray(data) && data.length > 0 ? data[0]['police_id'] : undefined
     if (result.success && (result.affectedRows ?? 0) > 0) {
+      await executeNonQuery(
+        'INSERT INTO notification_police (type,police_id) VALUES (?,?)',
+        ['report', police_id],
+      )
       res.status(200).json({
         success: true,
         message: '✅ The report status has been successfully updated.',
