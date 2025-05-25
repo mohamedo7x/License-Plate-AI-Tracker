@@ -13,6 +13,10 @@ export const formatDateV2 = (dateString: string): string => {
   return dayjs(dateString).format('DD/MM/YYYY')
 }
 
+export const getHouers = (dateString: string): string => {
+  return dayjs(dateString).format('HH:mm')
+}
+
 export const validDate = (dateString: Date): string => {
   const currentDate = new Date()
   const inputDate = new Date(dateString)

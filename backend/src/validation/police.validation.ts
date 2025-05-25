@@ -102,7 +102,7 @@ export const updatePoliceUserValidation = [
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters'),
 
-  body('rank')
+  body('rank_id')
     .optional()
     .isString()
     .withMessage('Rank must be a string')
@@ -153,6 +153,12 @@ export const updatePoliceUserValidation = [
     .optional()
     .isString()
     .withMessage('Profile image must be a string'),
+  body('password')
+    .optional()
+    .isString()
+    .withMessage('Password must be a string')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long'),
 ]
 
 export const loginPoliceUserValidation = [
@@ -166,7 +172,12 @@ export const loginPoliceUserValidation = [
     .withMessage('Username must be between 3 and 20 characters')
     .matches(/^[a-zA-Z0-9_]+$/)
     .withMessage('Username can only contain letters, numbers, and underscores'),
-
+  body('phone_number')
+    .notEmpty()
+    .withMessage('Phone number is required')
+    .isString()
+    .withMessage('Phone number must be a string')
+    .trim(),
   body('password')
     .notEmpty()
     .withMessage('Password is required')
@@ -174,4 +185,42 @@ export const loginPoliceUserValidation = [
     .withMessage('Password must be a string')
     .isLength({ min: 4 })
     .withMessage('Password must be at least 4 characters long'),
+]
+export const generateOTPForLogin = [
+  body('phone_number')
+    .notEmpty()
+    .withMessage('Phone number is required')
+    .isString()
+    .withMessage('Phone number must be a string')
+    .trim(),
+]
+export const changePasswordForPoliceUserValidation = [
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required')
+    .isString()
+    .withMessage('Password must be a string')
+    .isLength({ min: 4 })
+    .withMessage('Password must be at least 4 characters long'),
+  body('re-password')
+    .notEmpty()
+    .withMessage('Re-password is required')
+    .isString()
+    .withMessage('Re-password must be a string')
+    .isLength({ min: 4 })
+    .withMessage('Re-password must be at least 4 characters long')
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Passwords do not match')
+      }
+      return true
+    }),
+  body('sms_otp')
+    .notEmpty()
+    .withMessage('SMS OTP is required')
+    .isString()
+    .withMessage('SMS OTP must be a string')
+    .trim()
+    .isLength({ min: 4, max: 4 })
+    .withMessage('SMS OTP must be exactly 4 characters long'),
 ]

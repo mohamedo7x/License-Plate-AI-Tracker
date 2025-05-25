@@ -185,7 +185,7 @@ const getAllAdmins = asyncHandler(
 
 const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params
-  const { name, email, status } = req.body as Partial<AdminUser>
+  const { name, email, status, password } = req.body as Partial<AdminUser>
 
   const updates: string[] = []
   const values: any[] = []
@@ -194,7 +194,14 @@ const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
     updates.push('name = ?')
     values.push(name)
   }
-
+  if (password !== undefined) {
+    updates.push('password_hash = ?')
+    const newPassword = bcrypt.hashSync(
+      password,
+      parseInt(process.env.SALT_PASSWORD || '10'),
+    )
+    values.push(newPassword)
+  }
   let newImgProfile: string | undefined
   let oldImgProfile: string | null = null
 
@@ -565,12 +572,13 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
   const {
     military_id,
     name,
-    rank,
+    rank_id,
     department,
     active,
     username,
     phone_number,
     city,
+    password,
   } = req.body
 
   const updates: string[] = []
@@ -580,15 +588,22 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
     updates.push('military_id = ?')
     values.push(military_id)
   }
-
+  if (password !== undefined) {
+    updates.push('password_hash = ?')
+    const newPassword = bcrypt.hashSync(
+      password,
+      parseInt(process.env.SALT_PASSWORD || '10'),
+    )
+    values.push(newPassword)
+  }
   if (name !== undefined) {
     updates.push('name = ?')
     values.push(name)
   }
 
-  if (rank !== undefined) {
-    updates.push('rank = ?')
-    values.push(rank)
+  if (rank_id !== undefined) {
+    updates.push('rank_id = ?')
+    values.push(rank_id)
   }
 
   if (department !== undefined) {
