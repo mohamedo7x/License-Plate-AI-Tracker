@@ -10,6 +10,11 @@ import logger from './utils/logger'
 import socketio from 'socket.io'
 import http from 'http'
 import { add, getClientCount, remove } from './utils/clients'
+import jwt from 'jsonwebtoken'
+import fs from 'fs'
+import { getImageExtension } from './utils/DevOperation'
+import { SendDataToAIModel } from './utils/aiModel'
+import { CheckVehicleRealTime } from './controller/police.socket'
 const app = express()
 
 app.use(express.json())
@@ -22,20 +27,52 @@ app.use(
 )
 
 const httpserver = http.createServer(app)
-const io = new socketio.Server(httpserver)
+const io = new socketio.Server(httpserver, { cors: { origin: '*' } })
+
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token || socket.handshake.query?.token
+  if (!token) {
+    next(new Error('Authentication token is required'))
+    return
+  }
+  const jwtSecret = process.env.JWT_SECRET
+  if (!jwtSecret) {
+    next(new Error('JWT secret is not defined'))
+    return
+  }
+  try {
+    const userData = jwt.verify(token, jwtSecret)
+    ;(socket as any).user = userData
+    if (
+      typeof userData === 'object' &&
+      userData !== null &&
+      'username' in userData
+    ) {
+      console.log('Welcome', (userData as any).username)
+    } else {
+      console.log('Welcome, user')
+    }
+    next()
+  } catch (err) {
+    next(new Error('Invalid authentication token'))
+  }
+})
+
 // SOCKET IO SERVER
 io.on('connection', (socket) => {
+  const userData = (socket as any).user
   add(socket)
   socket.on('disconnect', () => {
     remove(socket)
   })
-  socket.on('getAllClients', () => {
-    const clients = getClientCount()
-    console.log('All clients:', clients)
-  })
-  socket.on('login', (data) => {
-    console.log('User logged in:', data)
-    socket.emit('loginSuccess', { message: 'Login successful' })
+  socket.on('frame', async (data) => {
+    const GetPlateNumber: string = await SendDataToAIModel(data)
+    const ResponseData = await CheckVehicleRealTime(
+      userData.username,
+      GetPlateNumber,
+      userData.id
+    )
+    socket.emit('frame', ResponseData)
   })
 })
 

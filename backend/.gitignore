@@ -28,3 +28,4 @@ node_modules
 *.avif
 seed/seed.male.txt
 seed/seed.female.txt
+src/test

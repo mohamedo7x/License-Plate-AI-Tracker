@@ -17,6 +17,9 @@ export const getHouers = (dateString: string): string => {
   return dayjs(dateString).format('HH:mm')
 }
 
+export const getRealTime = (dateString: string): string => {
+  return dayjs(dateString).format('HH:mm:ss')
+}
 export const validDate = (dateString: Date): string => {
   const currentDate = new Date()
   const inputDate = new Date(dateString)
