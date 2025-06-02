@@ -15,6 +15,7 @@ import fs from 'fs'
 import { getImageExtension } from './utils/DevOperation'
 import { SendDataToAIModel } from './utils/aiModel'
 import { CheckVehicleRealTime } from './controller/police.socket'
+import { executeNonQuery } from './utils/orm.util'
 const app = express()
 
 app.use(express.json())
@@ -59,18 +60,24 @@ io.use((socket, next) => {
 })
 
 // SOCKET IO SERVER
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   const userData = (socket as any).user
   add(socket)
-  socket.on('disconnect', () => {
+
+  const query = 'UPDATE police_users SET online = 1 WHERE id = ?'
+  await executeNonQuery(query, [userData.id])
+
+  socket.on('disconnect', async () => {
     remove(socket)
+    const query = 'UPDATE police_users SET online = 0 WHERE id = ?'
+    await executeNonQuery(query, [userData.id])
   })
   socket.on('frame', async (data) => {
     const GetPlateNumber: string = await SendDataToAIModel(data)
     const ResponseData = await CheckVehicleRealTime(
       userData.username,
       GetPlateNumber,
-      userData.id
+      userData.id,
     )
     socket.emit('frame', ResponseData)
   })
