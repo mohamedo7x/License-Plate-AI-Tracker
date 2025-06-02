@@ -4,12 +4,14 @@ import { executeNonQuery, executeQuery } from '../utils/orm.util'
 export async function CheckVehicleRealTime(
   uname_police: string,
   plate: string,
-  user_id:number
+  user_id: number,
 ) {
   //Check IN Redis DB if thisPlate Number Is Checked Before !
 
-  await executeNonQuery("INSERT INTO inspected_vehicles (plate , police_id) VALUES(?,?);",[plate , user_id])
-
+  await executeNonQuery(
+    'INSERT INTO inspected_vehicles (plate , police_id) VALUES(?,?);',
+    [plate, user_id],
+  )
 
   const currentTime = new Date()
   const isWantedVehcile = await executeQuery(
