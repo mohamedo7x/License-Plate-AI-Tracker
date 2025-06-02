@@ -91,5 +91,5 @@ export const generatePoliceUserJWTToken = (policeUser: PoliceUser): string => {
     city: policeUser.city,
   }
 
-  return jwt.sign(tokenData, JWT_SECRET, { expiresIn: '2h' })
+  return jwt.sign(tokenData, JWT_SECRET, { expiresIn: '10h' })
 }

@@ -4,7 +4,6 @@ import { executeQuery } from '../utils/orm.util'
 import { formatDateV2, validDate } from '../utils/dateFormat.util'
 
 export const getLicnseByID = asyncHandler(
-  // down
   async (req: Request, res: Response) => {
     const { id } = req.params
     const query = `SELECT
