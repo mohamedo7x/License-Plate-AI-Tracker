@@ -18,6 +18,7 @@ import { isPoliceUserExist } from '../auth/police_user.access'
 import * as path from 'path'
 import * as fs from 'fs'
 import { saveUploadedFile } from '../middleware/multer.middleware'
+import { HandelViolations } from '../utils/response'
 
 interface AdminUserRow extends AdminUser, RowDataPacket {}
 
@@ -25,11 +26,11 @@ interface CountResult extends RowDataPacket {
   total: number
 }
 
-interface PoliceUserRow extends RowDataPacket {
+export interface PoliceUserRow extends RowDataPacket {
   id: number
   military_id: string
   name: string
-  rank: string
+  rank_id: string
   department: string
   active: boolean
   username: string
@@ -42,7 +43,7 @@ interface PoliceUserRow extends RowDataPacket {
 
 const createAdmin = asyncHandler(
   async (req: Request<{}, {}, Partial<AdminUser>>, res: Response) => {
-    const { name, email, password_hash } = req.body
+    const { name, email, password_hash,role } = req.body
     const hashedPassword = await bcrypt.hash(
       password_hash || '',
       parseInt(process.env.SALT_PASSWORD || '10'),
@@ -65,7 +66,7 @@ const createAdmin = asyncHandler(
       img_profile,
       email,
       hashedPassword,
-      'admin',
+      role || "admin",
       'active',
       new Date(),
     ]
@@ -372,7 +373,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
   const {
     military_id,
     name,
-    rank,
+    rank_id,
     department,
     active,
     username,
@@ -402,11 +403,11 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     parseInt(process.env.SALT_PASSWORD || '10'),
   )
 
-  const query = `INSERT INTO police_users (military_id, name, \`rank\`, department, active, username, city, password_hash, phone_number, img_profile) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  const query = `INSERT INTO police_users (military_id, name, \`rank_id\`, department, active, username, city, password_hash, phone_number, img_profile) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   const result = await executeNonQuery(query, [
     military_id,
     name,
-    rank,
+    rank_id,
     department,
     active,
     username,
@@ -447,7 +448,7 @@ const getAllUsers = asyncHandler(
     )
 
     const result = await executeQuery<PoliceUserRow>(
-      `SELECT id, military_id, name, \`rank\`, department, city, active, username, phone_number, img_profile, last_login, created_at , online, updated_at 
+      `SELECT id, military_id, name, \`rank_id\`, department, city, active, username, phone_number, img_profile, last_login, created_at , online, updated_at 
      FROM police_users 
      ORDER BY created_at ASC 
      LIMIT ? OFFSET ?`,
@@ -465,7 +466,7 @@ const getAllUsers = asyncHandler(
           id: user.id,
           badgeNum: user.military_id,
           name: user.name,
-          rank: user.rank,
+          rank_id: user.rank_id,
           department: user.department,
           city: user.city,
           active: user.active,
@@ -499,16 +500,17 @@ const getAllUsers = asyncHandler(
 const getUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params
   const result = await executeSingleQuery<PoliceUserRow>(
-    'SELECT * FROM police_users WHERE id = ?',
+    'SELECT p.* , v.plate_id FROM police_users p INNER JOIN violations AS v ON p.id = v.police_id WHERE p.id = ?',
     [id],
   )
   if (result.success && result.data && result.data.length > 0) {
     const user = result.data[0]
+    const violation = HandelViolations(user)
     const response: PoliceUserResponse = {
       id: user.id,
       badgeNum: user.military_id,
       name: user.name,
-      rank: user.rank,
+      rank_id: user.rank_id,
       department: user.department,
       city: user.city,
       active: user.active,
@@ -524,6 +526,7 @@ const getUser = asyncHandler(async (req: Request, res: Response) => {
       online: user.online,
       created_at: user.created_at,
       updated_at: user.updated_at,
+      violations:violation // NOT FINISHED YET !!
     }
     res.json(response)
   } else {
