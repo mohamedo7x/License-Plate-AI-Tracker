@@ -43,7 +43,7 @@ export interface PoliceUserRow extends RowDataPacket {
 
 const createAdmin = asyncHandler(
   async (req: Request<{}, {}, Partial<AdminUser>>, res: Response) => {
-    const { name, email, password_hash,role } = req.body
+    const { name, email, password_hash, role } = req.body
     const hashedPassword = await bcrypt.hash(
       password_hash || '',
       parseInt(process.env.SALT_PASSWORD || '10'),
@@ -66,7 +66,7 @@ const createAdmin = asyncHandler(
       img_profile,
       email,
       hashedPassword,
-      role || "admin",
+      role || 'admin',
       'active',
       new Date(),
     ]
@@ -448,10 +448,7 @@ const getAllUsers = asyncHandler(
     )
 
     const result = await executeQuery<PoliceUserRow>(
-      `SELECT id, military_id, name, \`rank_id\`, department, city, active, username, phone_number, img_profile, last_login, created_at , online, updated_at 
-     FROM police_users 
-     ORDER BY created_at ASC 
-     LIMIT ? OFFSET ?`,
+      `SELECT pu.id, pu.military_id, pu.name, pu.rank_id, pu.department, pu.city, pu.active, pu.username, pu.phone_number, pu.img_profile, pu.last_login, pu.created_at, pu.online, pu.updated_at, (SELECT COUNT(*) FROM violations v WHERE v.police_id = pu.id) AS total_violations FROM police_users pu ORDER BY pu.created_at ASC LIMIT ? OFFSET ?;`,
       [limit, offset],
     )
 
@@ -472,6 +469,7 @@ const getAllUsers = asyncHandler(
           active: user.active,
           username: user.username,
           phone_number: user.phone_number,
+          total_violation: user.total_violations || 0,
           img_profile:
             req.protocol +
             '://' +
@@ -505,7 +503,7 @@ const getUser = asyncHandler(async (req: Request, res: Response) => {
   )
   if (result.success && result.data && result.data.length > 0) {
     const user = result.data[0]
-    const violation = HandelViolations(user)
+    const violation = await HandelViolations(user)
     const response: PoliceUserResponse = {
       id: user.id,
       badgeNum: user.military_id,
@@ -526,7 +524,7 @@ const getUser = asyncHandler(async (req: Request, res: Response) => {
       online: user.online,
       created_at: user.created_at,
       updated_at: user.updated_at,
-      violations:violation // NOT FINISHED YET !!
+      violations: violation, // NOT FINISHED YET !!
     }
     res.json(response)
   } else {

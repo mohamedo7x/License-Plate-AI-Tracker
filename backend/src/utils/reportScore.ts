@@ -1,4 +1,3 @@
-
 export const reportScore = (score: number) => {
   if (score < 3) {
     return 'Low'

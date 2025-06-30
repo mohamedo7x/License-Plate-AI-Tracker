@@ -1,6 +1,8 @@
 import { QueryResult, RowDataPacket } from 'mysql2'
 import { getHouers } from './dateFormat.util'
 import { PoliceUserRow } from '../controller/admin.controller'
+import { executeQuery, executeSingleQuery } from './orm.util'
+import { violation } from '../model/police_user.response.model'
 
 export const generateDescriptionForNotification = (
   typeOfNotification: string,
@@ -131,6 +133,65 @@ export const generateActivitesCard = (
   }
 }
 
-export const HandelViolations = (policeData:PoliceUserRow) => {
-  const {} = policeData;
+const formatViolations = (
+  violations: Partial<violation> | Partial<violation>[],
+): { caseSolved: number; activeCase: number; pendingCase: number } => {
+  const list = Array.isArray(violations) ? violations : [violations]
+
+  let caseSolved = 0
+  let activeCase = 0
+  let pendingCase = 0
+
+  for (const vio of list) {
+    switch (vio.violation_status) {
+      case 'paied':
+        ++caseSolved
+        break
+      case 'unpaied':
+        ++activeCase
+        break
+      case 'under_review':
+        ++pendingCase
+        break
+    }
+  }
+
+  return {
+    caseSolved,
+    activeCase,
+    pendingCase,
+  }
+}
+
+export const HandelViolations = async (policeData: PoliceUserRow) => {
+  const police_id = policeData.id
+
+  const spesific_violations = await executeQuery<violation>(
+    `
+SELECT 
+  v.plate_id as plate_number ,
+  v.location as location ,
+  vt.name as violation ,
+  v.status as violation_status ,
+  v.id as violation_id
+FROM violations v 
+INNER JOIN violation_type vt ON vt.ID = v.type
+WHERE v.police_id = ?`,
+    [police_id],
+  )
+  if (spesific_violations && spesific_violations.data) {
+    const statstic_data = formatViolations(spesific_violations.data)
+    return {
+      sucess: true,
+      statistics: statstic_data,
+      total: spesific_violations.data.length,
+      data: spesific_violations.data,
+    }
+  } else {
+    return {
+      sucess: false,
+      total: 0,
+      data: {},
+    }
+  }
 }
