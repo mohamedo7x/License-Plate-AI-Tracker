@@ -11,8 +11,6 @@ import socketio from 'socket.io'
 import http from 'http'
 import { add, getClientCount, remove } from './utils/clients'
 import jwt from 'jsonwebtoken'
-import fs from 'fs'
-import { getImageExtension } from './utils/DevOperation'
 import { SendDataToAIModel } from './utils/aiModel'
 import { CheckVehicleRealTime } from './controller/police.socket'
 import { executeNonQuery } from './utils/orm.util'
@@ -144,7 +142,7 @@ app.use(mainRoute)
 
 app.use(customErrorHandler)
 
-const startServer = async () => {
+export const startServer = async () => {
   try {
     await StartConnectionToDb()
     app.get('/isDbAlive', async (req, res) => {
@@ -168,5 +166,3 @@ const startServer = async () => {
     process.exit(1)
   }
 }
-
-startServer()

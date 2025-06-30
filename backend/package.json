@@ -2,11 +2,11 @@
   "name": "licenseplateai",
   "version": "1.0.0",
   "description": "<p align=\"center\">\r   <a target=\"blank\">\r     <img src=\"./mini-logo.png\" width=\"120\" alt=\"PR\" />\r   </a>\r </p>\r <h3 align=\"center\">Backend License Plate AI Tracker 📷</h3>",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "scripts": {
-    "start:dev": "npm run format && nodemon src/index.ts",
-    "start:devf": "nodemon --legacy-watch src/index.ts",
-    "start:prod": "node dist/index.js",
+    "start:dev": "npm run format && nodemon src/server.ts",
+    "start:devf": "nodemon --legacy-watch src/server.ts",
+    "start:prod": "node dist/server.js",
     "build": "tsc --project .",
     "format": "prettier --write \"src/**/*.ts\""
   },

@@ -28,10 +28,10 @@ export const getAllReports = asyncHandler(
     }
   },
 )
-// return ALL police Officer Viloations 
+// return ALL police Officer Viloations
 export const getSpesificReport = asyncHandler(
   async (req: Request, res: Response) => {
-    const reportId = req.params.id;
+    const reportId = req.params.id
     const query = `
   SELECT
       rp.id,
@@ -64,13 +64,13 @@ export const getSpesificReport = asyncHandler(
 `
 
     const result = await executeSingleQuery(query, [`%${reportId}%`])
-    
+
     if (result.success && result.data) {
       const userData = result.data.map((report) => {
         return {
           ...report,
           SCORE: reportScore(report.SCORE),
-          date: getFullDate(report.date)
+          date: getFullDate(report.date),
         }
       })
       res.status(200).json({
@@ -91,10 +91,10 @@ export const deleteReport = asyncHandler(
   async (req: Request, res: Response) => {
     const reportId = req.params.id
     const result = await executeNonQuery(
-      'DELETE FROM police_reports WHERE id = ?',
+      'DELETE FROM police_reports WHERE report_id = ?',
       [reportId],
     )
-
+    await executeNonQuery('DELETE FROM reports WHERE id = ?', [reportId])
     if (result.success && (result.affectedRows ?? 0) > 0) {
       res.status(200).json({
         success: true,

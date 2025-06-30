@@ -1,3 +1,4 @@
+import { RowDataPacket } from 'mysql2'
 import { User } from './user.model'
 
 export interface PoliceUserResponse {
@@ -17,7 +18,12 @@ export interface PoliceUserResponse {
   updated_at?: Date
   violations?: [] | any
 }
-
+export interface violation extends RowDataPacket {
+  plate_number: number
+  location: string
+  violation_status: string
+  violation_id: number
+}
 export interface PoliceUserListResponse {
   data: PoliceUserResponse[]
   pagination: {

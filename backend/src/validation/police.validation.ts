@@ -19,7 +19,7 @@ export const createPoliceUserValidation = [
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters'),
 
-  body('rank')
+  body('rank_id')
     .notEmpty()
     .withMessage('Rank is required')
     .isString()
