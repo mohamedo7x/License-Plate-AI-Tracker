@@ -5,7 +5,7 @@ import {
 } from '../utils/orm.util'
 import asyncHandler from '../middleware/asyncHandler'
 import { Request, Response } from 'express'
-import { formatDate } from '../utils/dateFormat.util'
+import { formatDate, getFullDate } from '../utils/dateFormat.util'
 import { reportScore } from '../utils/reportScore'
 
 export const getAllReports = asyncHandler(
@@ -17,7 +17,7 @@ export const getAllReports = asyncHandler(
       const userData = result.data.map((report) => {
         return {
           ...report,
-          date: formatDate(report.date),
+          date: getFullDate(report.date),
           SCORE: reportScore(report.SCORE),
         }
       })
@@ -28,33 +28,49 @@ export const getAllReports = asyncHandler(
     }
   },
 )
-
+// return ALL police Officer Viloations 
 export const getSpesificReport = asyncHandler(
   async (req: Request, res: Response) => {
-    const reportId = req.params.id
+    const reportId = req.params.id;
     const query = `
   SELECT
       rp.id,
+      rt.name,
       rp.title,
       rp.description,
       rp.status,
       rp.date,
-      rt.name
+      pc.id AS police_id,
+      pc.name AS police_name,
+      SUM(rt.point) AS SCORE
+      
+      
   FROM
       reports AS rp
   INNER JOIN police_reports AS pr ON rp.id = pr.report_id
   INNER JOIN report_type AS rt ON rp.type = rt.id
+  INNER JOIN police_users AS pc ON pc.id = pr.police_id
   WHERE
-      rp.id LIKE ?;
+      rp.id LIKE ?
+      GROUP BY
+    rp.id,
+    rt.name,
+    rp.title,
+    rp.description,
+    rp.status,
+    rp.date,
+    pc.id;
+;
 `
 
     const result = await executeSingleQuery(query, [`%${reportId}%`])
-
+    
     if (result.success && result.data) {
       const userData = result.data.map((report) => {
         return {
           ...report,
-          date: formatDate(report.date),
+          SCORE: reportScore(report.SCORE),
+          date: getFullDate(report.date)
         }
       })
       res.status(200).json({

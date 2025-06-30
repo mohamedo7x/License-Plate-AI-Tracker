@@ -4,7 +4,7 @@ export interface PoliceUserResponse {
   id: number
   badgeNum: string
   name: string
-  rank: string
+  rank_id: string
   department: string
   city: string
   active: boolean
@@ -15,6 +15,7 @@ export interface PoliceUserResponse {
   last_login?: Date | null
   created_at?: Date
   updated_at?: Date
+  violations?: [] | any
 }
 
 export interface PoliceUserListResponse {

@@ -1,5 +1,6 @@
 import { QueryResult, RowDataPacket } from 'mysql2'
 import { getHouers } from './dateFormat.util'
+import { PoliceUserRow } from '../controller/admin.controller'
 
 export const generateDescriptionForNotification = (
   typeOfNotification: string,
@@ -128,4 +129,8 @@ export const generateActivitesCard = (
   } else {
     return {}
   }
+}
+
+export const HandelViolations = (policeData:PoliceUserRow) => {
+  const {} = policeData;
 }
