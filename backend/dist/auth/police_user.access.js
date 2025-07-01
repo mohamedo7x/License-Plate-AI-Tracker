@@ -87,6 +87,6 @@ const generatePoliceUserJWTToken = (policeUser) => {
         department: policeUser.department,
         city: policeUser.city,
     };
-    return jsonwebtoken_1.default.sign(tokenData, JWT_SECRET, { expiresIn: '1h' });
+    return jsonwebtoken_1.default.sign(tokenData, JWT_SECRET, { expiresIn: '10h' });
 };
 exports.generatePoliceUserJWTToken = generatePoliceUserJWTToken;

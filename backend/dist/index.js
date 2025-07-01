@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.startServer = void 0;
 const express_1 = __importDefault(require("express"));
 const errorhandler_1 = __importDefault(require("errorhandler"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -24,28 +25,63 @@ const logger_1 = __importDefault(require("./utils/logger"));
 const socket_io_1 = __importDefault(require("socket.io"));
 const http_1 = __importDefault(require("http"));
 const clients_1 = require("./utils/clients");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const aiModel_1 = require("./utils/aiModel");
+const police_socket_1 = require("./controller/police.socket");
+const orm_util_1 = require("./utils/orm.util");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use(express_1.default.static(path_1.default.join(__dirname, 'images')));
 app.use('/uploads/images', express_1.default.static(path_1.default.join(__dirname, 'uploads', 'images')));
 const httpserver = http_1.default.createServer(app);
-const io = new socket_io_1.default.Server(httpserver);
-// SOCKET IO SERVER
-io.on('connection', (socket) => {
-    (0, clients_1.add)(socket);
-    socket.on('disconnect', () => {
-        (0, clients_1.remove)(socket);
-    });
-    socket.on('getAllClients', () => {
-        const clients = (0, clients_1.getClientCount)();
-        console.log('All clients:', clients);
-    });
-    socket.on('login', (data) => {
-        console.log('User logged in:', data);
-        socket.emit('loginSuccess', { message: 'Login successful' });
-    });
+const io = new socket_io_1.default.Server(httpserver, { cors: { origin: '*' } });
+io.use((socket, next) => {
+    var _a, _b;
+    const token = ((_a = socket.handshake.auth) === null || _a === void 0 ? void 0 : _a.token) || ((_b = socket.handshake.query) === null || _b === void 0 ? void 0 : _b.token);
+    if (!token) {
+        next(new Error('Authentication token is required'));
+        return;
+    }
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+        next(new Error('JWT secret is not defined'));
+        return;
+    }
+    try {
+        const userData = jsonwebtoken_1.default.verify(token, jwtSecret);
+        socket.user = userData;
+        if (typeof userData === 'object' &&
+            userData !== null &&
+            'username' in userData) {
+            console.log('Welcome', userData.username);
+        }
+        else {
+            console.log('Welcome, user');
+        }
+        next();
+    }
+    catch (err) {
+        next(new Error('Invalid authentication token'));
+    }
 });
+// SOCKET IO SERVER
+io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
+    const userData = socket.user;
+    (0, clients_1.add)(socket);
+    const query = 'UPDATE police_users SET online = 1 WHERE id = ?';
+    yield (0, orm_util_1.executeNonQuery)(query, [userData.id]);
+    socket.on('disconnect', () => __awaiter(void 0, void 0, void 0, function* () {
+        (0, clients_1.remove)(socket);
+        const query = 'UPDATE police_users SET online = 0 WHERE id = ?';
+        yield (0, orm_util_1.executeNonQuery)(query, [userData.id]);
+    }));
+    socket.on('frame', (data) => __awaiter(void 0, void 0, void 0, function* () {
+        const GetPlateNumber = yield (0, aiModel_1.SendDataToAIModel)(data);
+        const ResponseData = yield (0, police_socket_1.CheckVehicleRealTime)(userData.username, GetPlateNumber, userData.id);
+        socket.emit('frame', ResponseData);
+    }));
+}));
 app.use((req, res, next) => {
     const startTime = new Date();
     res.on('finish', () => {
@@ -105,4 +141,4 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
         process.exit(1);
     }
 });
-startServer();
+exports.startServer = startServer;

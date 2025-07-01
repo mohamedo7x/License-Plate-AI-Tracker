@@ -79,4 +79,10 @@ exports.updateAdminValidation = [
         .withMessage('Status must be a string')
         .isIn(['active', 'inactive'])
         .withMessage('Status must be either active or inactive'),
+    (0, express_validator_1.body)('password')
+        .optional()
+        .isString()
+        .withMessage('Password must be a string')
+        .isLength({ min: 6 })
+        .withMessage('Password must be at least 6 characters long'),
 ];

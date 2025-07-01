@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.saveUploadedFile = exports.uploadFile = void 0;
+exports.saveUploadedFiles = exports.saveUploadedFile = exports.uploadMultiFiles = exports.uploadFile = void 0;
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const crypto_1 = __importDefault(require("crypto"));
@@ -27,29 +27,33 @@ const fileFilter = (req, file, cb) => {
         cb(new Error('Only image files are allowed'));
     }
 };
-const upload_middleware = (0, multer_1.default)({
+const uploadMiddleware = (0, multer_1.default)({
     storage,
     fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024,
+        fileSize: 10 * 1024 * 1024, // 10 MB
     },
 });
-exports.uploadFile = upload_middleware.single('img_profile');
+exports.uploadFile = uploadMiddleware.single('img_profile');
+exports.uploadMultiFiles = uploadMiddleware.array('attachment');
+const getUploadDestination = (url) => {
+    if (url.includes('/police')) {
+        return path_1.default.join(__dirname, '..', 'uploads', 'images', 'police_users');
+    }
+    if (url.includes('/admin')) {
+        return path_1.default.join(__dirname, '..', 'uploads', 'images', 'admin_users');
+    }
+    if (url.includes('/violation')) {
+        return path_1.default.join(__dirname, '..', 'uploads', 'images', 'violation_ticket');
+    }
+    throw new Error('Invalid upload destination');
+};
 const saveUploadedFile = (req) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.file) {
         throw new Error('No file uploaded');
     }
     const filename = crypto_1.default.randomBytes(10).toString('hex') + path_1.default.extname(req.file.originalname);
-    let destination;
-    if (req.originalUrl.includes('/police')) {
-        destination = path_1.default.join(__dirname, '..', 'uploads', 'images', 'police_users');
-    }
-    else if (req.originalUrl.includes('/admin')) {
-        destination = path_1.default.join(__dirname, '..', 'uploads', 'images', 'admin_users');
-    }
-    else {
-        throw new Error('Invalid upload destination');
-    }
+    const destination = getUploadDestination(req.originalUrl);
     if (!fs_1.default.existsSync(destination)) {
         fs_1.default.mkdirSync(destination, { recursive: true });
     }
@@ -63,9 +67,42 @@ const saveUploadedFile = (req) => __awaiter(void 0, void 0, void 0, function* ()
     }
     catch (error) {
         if (fs_1.default.existsSync(filePath)) {
-            fs_1.default.unlinkSync(filePath);
+            fs_1.default.unlinkSync(filePath); // clean up partial file
         }
         throw error;
     }
 });
 exports.saveUploadedFile = saveUploadedFile;
+const saveUploadedFiles = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const files = req.files;
+    if (!files || !Array.isArray(files) || files.length === 0) {
+        throw new Error('No files uploaded');
+    }
+    const destination = getUploadDestination(req.originalUrl);
+    if (!fs_1.default.existsSync(destination)) {
+        fs_1.default.mkdirSync(destination, { recursive: true });
+    }
+    const savedFilenames = [];
+    for (const file of files) {
+        const filename = crypto_1.default.randomBytes(10).toString('hex') + path_1.default.extname(file.originalname);
+        const filePath = path_1.default.join(destination, filename);
+        try {
+            yield (0, util_1.promisify)(fs_1.default.writeFile)(filePath, file.buffer);
+            if (!fs_1.default.existsSync(filePath)) {
+                throw new Error(`File ${file.originalname} was not saved successfully`);
+            }
+            savedFilenames.push(filename);
+        }
+        catch (error) {
+            for (const f of savedFilenames) {
+                const fullPath = path_1.default.join(destination, f);
+                if (fs_1.default.existsSync(fullPath)) {
+                    fs_1.default.unlinkSync(fullPath);
+                }
+            }
+            throw error;
+        }
+    }
+    return savedFilenames;
+});
+exports.saveUploadedFiles = saveUploadedFiles;

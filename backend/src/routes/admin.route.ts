@@ -11,6 +11,7 @@ import {
   getUser,
   deleteUser,
   updateUser,
+  getAllViolations,
 } from '../controller/admin.controller'
 import {
   validateAdminToken,
@@ -136,5 +137,8 @@ router
     validateRequest,
     updateUser,
   )
+
+
+
 
 export default router

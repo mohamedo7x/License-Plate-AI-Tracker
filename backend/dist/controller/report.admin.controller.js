@@ -21,7 +21,7 @@ exports.getAllReports = (0, asyncHandler_1.default)((req, res) => __awaiter(void
     const result = yield (0, orm_util_1.executeQuery)('SELECT rp.id AS report_id , pu.id AS police_id , pu.name AS officer_name, rp.title, rp.description, rp.status, rp.date, rt.name AS report_name, rt.point AS SCORE FROM reports AS rp INNER JOIN police_reports AS pr ON rp.id = pr.report_id INNER JOIN report_type AS rt ON rp.type = rt.id INNER JOIN police_users AS pu ON pu.id = pr.police_id;');
     if (result.success && result.data) {
         const userData = result.data.map((report) => {
-            return Object.assign(Object.assign({}, report), { date: (0, dateFormat_util_1.formatDate)(report.date), SCORE: (0, reportScore_1.reportScore)(report.SCORE) });
+            return Object.assign(Object.assign({}, report), { date: (0, dateFormat_util_1.getFullDate)(report.date), SCORE: (0, reportScore_1.reportScore)(report.SCORE) });
         });
         res.status(200).json({
             success: true,
@@ -29,27 +29,43 @@ exports.getAllReports = (0, asyncHandler_1.default)((req, res) => __awaiter(void
         });
     }
 }));
+// return ALL police Officer Viloations
 exports.getSpesificReport = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const reportId = req.params.id;
     const query = `
   SELECT
       rp.id,
+      rt.name,
       rp.title,
       rp.description,
       rp.status,
       rp.date,
-      rt.name
+      pc.id AS police_id,
+      pc.name AS police_name,
+      SUM(rt.point) AS SCORE
+      
+      
   FROM
       reports AS rp
   INNER JOIN police_reports AS pr ON rp.id = pr.report_id
   INNER JOIN report_type AS rt ON rp.type = rt.id
+  INNER JOIN police_users AS pc ON pc.id = pr.police_id
   WHERE
-      rp.id LIKE ?;
+      rp.id LIKE ?
+      GROUP BY
+    rp.id,
+    rt.name,
+    rp.title,
+    rp.description,
+    rp.status,
+    rp.date,
+    pc.id;
+;
 `;
     const result = yield (0, orm_util_1.executeSingleQuery)(query, [`%${reportId}%`]);
     if (result.success && result.data) {
         const userData = result.data.map((report) => {
-            return Object.assign(Object.assign({}, report), { date: (0, dateFormat_util_1.formatDate)(report.date) });
+            return Object.assign(Object.assign({}, report), { SCORE: (0, reportScore_1.reportScore)(report.SCORE), date: (0, dateFormat_util_1.getFullDate)(report.date) });
         });
         res.status(200).json({
             success: true,
@@ -66,7 +82,8 @@ exports.getSpesificReport = (0, asyncHandler_1.default)((req, res) => __awaiter(
 exports.deleteReport = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const reportId = req.params.id;
-    const result = yield (0, orm_util_1.executeNonQuery)('DELETE FROM police_reports WHERE id = ?', [reportId]);
+    const result = yield (0, orm_util_1.executeNonQuery)('DELETE FROM police_reports WHERE report_id = ?', [reportId]);
+    yield (0, orm_util_1.executeNonQuery)('DELETE FROM reports WHERE id = ?', [reportId]);
     if (result.success && ((_a = result.affectedRows) !== null && _a !== void 0 ? _a : 0) > 0) {
         res.status(200).json({
             success: true,
@@ -92,8 +109,12 @@ exports.changeReportStatus = (0, asyncHandler_1.default)((req, res) => __awaiter
         });
         return;
     }
-    const result = yield (0, orm_util_1.executeNonQuery)('UPDATE police_reports SET status = ? WHERE id = ?', [status, reportId]);
+    const result = yield (0, orm_util_1.executeNonQuery)('UPDATE reports SET status = ? WHERE id = ?', [status, reportId]);
+    const policeUserQuery = yield (0, orm_util_1.executeQuery)('SELECT police_id FROM police_reports WHERE report_id = ? LIMIT 1', [reportId]);
+    const data = policeUserQuery.data;
+    const police_id = Array.isArray(data) && data.length > 0 ? data[0]['police_id'] : undefined;
     if (result.success && ((_a = result.affectedRows) !== null && _a !== void 0 ? _a : 0) > 0) {
+        yield (0, orm_util_1.executeNonQuery)('INSERT INTO notification_police (type,police_id) VALUES (?,?)', ['report', police_id]);
         res.status(200).json({
             success: true,
             message: '✅ The report status has been successfully updated.',

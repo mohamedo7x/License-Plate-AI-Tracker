@@ -26,7 +26,7 @@ exports.getPersonByID = (0, asyncHandler_1.default)((req, res) => __awaiter(void
     }
     const personData = person.data
         ? person.data.map((person) => {
-            return Object.assign(Object.assign({}, person), { date_of_birth: (0, dateFormat_util_1.formatDate)(person.date_of_birth), issue_date: (0, dateFormat_util_1.formatDate)(person.issue_date), expired_date: (0, dateFormat_util_1.formatDate)(person.expired_date), criminal_status: person.criminal_status === 1 ? 'Wanted' : 'Not Wanted' });
+            return Object.assign(Object.assign({}, person), { date_of_birth: (0, dateFormat_util_1.formatDateV2)(person.date_of_birth), issue_date: (0, dateFormat_util_1.formatDateV2)(person.issue_date), expired_date: (0, dateFormat_util_1.formatDateV2)(person.expired_date), criminal_status: person.criminal_status === 1 ? 'مطلوب' : 'غير مطلوب' });
         })
         : [];
     res.status(200).json({ person: personData });
@@ -39,7 +39,7 @@ exports.getPersons = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0,
     const persons = yield (0, orm_util_1.executeQuery)(query, [limit, offset]);
     const PersonsData = persons.data
         ? persons.data.map((person) => {
-            return Object.assign(Object.assign({}, person), { date_of_birth: (0, dateFormat_util_1.formatDate)(person.date_of_birth), issue_date: (0, dateFormat_util_1.formatDate)(person.issue_date), expired_date: (0, dateFormat_util_1.formatDate)(person.expired_date), criminal_status: person.criminal_status === 1 ? 'Wanted' : 'Not Wanted' });
+            return Object.assign(Object.assign({}, person), { date_of_birth: (0, dateFormat_util_1.formatDateV2)(person.date_of_birth), issue_date: (0, dateFormat_util_1.formatDateV2)(person.issue_date), expired_date: (0, dateFormat_util_1.formatDateV2)(person.expired_date), criminal_status: person.criminal_status === 1 ? 'مطلوب' : 'غير مطلوب' });
         })
         : [];
     res.status(200).json({
