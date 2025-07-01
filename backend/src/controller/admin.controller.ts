@@ -19,6 +19,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { saveUploadedFile } from '../middleware/multer.middleware'
 import { HandelViolations } from '../utils/response'
+import { getFullDate, getRealTime } from '../utils/dateFormat.util'
 
 interface AdminUserRow extends AdminUser, RowDataPacket {}
 
@@ -498,7 +499,7 @@ const getAllUsers = asyncHandler(
 const getUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params
   const result = await executeSingleQuery<PoliceUserRow>(
-    'SELECT p.* , v.plate_id FROM police_users p INNER JOIN violations AS v ON p.id = v.police_id WHERE p.id = ?',
+    'SELECT p.* , v.plate_id FROM police_users p LEFT JOIN violations AS v ON p.id = v.police_id WHERE p.id = ?',
     [id],
   )
   if (result.success && result.data && result.data.length > 0) {
@@ -524,7 +525,7 @@ const getUser = asyncHandler(async (req: Request, res: Response) => {
       online: user.online,
       created_at: user.created_at,
       updated_at: user.updated_at,
-      violations: violation, // NOT FINISHED YET !!
+      violations: violation, 
     }
     res.json(response)
   } else {
@@ -705,7 +706,56 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
     res.status(500).json({ error: result.error })
   }
 })
+const getAllViolations = asyncHandler(async (req:Request , res:Response)=> {
+    const page = parseInt(req.query.page as string) || 1
+    const limit = parseInt(req.query.limit as string) || 10
+    const offset = (page - 1) * limit
+    const data = await executeQuery("SELECT v.id , v.plate_id , v.location , vt.name , v.status FROM violations v JOIN violation_type vt ON vt.ID = v.type LIMIT  ? OFFSET  ?;",[limit,offset])
+    res.json({
+      sucess:true,
+      data:data.data
+    })
+})
 
+const getViolationsType = asyncHandler(async (req:Request , res:Response)=> {
+  const data = await executeQuery("SELECT * FROM violation_type");
+  res.status(200).json(data.data)
+})
+
+const getSpesificViolation = asyncHandler(async (req: Request, res: Response) => {
+  const id = req.query.id;
+  const result = await executeQuery(
+    `SELECT 
+      v.plate AS vehicle_plate, 
+      p.full_name AS vehicle_owner_name, 
+      p.address AS owner_location, 
+      v.brand AS vehicle_brand, 
+      vio.id AS violation_id, 
+      vt.name AS violation_type_name, 
+      vio.create_at AS violation_date, 
+      vio.location AS violation_location, 
+      pu.name AS officer_name, 
+      pu.id AS officer_id, 
+      vio.status AS violation_status, 
+      vio.description AS violation_description 
+    FROM violations vio 
+    JOIN vehicle v ON vio.plate_id = v.plate 
+    JOIN vehicle_license vl ON v.plate = vl.vehicle_plate 
+    JOIN driver_license dl ON vl.driving_license_id = dl.number 
+    JOIN person p ON dl.driver_id = p.national_id 
+    JOIN violation_type vt ON vio.type = vt.ID 
+    JOIN police_users pu ON vio.police_id = pu.id 
+    WHERE vio.id = ?;`,
+    [id]
+  );
+
+  const data = result.data?.map((row: any) => ({
+    ...row,
+    violation_date: getFullDate(row.violation_date)
+  }));
+
+  res.json(data);
+});
 export {
   createAdmin,
   getAdmin,
@@ -718,4 +768,7 @@ export {
   getUser,
   updateUser,
   deleteUser,
+  getAllViolations,
+  getViolationsType,
+  getSpesificViolation
 }
