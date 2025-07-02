@@ -187,7 +187,7 @@ const getAllAdmins = asyncHandler(
 
 const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params
-  const { name, email, status, password } = req.body as Partial<AdminUser>
+  const { name, email, status, password,role } = req.body as Partial<AdminUser>
 
   const updates: string[] = []
   const values: any[] = []
@@ -195,6 +195,10 @@ const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
   if (name !== undefined) {
     updates.push('name = ?')
     values.push(name)
+  }
+  if(role !== undefined){
+    updates.push("role = ?");
+    values.push(role)
   }
   if (password !== undefined) {
     updates.push('password_hash = ?')
@@ -556,7 +560,7 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
       }
     }
     const result = await executeNonQuery(
-      'DELETE FROM police_users WHERE id = ?',
+      'UPDATE police_users SET active = 0 WHERE id = ?',
       [id],
     )
     if (result.success) {
@@ -726,6 +730,7 @@ const getSpesificViolation = asyncHandler(async (req: Request, res: Response) =>
   const id = req.query.id;
   const result = await executeQuery(
     `SELECT 
+      p.national_id AS vehicle_owner_id,
       v.plate AS vehicle_plate, 
       p.full_name AS vehicle_owner_name, 
       p.address AS owner_location, 
@@ -754,7 +759,7 @@ const getSpesificViolation = asyncHandler(async (req: Request, res: Response) =>
     violation_date: getFullDate(row.violation_date)
   }));
 
-  res.json(data);
+  res.json(data ? data[0] : data);
 });
 export {
   createAdmin,
