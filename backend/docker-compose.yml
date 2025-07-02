@@ -18,6 +18,7 @@ services:
       - MYSQL_DBNAME=traffic_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - JWT_JWT_SECRET=your-secret-key
     volumes:
       - ./src:/usr/src/app/src
       - ./package.json:/usr/src/app/package.json

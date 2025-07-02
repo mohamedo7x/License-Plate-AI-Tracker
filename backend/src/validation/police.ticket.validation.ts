@@ -21,9 +21,7 @@ export const policeTicketValidation = [
     .notEmpty()
     .withMessage('Violation type is required')
     .isInt()
-    .withMessage('Violation type must be an integer')
-    .isIn([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    .withMessage('Violation type must be between 1 and 10'),
+    .withMessage('Violation type must be an integer'),
   body('action_taken')
     .notEmpty()
     .withMessage('Action taken is required')

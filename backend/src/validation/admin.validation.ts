@@ -34,8 +34,8 @@ export const createAdminValidation = [
     .optional()
     .isString()
     .withMessage('Role must be a string')
-    .isIn(['admin', 'super_admin'])
-    .withMessage('Role must be either admin or super_admin'),
+    .isIn(['admin', 'superadmin'])
+    .withMessage('Role must be either admin or superadmin'),
 
   body('status')
     .optional()
