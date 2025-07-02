@@ -34,7 +34,7 @@ io.use((socket, next) => {
     next(new Error('Authentication token is required'))
     return
   }
-  const jwtSecret = process.env.JWT_SECRET
+  const jwtSecret = process.env.JWT_SECRET || 'your-secret-key'
   if (!jwtSecret) {
     next(new Error('JWT secret is not defined'))
     return
