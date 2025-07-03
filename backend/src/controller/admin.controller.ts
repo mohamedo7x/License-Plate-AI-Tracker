@@ -359,7 +359,7 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
     admin.id,
   ])
 
-  const token = generateAdminJWTToken(admin)
+  const token = generateAdminJWTToken(admin , req)
 
   res.json({
     message: 'Login successful',
