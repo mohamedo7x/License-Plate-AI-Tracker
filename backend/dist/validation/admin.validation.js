@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAdminValidation = exports.loginAdminValidation = exports.createAdminValidation = void 0;
+exports.createViolationAdmin = exports.updateAdminValidation = exports.loginAdminValidation = exports.createAdminValidation = void 0;
 const express_validator_1 = require("express-validator");
 exports.createAdminValidation = [
     (0, express_validator_1.body)('name')
@@ -32,8 +32,8 @@ exports.createAdminValidation = [
         .optional()
         .isString()
         .withMessage('Role must be a string')
-        .isIn(['admin', 'super_admin'])
-        .withMessage('Role must be either admin or super_admin'),
+        .isIn(['admin', 'superadmin'])
+        .withMessage('Role must be either admin or superadmin'),
     (0, express_validator_1.body)('status')
         .optional()
         .isString()
@@ -85,4 +85,35 @@ exports.updateAdminValidation = [
         .withMessage('Password must be a string')
         .isLength({ min: 6 })
         .withMessage('Password must be at least 6 characters long'),
+];
+exports.createViolationAdmin = [
+    (0, express_validator_1.body)('police_id')
+        .notEmpty()
+        .withMessage('police_id is required')
+        .isInt()
+        .withMessage('police_id must be an integer'),
+    (0, express_validator_1.body)('plate_id')
+        .notEmpty()
+        .withMessage('plate_id is required')
+        .isString()
+        .withMessage('plate_id must be a string')
+        .isLength({ max: 10 })
+        .withMessage('plate_id cannot exceed 10 characters'),
+    (0, express_validator_1.body)('location')
+        .notEmpty()
+        .isString()
+        .withMessage('location must be a string'),
+    (0, express_validator_1.body)('type')
+        .notEmpty()
+        .withMessage('type is required')
+        .isInt()
+        .withMessage('type must be an integer'),
+    (0, express_validator_1.body)('description')
+        .notEmpty()
+        .isString()
+        .withMessage('description must be a string'),
+    (0, express_validator_1.body)('attachment')
+        .optional()
+        .isString()
+        .withMessage('Attachment must be a string'),
 ];

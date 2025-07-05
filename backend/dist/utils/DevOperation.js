@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getImageExtension = getImageExtension;
+exports.getMonthKey = getMonthKey;
 function getImageExtension(arrayBuffer) {
     const arr = new Uint8Array(arrayBuffer);
     if (arr[0] === 0x89 &&
@@ -29,4 +30,21 @@ function getImageExtension(arrayBuffer) {
         return 'webp';
     }
     return 'bin';
+}
+function getMonthKey(digits) {
+    const monthMap = {
+        '01': 'janMonth',
+        '02': 'febMonth',
+        '03': 'marMonth',
+        '04': 'aprMonth',
+        '05': 'mayMonth',
+        '06': 'junMonth',
+        '07': 'julMonth',
+        '08': 'augMonth',
+        '09': 'sepMonth',
+        '10': 'octMonth',
+        '11': 'novMonth',
+        '12': 'decMonth',
+    };
+    return monthMap[digits] || 'invalidMonth';
 }

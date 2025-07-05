@@ -32,3 +32,22 @@ export function getImageExtension(arrayBuffer: ArrayBuffer) {
   }
   return 'bin'
 }
+
+export function getMonthKey(digits: string): string {
+  const monthMap: { [key: string]: string } = {
+    '01': 'janMonth',
+    '02': 'febMonth',
+    '03': 'marMonth',
+    '04': 'aprMonth',
+    '05': 'mayMonth',
+    '06': 'junMonth',
+    '07': 'julMonth',
+    '08': 'augMonth',
+    '09': 'sepMonth',
+    '10': 'octMonth',
+    '11': 'novMonth',
+    '12': 'decMonth',
+  }
+
+  return monthMap[digits] || 'invalidMonth'
+}

@@ -104,22 +104,28 @@ export const createViolationAdmin = [
     .withMessage('police_id must be an integer'),
 
   body('plate_id')
-    .notEmpty().withMessage('plate_id is required')
-    .isString().withMessage('plate_id must be a string')
-    .isLength({ max: 10 }).withMessage('plate_id cannot exceed 10 characters'),
+    .notEmpty()
+    .withMessage('plate_id is required')
+    .isString()
+    .withMessage('plate_id must be a string')
+    .isLength({ max: 10 })
+    .withMessage('plate_id cannot exceed 10 characters'),
 
   body('location')
     .notEmpty()
-    .isString().withMessage('location must be a string'),
+    .isString()
+    .withMessage('location must be a string'),
 
   body('type')
-    .notEmpty().withMessage('type is required')
-    .isInt().withMessage('type must be an integer'),
-
+    .notEmpty()
+    .withMessage('type is required')
+    .isInt()
+    .withMessage('type must be an integer'),
 
   body('description')
     .notEmpty()
-    .isString().withMessage('description must be a string'),
+    .isString()
+    .withMessage('description must be a string'),
 
   body('attachment')
     .optional()

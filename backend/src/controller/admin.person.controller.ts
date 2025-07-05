@@ -5,7 +5,7 @@ import { formatDate, formatDateV2 } from '../utils/dateFormat.util'
 
 export const getPersonByID = asyncHandler(
   async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { id } = req.params
 
     const query = `
       SELECT 
@@ -38,13 +38,13 @@ export const getPersonByID = asyncHandler(
       LEFT JOIN vehicle_license vl ON vl.driving_license_id = dl.number
       LEFT JOIN vehicle v ON v.plate = vl.vehicle_plate
       WHERE p.national_id = ?
-    `;
+    `
 
-    const result = await executeQuery(query, [id]);
+    const result = await executeQuery(query, [id])
 
     if (!result.data || result.data.length === 0) {
-       res.status(404).json({ message: 'Person not found' });
-       return;
+      res.status(404).json({ message: 'Person not found' })
+      return
     }
 
     const formattedPerson = {
@@ -59,7 +59,7 @@ export const getPersonByID = asyncHandler(
       expired_date: formatDateV2(result.data[0].person_expired_date),
       criminal_status:
         result.data[0].criminal_status === 1 ? 'مطلوب' : 'غير مطلوب',
-    };
+    }
 
     const vehicles = result.data
       .filter((v) => v.plate) // Ignore null plates
@@ -74,15 +74,14 @@ export const getPersonByID = asyncHandler(
         expiry_date: formatDateV2(v.vehicle_expiry_date),
         traffic_unit: v.traffic_office,
         traffic_department: v.traffic_department,
-      }));
+      }))
 
     res.status(200).json({
       person: formattedPerson,
       vehicles,
-    });
-  }
-);
-
+    })
+  },
+)
 
 export const getPersons = asyncHandler(async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1
@@ -111,13 +110,13 @@ export const getPersons = asyncHandler(async (req: Request, res: Response) => {
   })
 })
 
+export const getAllWantedPersons = asyncHandler(
+  async (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1
+    const limit = parseInt(req.query.limit as string) || 10
+    const offset = (page - 1) * limit
 
-export const getAllWantedPersons = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1
-  const limit = parseInt(req.query.limit as string) || 10
-  const offset = (page - 1) * limit
-
-  const dataQuery = `SELECT 
+    const dataQuery = `SELECT 
     national_id,
     full_name,
     address,
@@ -125,29 +124,31 @@ export const getAllWantedPersons = asyncHandler(async (req: Request, res: Respon
     criminal_status
   FROM person 
   WHERE criminal_status = 1 
-  LIMIT ? OFFSET ?`;
+  LIMIT ? OFFSET ?`
 
-  const data = await executeQuery(dataQuery, [limit, offset])
+    const data = await executeQuery(dataQuery, [limit, offset])
 
-  const countQuery = `SELECT COUNT(*) AS total FROM person WHERE criminal_status = 1`;
-  const countResult = await executeQuery(countQuery)
-  const total = countResult.data?.[0]?.total || 0
-  const totalPages = Math.ceil(total / limit)
+    const countQuery = `SELECT COUNT(*) AS total FROM person WHERE criminal_status = 1`
+    const countResult = await executeQuery(countQuery)
+    const total = countResult.data?.[0]?.total || 0
+    const totalPages = Math.ceil(total / limit)
 
-  const formattedData = data.data?.map(person => ({
-    ...person,
-    date_of_birth: formatDateV2(person.date_of_birth),
-    criminal_status: person.criminal_status == 1 ? 'مطلوب' : 'غير مطلوب'
-  })) || []
+    const formattedData =
+      data.data?.map((person) => ({
+        ...person,
+        date_of_birth: formatDateV2(person.date_of_birth),
+        criminal_status: person.criminal_status == 1 ? 'مطلوب' : 'غير مطلوب',
+      })) || []
 
-  res.status(200).json({
-    page,
-    limit,
-    total,
-    totalPages,
-    data: formattedData
-  })
-})
+    res.status(200).json({
+      page,
+      limit,
+      total,
+      totalPages,
+      data: formattedData,
+    })
+  },
+)
 export const changeCriminalStatus = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params

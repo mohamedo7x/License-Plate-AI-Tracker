@@ -78,4 +78,5 @@ router.route('/police/user/:id').delete(admin_middleware_1.validateAdminToken, a
 router
     .route('/police/user/:id')
     .put(admin_middleware_1.validateAdminToken, multer_middleware_1.uploadFile, police_validation_1.updatePoliceUserValidation, validateRequest_1.validateRequest, admin_controller_1.updateUser);
+router.get('/vehciles/get', admin_middleware_1.validateAdminToken, admin_controller_1.getAllVheciles);
 exports.default = router;

@@ -38,9 +38,6 @@ router
 
 router.route('/').get(validateAdminToken, getPersons)
 
-
-
-
 /**
  * @route   PUT /api/person/admin/:id/criminal-status
  * @desc    Change Criminal Status

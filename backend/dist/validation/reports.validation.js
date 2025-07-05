@@ -15,9 +15,7 @@ exports.createReportValidation = [
         .notEmpty()
         .withMessage('Type of reprots is required')
         .isInt()
-        .withMessage('Type of reports must be an integer')
-        .isIn([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        .withMessage('Type of reports must be between 1 and 10'),
+        .withMessage('Type of reports must be an integer'),
     (0, express_validator_1.body)('description')
         .notEmpty()
         .withMessage('Description of reprots is required')
