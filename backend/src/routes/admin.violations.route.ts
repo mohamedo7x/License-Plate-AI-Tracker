@@ -1,6 +1,9 @@
 import { Router } from 'express'
 import { validateAdminToken } from '../middleware/admin.middleware'
-import { getAllViolations, getSpesificViolation, getViolationsType } from '../controller/admin.controller'
+import { createViolationForAdmin, getAllViolations, getSpesificViolation, getViolationsType } from '../controller/admin.controller'
+import { createViolationAdmin } from '../validation/admin.validation'
+import { validateRequest } from '../middleware/validateRequest'
+import { uploadMultiFiles } from '../middleware/multer.middleware'
 const router = Router()
 
 /**
@@ -29,16 +32,19 @@ router
   )
 
 
-  /**
- * @route   GET /api/custome/getSpesific
- * @desc    Get All violations
- * @access  Private ( Admin )
+/**
+ * @route   POST /api/custome/createViolation
+ * @desc    Create a new violation
+ * @access  Private (Admin only)
  */
 router
-  .route('/getSpesific')
-  .get(
+  .route('/createViolation')
+  .post(
     validateAdminToken,
-    getSpesificViolation
+    uploadMultiFiles,
+    createViolationAdmin,
+    validateRequest,
+    createViolationForAdmin
   )
 
 export default router;
