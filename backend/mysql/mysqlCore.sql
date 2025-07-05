@@ -2,10 +2,10 @@
 -- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: mysql_db
--- Generation Time: Jun 02, 2025 at 03:16 AM
--- Server version: 9.3.0
--- PHP Version: 8.2.28
+-- Host: mysql:3306
+-- Generation Time: Jul 05, 2025 at 01:47 PM
+-- Server version: 9.2.0
+-- PHP Version: 8.2.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -45,7 +45,8 @@ CREATE TABLE `admin_users` (
 --
 
 INSERT INTO `admin_users` (`id`, `name`, `email`, `password_hash`, `role`, `status`, `img_profile`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 'Oliver Weston', 'mohamedo7x@hotmail.com', '$2b$10$4fRXoIfJ43mmnuqullqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'superadmin', 'active', 'default.png', '2025-05-23 18:07:57', '2023-04-18 15:05:43', '2025-04-06 02:31:14');
+(1, 'Oliver Weston', 'mohamedo7x@hotmail.com', '$2b$10$4fRXoIfJ43mmnuqullqSreMuOS9/0x2fZTwsgQ8/E.itSjRCwn7qm', 'superadmin', 'active', 'default.png', '2025-07-05 03:21:34', '2023-04-18 15:05:43', '2025-04-06 02:31:14'),
+(15, 'TestingB', 'al3l8_11@gmcc.com', '$2b$10$7UD4Luf0CqCLxZm.vhf1KuBSc0Ou4sjvN7hEwMPs7Numv8CfroVjW', 'admin', 'active', 'df663843caa09da57dac.png', NULL, '2025-07-02 14:15:34', '2025-07-02 14:18:22');
 
 -- --------------------------------------------------------
 
@@ -67,25 +68,22 @@ CREATE TABLE `AuditLogs` (
 --
 
 INSERT INTO `AuditLogs` (`id`, `timestamp`, `level`, `message`, `meta`, `created_at`) VALUES
-(1, '2025-06-02 03:05:50', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/license/BF35WOKTLA\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-06-02 06:05:50:550\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"31ms\", \"requestParams\": {\"id\": \"BF35WOKTLA\"}}', '2025-06-02 03:05:50'),
-(2, '2025-06-02 03:06:04', '[32mhttp[39m', '[32mUnauthorized Error[39m', '{\"ip\": \"::1\", \"path\": \"/person/police/29503212568912\", \"stack\": \"UnauthorizedError: Token has expired. Please login again.\\n    at validateJWTToken (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\src\\\\auth\\\\police_user.access.ts:50:13)\\n    at validatePoliceToken (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\src\\\\auth\\\\police_user.access.ts:72:37)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at param (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:365:14)\\n    at param (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:376:14)\\n    at Function.process_params (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:421:3)\", \"method\": \"GET\", \"userId\": null, \"errorName\": \"UnauthorizedError\", \"errorType\": \"UnauthorizedError\", \"timestamp\": \"2025-06-02 06:06:04:64\", \"statusCode\": 401, \"requestBody\": {}, \"requestQuery\": {}, \"requestParams\": {}}', '2025-06-02 03:06:04'),
-(3, '2025-06-02 03:06:04', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/person/police/29503212568912\", \"method\": \"GET\", \"status\": 401, \"timestamp\": \"2025-06-02 06:06:04:64\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"43ms\"}', '2025-06-02 03:06:04'),
-(4, '2025-06-02 03:06:17', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/generate-otp\", \"method\": \"POST\", \"status\": 200, \"timestamp\": \"2025-06-02 06:06:17:617\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"requestBody\": {\"phone_number\": \"0569876543\"}, \"responseTime\": \"110ms\"}', '2025-06-02 03:06:17'),
-(5, '2025-06-02 03:06:56', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/login\", \"method\": \"POST\", \"status\": 200, \"timestamp\": \"2025-06-02 06:06:56:656\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"requestBody\": {\"sms_otp\": \"0431\", \"password\": \"123123\", \"username\": \"mohamedo7x\", \"phone_number\": \"0569876543\"}, \"responseTime\": \"188ms\"}', '2025-06-02 03:06:56'),
-(6, '2025-06-02 03:07:23', '[32mhttp[39m', '[32mUnauthorized Error[39m', '{\"ip\": \"::1\", \"path\": \"/person/police/29503212568912\", \"stack\": \"UnauthorizedError: Token has expired. Please login again.\\n    at validateJWTToken (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\src\\\\auth\\\\police_user.access.ts:50:13)\\n    at validatePoliceToken (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\src\\\\auth\\\\police_user.access.ts:72:37)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at param (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:365:14)\\n    at param (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:376:14)\\n    at Function.process_params (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:421:3)\", \"method\": \"GET\", \"userId\": null, \"errorName\": \"UnauthorizedError\", \"errorType\": \"UnauthorizedError\", \"timestamp\": \"2025-06-02 06:07:23:723\", \"statusCode\": 401, \"requestBody\": {}, \"requestQuery\": {}, \"requestParams\": {}}', '2025-06-02 03:07:23'),
-(7, '2025-06-02 03:07:23', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/person/police/29503212568912\", \"method\": \"GET\", \"status\": 401, \"timestamp\": \"2025-06-02 06:07:23:723\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"13ms\"}', '2025-06-02 03:07:23'),
-(8, '2025-06-02 03:07:29', '[32mhttp[39m', '[32mUnauthorized Error[39m', '{\"ip\": \"::1\", \"path\": \"/person/police/29503212568912\", \"stack\": \"UnauthorizedError: Token has expired. Please login again.\\n    at validateJWTToken (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\src\\\\auth\\\\police_user.access.ts:50:13)\\n    at validatePoliceToken (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\src\\\\auth\\\\police_user.access.ts:72:37)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at param (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:365:14)\\n    at param (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:376:14)\\n    at Function.process_params (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:421:3)\", \"method\": \"GET\", \"userId\": null, \"errorName\": \"UnauthorizedError\", \"errorType\": \"UnauthorizedError\", \"timestamp\": \"2025-06-02 06:07:29:729\", \"statusCode\": 401, \"requestBody\": {}, \"requestQuery\": {}, \"requestParams\": {}}', '2025-06-02 03:07:29'),
-(9, '2025-06-02 03:07:29', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/person/police/29503212568912\", \"method\": \"GET\", \"status\": 401, \"timestamp\": \"2025-06-02 06:07:29:729\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"6ms\"}', '2025-06-02 03:07:29'),
-(10, '2025-06-02 03:07:46', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/login\", \"method\": \"POST\", \"status\": 401, \"timestamp\": \"2025-06-02 06:07:46:746\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"requestBody\": {\"sms_otp\": \"3100\", \"password\": \"123123\", \"username\": \"mohamedo7x\", \"phone_number\": \"0569876543\"}, \"responseTime\": \"132ms\"}', '2025-06-02 03:07:46'),
-(11, '2025-06-02 03:07:52', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/generate-otp\", \"method\": \"POST\", \"status\": 200, \"timestamp\": \"2025-06-02 06:07:52:752\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"requestBody\": {\"phone_number\": \"0569876543\"}, \"responseTime\": \"64ms\"}', '2025-06-02 03:07:52'),
-(12, '2025-06-02 03:08:01', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/login\", \"method\": \"POST\", \"status\": 200, \"timestamp\": \"2025-06-02 06:08:01:81\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"requestBody\": {\"sms_otp\": \"3269\", \"password\": \"123123\", \"username\": \"mohamedo7x\", \"phone_number\": \"0569876543\"}, \"responseTime\": \"205ms\"}', '2025-06-02 03:08:01'),
-(13, '2025-06-02 03:08:12', '[32mhttp[39m', '[32mUnauthorized Error[39m', '{\"ip\": \"::1\", \"path\": \"/person/police/29503212568912\", \"stack\": \"UnauthorizedError: Token has expired. Please login again.\\n    at validateJWTToken (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\src\\\\auth\\\\police_user.access.ts:50:13)\\n    at validatePoliceToken (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\src\\\\auth\\\\police_user.access.ts:72:37)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at param (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:365:14)\\n    at param (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:376:14)\\n    at Function.process_params (C:\\\\Users\\\\alcaptin\\\\Desktop\\\\Traffic\\\\backend\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:421:3)\", \"method\": \"GET\", \"userId\": null, \"errorName\": \"UnauthorizedError\", \"errorType\": \"UnauthorizedError\", \"timestamp\": \"2025-06-02 06:08:12:812\", \"statusCode\": 401, \"requestBody\": {}, \"requestQuery\": {}, \"requestParams\": {}}', '2025-06-02 03:08:12'),
-(14, '2025-06-02 03:08:12', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/person/police/29503212568912\", \"method\": \"GET\", \"status\": 401, \"timestamp\": \"2025-06-02 06:08:12:812\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"12ms\"}', '2025-06-02 03:08:12'),
-(15, '2025-06-02 03:08:19', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/29503212568912\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-06-02 06:08:19:819\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"16ms\", \"requestParams\": {\"id\": \"29503212568912\"}}', '2025-06-02 03:08:19'),
-(16, '2025-06-02 03:08:55', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/vehicle/CA07TRE\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-06-02 06:08:55:855\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"27ms\", \"requestParams\": {\"plate_id\": \"CA07TRE\"}}', '2025-06-02 03:08:55'),
-(17, '2025-06-02 03:09:17', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/license/BF35WOKTLA\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-06-02 06:09:17:917\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"9ms\", \"requestParams\": {\"id\": \"BF35WOKTLA\"}}', '2025-06-02 03:09:17'),
-(18, '2025-06-02 03:10:09', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/license/MU47CEXYQN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-06-02 06:10:09:109\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"13ms\", \"requestParams\": {\"id\": \"MU47CEXYQN\"}}', '2025-06-02 03:10:09'),
-(19, '2025-06-02 03:14:49', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::1\", \"url\": \"/license/BF35WOKTLA\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-06-02 06:14:49:1449\", \"userAgent\": \"PostmanRuntime/7.44.0\", \"responseTime\": \"90ms\", \"requestParams\": {\"id\": \"BF35WOKTLA\"}}', '2025-06-02 03:14:49');
+(1, '2025-07-05 13:10:05', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/home\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:10:05:105\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"45ms\"}', '2025-07-05 13:10:05'),
+(2, '2025-07-05 13:11:38', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/home\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:11:38:1138\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"12ms\"}', '2025-07-05 13:11:38'),
+(3, '2025-07-05 13:14:38', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/home\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:14:38:1438\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"23ms\"}', '2025-07-05 13:14:38'),
+(4, '2025-07-05 13:24:55', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 404, \"timestamp\": \"2025-07-05 13:24:55:2455\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"requestQuery\": {\"id\": \"1\"}, \"responseTime\": \"7ms\"}', '2025-07-05 13:24:55'),
+(5, '2025-07-05 13:25:02', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:25:02:252\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"requestQuery\": {\"page\": \"1\", \"limit\": \"10\"}, \"responseTime\": \"47ms\"}', '2025-07-05 13:25:02'),
+(6, '2025-07-05 13:25:08', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:25:08:258\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"9ms\"}', '2025-07-05 13:25:08'),
+(7, '2025-07-05 13:27:23', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:27:23:2723\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"requestQuery\": {\"id\": \"1\"}, \"responseTime\": \"69ms\"}', '2025-07-05 13:27:23'),
+(8, '2025-07-05 13:27:32', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:27:32:2732\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"requestQuery\": {\"id\": \"2\"}, \"responseTime\": \"7ms\"}', '2025-07-05 13:27:32'),
+(9, '2025-07-05 13:27:34', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:27:34:2734\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"requestQuery\": {\"id\": \"3\"}, \"responseTime\": \"5ms\"}', '2025-07-05 13:27:34'),
+(10, '2025-07-05 13:27:37', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:27:37:2737\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"requestQuery\": {\"id\": \"4\"}, \"responseTime\": \"6ms\"}', '2025-07-05 13:27:37'),
+(11, '2025-07-05 13:28:16', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:28:16:2816\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"36ms\", \"requestParams\": {\"id\": \"2\"}}', '2025-07-05 13:28:16'),
+(12, '2025-07-05 13:28:28', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:28:28:2828\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"9ms\", \"requestParams\": {\"id\": \"2\"}}', '2025-07-05 13:28:28'),
+(13, '2025-07-05 13:29:03', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:29:03:293\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"16ms\", \"requestParams\": {\"id\": \"2\"}}', '2025-07-05 13:29:03'),
+(14, '2025-07-05 13:29:36', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:29:36:2936\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"38ms\", \"requestParams\": {\"id\": \"2\"}}', '2025-07-05 13:29:36'),
+(15, '2025-07-05 13:42:57', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:42:57:4257\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"16ms\", \"requestParams\": {\"id\": \"2\"}}', '2025-07-05 13:42:57'),
+(16, '2025-07-05 13:42:59', '[32mhttp[39m', '[32mHTTP Request[39m', '{\"ip\": \"::ffff:172.18.0.1\", \"url\": \"/custome\", \"user\": \"ADMIN\", \"method\": \"GET\", \"status\": 200, \"timestamp\": \"2025-07-05 13:42:59:4259\", \"userAgent\": \"PostmanRuntime/7.44.1\", \"responseTime\": \"5ms\", \"requestParams\": {\"id\": \"1\"}}', '2025-07-05 13:42:59');
 
 -- --------------------------------------------------------
 
@@ -133,6 +131,22 @@ CREATE TABLE `inspected_vehicles` (
   `police_id` int DEFAULT NULL,
   `create_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `inspected_vehicles`
+--
+
+INSERT INTO `inspected_vehicles` (`id`, `plate`, `police_id`, `create_at`) VALUES
+(1, 'CA07TRE', 2, '2025-07-02 16:14:28'),
+(2, 'CA07TRE', 2, '2025-07-02 16:21:34'),
+(3, 'CA07TRE', 2, '2025-07-02 16:21:35'),
+(4, 'CA07TRE', 2, '2025-07-02 16:21:35'),
+(5, 'CA07TRE', 2, '2025-07-02 16:21:35'),
+(6, 'CA07TRE', 2, '2025-07-05 02:36:17'),
+(7, 'CA07TRE', 2, '2025-07-05 02:38:47'),
+(8, 'CA07TRE', 2, '2025-07-05 02:39:45'),
+(9, 'CA07TRE', 2, '2025-07-05 03:05:27'),
+(10, 'CA07TRE', 2, '2025-07-05 03:05:40');
 
 -- --------------------------------------------------------
 
@@ -233,7 +247,6 @@ CREATE TABLE `police_reports` (
 --
 
 INSERT INTO `police_reports` (`id`, `police_id`, `report_id`, `created_at`) VALUES
-(1, 1, 'ec2e9eef2c1f4bf9a1950d64947a30ec', '2025-05-24 16:39:25'),
 (2, 1, '770cf126b2914a5889045152499dbf9d', '2025-05-24 16:39:25'),
 (3, 2, '1c00923a11e44a6cb77f375105890f6f', '2025-05-24 16:39:25'),
 (4, 2, '77d8b110267c466e92f7fc539e644137', '2025-05-31 22:08:11');
@@ -268,7 +281,8 @@ CREATE TABLE `police_users` (
 
 INSERT INTO `police_users` (`id`, `military_id`, `name`, `rank_id`, `department`, `city`, `last_login`, `active`, `username`, `online`, `password_hash`, `phone_number`, `img_profile`, `created_at`, `updated_at`) VALUES
 (1, 'MIL654321', 'Abdullah Al-Ghamdi', 'First Lieutenant', 'Jeddah Traffic Department', 'Zagazig', '2025-05-18 23:54:33', 1, 'medo', 0, '$2b$10$BD7UTDr7QuhNmQkvoDdER.Ar1MNXR2Rt7EtxDl5EWvyCjSrzkiyEG', '0569876541', 'ac9c37a5e457387f45c7.png', '2025-04-07 01:51:25', '2025-05-23 14:18:54'),
-(2, 'MIL654300', 'أحمد سامي عبد الرحمن', 'نقيب', 'إدارة مرور الإسكندرية', 'الإسكندرية', '2025-06-02 06:08:01', 1, 'mohamedo7x', 1, '$2b$10$4njLSXLZD47kn6LOBubIKuodxQ1ls1MQ3cOKtkMgRPkTapByGrHWG', '0569876543', '242a262657ef48b751d9.jpg', '2025-05-18 21:03:37', '2025-06-02 03:08:01');
+(2, 'MIL654300', 'أحمد سامي عبد الرحمن', 'نقيب', 'إدارة مرور الإسكندرية', 'الإسكندرية', '2025-07-05 02:35:45', 1, 'mohamedo7x', 0, '$2b$10$4njLSXLZD47kn6LOBubIKuodxQ1ls1MQ3cOKtkMgRPkTapByGrHWG', '0569876543', '242a262657ef48b751d9.jpg', '2025-05-18 21:03:37', '2025-07-05 03:05:50'),
+(3, 'MIL654200', 'Mohamed Dama Fc', 'Second Lieutenant', 'Giza Traffic Department', 'cairo', NULL, 0, 'mohamedo7xx', 0, '$2b$10$JDEBaQmiwBSZ1HI9oLGff.18.e9Dv.Ci1/Shvui/Wv1NDb06bLZBS', '0569876543', '3ec60e2bb6cd52ae8cfd.png', '2025-07-01 00:16:21', '2025-07-02 14:13:43');
 
 -- --------------------------------------------------------
 
@@ -292,8 +306,7 @@ CREATE TABLE `reports` (
 INSERT INTO `reports` (`id`, `title`, `type`, `description`, `status`, `date`) VALUES
 ('1c00923a11e44a6cb77f375105890f6f', 'تقرير تصادم مركبات', 4, 'تقرير حول حادث تصادم بين مركبتين في شارع الملك فهد، يتضمن التفاصيل الأولية عن الأضرار والإصابات والإجراءات المتخذة من قبل الجهات المعنية.', 'complete', '2025-05-18 21:06:47'),
 ('770cf126b2914a5889045152499dbf9d', 'تحليل حركة المرور في المنطقة التجارية', 1, 'تحليل لحركة المرور في المنطقة التجارية خلال ساعات الذروة، مع رصد لأكثر التقاطعات ازدحاماً وتوصيات لتحسين تدفق المركبات وتقليل الاختناقات.', 'processing', '2024-01-22 14:18:36'),
-('77d8b110267c466e92f7fc539e644137', 'تقرير تصادم مركبات', 4, 'تقرير حول حادث تصادم بين مركبتين في شارع الملك فهد، يتضمن التفاصيل الأولية عن الأضرار والإصابات والإجراءات المتخذة من قبل الجهات المعنية.', 'processing', '2025-05-31 22:08:11'),
-('ec2e9eef2c1f4bf9a1950d64947a30ec', 'تحليل حركة المرور في المنطقة التجارية', 10, 'تحليل لحركة المرور في المنطقة التجارية خلال ساعات الذروة، مع رصد لأكثر التقاطعات ازدحاماً وتوصيات لتحسين تدفق المركبات وتقليل الاختناقات.', 'processing', '2015-02-11 07:53:55');
+('77d8b110267c466e92f7fc539e644137', 'تقرير تصادم مركبات', 4, 'تقرير حول حادث تصادم بين مركبتين في شارع الملك فهد، يتضمن التفاصيل الأولية عن الأضرار والإصابات والإجراءات المتخذة من قبل الجهات المعنية.', 'processing', '2025-05-31 22:08:11');
 
 -- --------------------------------------------------------
 
@@ -415,22 +428,22 @@ CREATE TABLE `violations` (
   `plate_id` varchar(10) DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
   `type` int DEFAULT NULL,
+  `status` enum('paied','unpaied','under_review') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'unpaied',
   `action` int DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
-  `status` enum('paied','unpaied','') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'unpaied',
   `attachments` json DEFAULT NULL,
-  `create_at` datetime DEFAULT CURRENT_TIMESTAMP
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `violations`
 --
 
-INSERT INTO `violations` (`id`, `police_id`, `plate_id`, `location`, `type`, `action`, `description`, `status`, `attachments`, `create_at`) VALUES
-(1, 1, 'CA02BNM', 'Zagazig', 1, 5, 'قطع اشاره مرور', 'paied', NULL, '2025-05-23 00:30:07'),
-(2, 2, 'CA02BNM', 'cairo', 2, 1, 'None', 'unpaied', NULL, '2025-05-23 00:38:01'),
-(3, 2, 'CA07TRE', 'Zagazig', 1, 5, 'cvcv', 'unpaied', NULL, '2025-06-02 01:34:35'),
-(4, 2, 'CA07TRE', 'Cairo', 3, 2, NULL, 'unpaied', NULL, '2025-06-02 02:25:04');
+INSERT INTO `violations` (`id`, `police_id`, `plate_id`, `location`, `type`, `status`, `action`, `description`, `attachments`, `created_at`) VALUES
+(1, 1, 'CA02BNM', 'Zagazig', 1, 'paied', 5, 'قطع اشاره مرور', NULL, '2025-05-23 00:30:07'),
+(2, 2, 'CA02BNM', 'cairo', 2, 'unpaied', 1, 'None', NULL, '2025-07-01 00:38:01'),
+(3, 2, 'CA07TRE', 'Zagazig', 1, 'paied', 5, 'cvcv', NULL, '2025-07-01 01:34:35'),
+(4, 2, 'CA07TRE', 'Cairo', 3, 'under_review', 2, NULL, NULL, '2025-07-01 02:25:04');
 
 -- --------------------------------------------------------
 
@@ -494,7 +507,9 @@ INSERT INTO `violation_type` (`ID`, `name`, `desctiption`, `score`) VALUES
 --
 
 CREATE TABLE `wanted_vehicle` (
+  `id` int NOT NULL,
   `plate` varchar(10) DEFAULT NULL,
+  `location` varchar(100) NOT NULL,
   `description` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -626,6 +641,7 @@ ALTER TABLE `violation_type`
 -- Indexes for table `wanted_vehicle`
 --
 ALTER TABLE `wanted_vehicle`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `plate` (`plate`);
 
 --
@@ -636,19 +652,19 @@ ALTER TABLE `wanted_vehicle`
 -- AUTO_INCREMENT for table `admin_users`
 --
 ALTER TABLE `admin_users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `AuditLogs`
 --
 ALTER TABLE `AuditLogs`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `inspected_vehicles`
 --
 ALTER TABLE `inspected_vehicles`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `notification_police`
@@ -666,7 +682,7 @@ ALTER TABLE `police_reports`
 -- AUTO_INCREMENT for table `police_users`
 --
 ALTER TABLE `police_users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `report_type`
@@ -684,7 +700,7 @@ ALTER TABLE `vehicle_license`
 -- AUTO_INCREMENT for table `violations`
 --
 ALTER TABLE `violations`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `violation_action`
@@ -697,6 +713,12 @@ ALTER TABLE `violation_action`
 --
 ALTER TABLE `violation_type`
   MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `wanted_vehicle`
+--
+ALTER TABLE `wanted_vehicle`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
