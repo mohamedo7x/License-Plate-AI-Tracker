@@ -195,3 +195,37 @@ WHERE v.police_id = ?`,
     }
   }
 }
+
+
+
+
+
+
+export const HandelAttachmets = (
+  attachments: string | string[] | null,
+  protocol: string,
+  host: string | undefined
+): string[] => {
+  const baseUrl = `${protocol}://${host}/uploads/images/violation_ticket/`
+
+  if (!attachments) return []
+
+  let files: string[] = []
+
+  if (typeof attachments === 'string') {
+    try {
+     
+      files = JSON.parse(attachments)
+      if (!Array.isArray(files)) {
+        files = attachments.split(',')
+      }
+    } catch {
+  
+      files = attachments.split(',')
+    }
+  } else if (Array.isArray(attachments)) {
+    files = attachments
+  }
+
+  return files.map(file => baseUrl + file.trim())
+}

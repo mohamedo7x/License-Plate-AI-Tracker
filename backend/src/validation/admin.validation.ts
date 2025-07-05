@@ -95,3 +95,34 @@ export const updateAdminValidation = [
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters long'),
 ]
+
+export const createViolationAdmin = [
+  body('police_id')
+    .notEmpty()
+    .withMessage('police_id is required')
+    .isInt()
+    .withMessage('police_id must be an integer'),
+
+  body('plate_id')
+    .notEmpty().withMessage('plate_id is required')
+    .isString().withMessage('plate_id must be a string')
+    .isLength({ max: 10 }).withMessage('plate_id cannot exceed 10 characters'),
+
+  body('location')
+    .notEmpty()
+    .isString().withMessage('location must be a string'),
+
+  body('type')
+    .notEmpty().withMessage('type is required')
+    .isInt().withMessage('type must be an integer'),
+
+
+  body('description')
+    .notEmpty()
+    .isString().withMessage('description must be a string'),
+
+  body('attachment')
+    .optional()
+    .isString()
+    .withMessage('Attachment must be a string'),
+]

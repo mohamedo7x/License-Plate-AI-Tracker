@@ -17,8 +17,8 @@ import {
 import { isPoliceUserExist } from '../auth/police_user.access'
 import * as path from 'path'
 import * as fs from 'fs'
-import { saveUploadedFile } from '../middleware/multer.middleware'
-import { HandelViolations } from '../utils/response'
+import { saveUploadedFile, saveUploadedFiles } from '../middleware/multer.middleware'
+import { HandelAttachmets, HandelViolations } from '../utils/response'
 import { getFullDate, getRealTime } from '../utils/dateFormat.util'
 
 interface AdminUserRow extends AdminUser, RowDataPacket {}
@@ -714,10 +714,20 @@ const getAllViolations = asyncHandler(async (req:Request , res:Response)=> {
     const page = parseInt(req.query.page as string) || 1
     const limit = parseInt(req.query.limit as string) || 10
     const offset = (page - 1) * limit
-    const data = await executeQuery("SELECT v.id , v.plate_id , v.location , vt.name , v.status FROM violations v JOIN violation_type vt ON vt.ID = v.type LIMIT  ? OFFSET  ?;",[limit,offset])
+    const data = await executeQuery("SELECT v.id , v.plate_id , v.location , vt.name , v.status , v.attachments FROM violations v JOIN violation_type vt ON vt.ID = v.type LIMIT  ? OFFSET  ?;",[limit,offset])
+    let newData;
+    
+    if(data && data.data){
+      newData = data.data?.map(violation => {
+        return {
+          ...violation,
+          attachments: violation.attachments ? HandelAttachmets(violation.attachments , req.protocol , req.get('host')) : undefined,
+        }
+      })
+    }
     res.json({
       sucess:true,
-      data:data.data
+      data:newData
     })
 })
 
@@ -761,6 +771,51 @@ const getSpesificViolation = asyncHandler(async (req: Request, res: Response) =>
 
   res.json(data ? data[0] : data);
 });
+
+
+
+const createViolationForAdmin = asyncHandler(async (req: Request, res: Response) => {
+      let attachmentPaths: string[] = []
+  
+      if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+        const savedFiles = await saveUploadedFiles(req)
+        attachmentPaths = savedFiles.map((filename) => `${filename}`)
+        const query = `
+          INSERT INTO violations 
+          (police_id, plate_id, location, type, description, attachments , status )
+          VALUES (?, ?, ?, ?, ?, ?,?)
+        `
+        const values = [
+          req.body.police_id,
+          req.body.plate_id,
+          req.body.location,
+          req.body.type,
+          req.body.description,
+          JSON.stringify(attachmentPaths),
+          'under_review',
+        ]
+        await executeQuery(query, values)
+      } else {
+        const query = `
+              INSERT INTO violations 
+              (police_id, plate_id, location, type, description , status )
+              VALUES (?, ?, ?, ?, ?,?)
+          `
+        const values = [
+          req.body.police_id,
+          req.body.plate_id,
+          req.body.location,
+          req.body.type,
+          req.body.description,
+          'under_review',
+        ]
+        await executeQuery(query, values)
+      }
+  
+      res.status(201).json({ success: true, message: 'Ticket created' })
+})
+
+
 export {
   createAdmin,
   getAdmin,
@@ -775,5 +830,6 @@ export {
   deleteUser,
   getAllViolations,
   getViolationsType,
-  getSpesificViolation
+  getSpesificViolation,
+  createViolationForAdmin
 }

@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { validateAdminToken } from '../middleware/admin.middleware'
 import {
   changeCriminalStatus,
+  getAllWantedPersons,
   getPersonByID,
   getPersons,
 } from '../controller/admin.person.controller'
@@ -11,6 +12,14 @@ import {
 } from '../validation/person.validation'
 import { validateRequest } from '../middleware/validateRequest'
 const router = Router()
+
+/**
+ * @route   GET /api/person/admin
+ * @desc    Get all wanted persons
+ * @access  Private (Admin only)
+ **/
+
+router.route('/get/wanted').get(validateAdminToken, getAllWantedPersons)
 
 /**
  * @route   GET /api/person/admin
@@ -28,6 +37,9 @@ router
  **/
 
 router.route('/').get(validateAdminToken, getPersons)
+
+
+
 
 /**
  * @route   PUT /api/person/admin/:id/criminal-status
