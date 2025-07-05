@@ -4,6 +4,7 @@ import {
   createViolationForAdmin,
   deleteViolationByAdmin,
   getAllViolations,
+  getSpesificViolation,
   getViolationsType,
   updateViolationByAdmin,
 } from '../controller/admin.controller'
@@ -12,6 +13,17 @@ import { validateRequest } from '../middleware/validateRequest'
 import { uploadMultiFiles } from '../middleware/multer.middleware'
 const router = Router()
 
+/*
+ * @route   GET /api/custome/getSpesific
+ * @desc    Get All violations
+ * @access  Private ( Admin )
+ */
+router
+  .route('/getSpesific/:id')
+  .get(
+    validateAdminToken,
+    getSpesificViolation
+  )
 /**
  * @route   GET /api/custome/getAllViolations
  * @desc    Get All violations
