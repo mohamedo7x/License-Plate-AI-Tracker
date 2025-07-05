@@ -66,7 +66,7 @@ ORDER BY m.month DESC;`
       sucess: true,
       statsticsData: HandelStatistics(FetchedData),
       barData: {}, // Not Completed
-      pieDate: { detected_violation, undetected_violation },
+      pieDate: [ detected_violation, undetected_violation ],
       lineChart,
     })
   },
