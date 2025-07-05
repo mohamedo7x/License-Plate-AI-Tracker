@@ -3,8 +3,9 @@ import { Request, Response } from 'express'
 import { executeQuery } from '../utils/orm.util'
 import { RowDataPacket } from 'mysql2'
 import { getMonthKey } from '../utils/DevOperation'
+import { HandelStatistics } from '../utils/response'
 
-interface HomePage extends RowDataPacket {
+export interface HomePage extends RowDataPacket {
   Total_Violations: number
   detected_violation: number
   under_investigation: number
@@ -63,7 +64,7 @@ ORDER BY m.month DESC;`
     })
     res.status(200).json({
       sucess: true,
-      statsticsData: FetchedData,
+      statsticsData: HandelStatistics(FetchedData),
       barData: {}, // Not Completed
       pieDate: { detected_violation, undetected_violation },
       lineChart,
