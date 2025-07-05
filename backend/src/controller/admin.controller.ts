@@ -754,7 +754,7 @@ const getViolationsType = asyncHandler(async (req: Request, res: Response) => {
 
 const getSpesificViolation = asyncHandler(
   async (req: Request, res: Response) => {
-    const id = req.query.id
+    const id = req.params.id
     const result = await executeQuery(
       `SELECT 
       p.national_id AS vehicle_owner_id,
@@ -764,7 +764,7 @@ const getSpesificViolation = asyncHandler(
       v.brand AS vehicle_brand, 
       vio.id AS violation_id, 
       vt.name AS violation_type_name, 
-      vio.create_at AS violation_date, 
+      vio.created_at AS violation_date, 
       vio.location AS violation_location, 
       pu.name AS officer_name, 
       pu.id AS officer_id, 
