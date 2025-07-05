@@ -95,6 +95,7 @@ export function generateAdminJWTToken(admin: AdminUser, req: Request): string {
       id: admin.id,
       email: admin.email,
       role: admin.role,
+      name: admin.name,
       img_profile:
         req.protocol +
         '://' +

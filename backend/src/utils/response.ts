@@ -3,6 +3,7 @@ import { getHouers } from './dateFormat.util'
 import { PoliceUserRow } from '../controller/admin.controller'
 import { executeQuery, executeSingleQuery } from './orm.util'
 import { violation } from '../model/police_user.response.model'
+import { HomePage } from '../controller/Home.controller'
 
 export const generateDescriptionForNotification = (
   typeOfNotification: string,
@@ -221,4 +222,15 @@ export const HandelAttachmets = (
   }
 
   return files.map((file) => baseUrl + file.trim())
+}
+
+export const HandelStatistics = (items:HomePage | undefined) => {
+  let Total_Violations = items?.Total_Violations || 0;
+  let detected_violation = items?.detected_violation || 0;
+  let under_investigation = items?.under_investigation || 0;
+  return {
+    Total_Violations,
+    detected_violation,
+    under_investigation
+  }
 }
