@@ -8,6 +8,8 @@ import adminPersonRoute from './admin.peron.route'
 import policePersonRoute from './police.person.route'
 import policeViolation from './police.violation.route'
 import CustomeValidation from './admin.violations.route'
+import HomeRoute from './Home.route'
+import WantedRouteForAdmin from './admin.vhecile'
 const route = Router()
 
 route.use(`/admin`, AdminRoute)
@@ -22,5 +24,9 @@ route.use('/person/admin', adminPersonRoute)
 route.use('/person/police', policePersonRoute)
 
 route.use('/violation', policeViolation)
-route.use('/custome' , CustomeValidation)
+route.use('/custome', CustomeValidation)
+
+route.use('/home', HomeRoute)
+
+route.use('/wanted', validateAdminToken, WantedRouteForAdmin)
 export default route

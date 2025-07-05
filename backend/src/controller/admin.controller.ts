@@ -1,6 +1,10 @@
 import asyncHandler from '../middleware/asyncHandler'
 import { AdminUser } from '../model/admin_user.model'
-import { AdminResponse, AdminListResponse } from '../model/admin.response.model'
+import {
+  AdminResponse,
+  AdminListResponse,
+  ResponseCounted,
+} from '../model/admin.response.model'
 import { Request, Response } from 'express'
 import {
   executeNonQuery,
@@ -17,7 +21,10 @@ import {
 import { isPoliceUserExist } from '../auth/police_user.access'
 import * as path from 'path'
 import * as fs from 'fs'
-import { saveUploadedFile, saveUploadedFiles } from '../middleware/multer.middleware'
+import {
+  saveUploadedFile,
+  saveUploadedFiles,
+} from '../middleware/multer.middleware'
 import { HandelAttachmets, HandelViolations } from '../utils/response'
 import { getFullDate, getRealTime } from '../utils/dateFormat.util'
 
@@ -187,7 +194,7 @@ const getAllAdmins = asyncHandler(
 
 const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params
-  const { name, email, status, password,role } = req.body as Partial<AdminUser>
+  const { name, email, status, password, role } = req.body as Partial<AdminUser>
 
   const updates: string[] = []
   const values: any[] = []
@@ -196,8 +203,8 @@ const updateAdmin = asyncHandler(async (req: Request, res: Response) => {
     updates.push('name = ?')
     values.push(name)
   }
-  if(role !== undefined){
-    updates.push("role = ?");
+  if (role !== undefined) {
+    updates.push('role = ?')
     values.push(role)
   }
   if (password !== undefined) {
@@ -359,7 +366,7 @@ const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
     admin.id,
   ])
 
-  const token = generateAdminJWTToken(admin , req)
+  const token = generateAdminJWTToken(admin, req)
 
   res.json({
     message: 'Login successful',
@@ -529,7 +536,7 @@ const getUser = asyncHandler(async (req: Request, res: Response) => {
       online: user.online,
       created_at: user.created_at,
       updated_at: user.updated_at,
-      violations: violation, 
+      violations: violation,
     }
     res.json(response)
   } else {
@@ -710,36 +717,46 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
     res.status(500).json({ error: result.error })
   }
 })
-const getAllViolations = asyncHandler(async (req:Request , res:Response)=> {
-    const page = parseInt(req.query.page as string) || 1
-    const limit = parseInt(req.query.limit as string) || 10
-    const offset = (page - 1) * limit
-    const data = await executeQuery("SELECT v.id , v.plate_id , v.location , vt.name , v.status , v.attachments FROM violations v JOIN violation_type vt ON vt.ID = v.type LIMIT  ? OFFSET  ?;",[limit,offset])
-    let newData;
-    
-    if(data && data.data){
-      newData = data.data?.map(violation => {
-        return {
-          ...violation,
-          attachments: violation.attachments ? HandelAttachmets(violation.attachments , req.protocol , req.get('host')) : undefined,
-        }
-      })
-    }
-    res.json({
-      sucess:true,
-      data:newData
+const getAllViolations = asyncHandler(async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1
+  const limit = parseInt(req.query.limit as string) || 10
+  const offset = (page - 1) * limit
+  const data = await executeQuery(
+    'SELECT v.id , v.plate_id , v.location , vt.name , v.status , v.attachments, v.description FROM violations v JOIN violation_type vt ON vt.ID = v.type LIMIT  ? OFFSET  ?;',
+    [limit, offset],
+  )
+  let newData
+
+  if (data && data.data) {
+    newData = data.data?.map((violation) => {
+      return {
+        ...violation,
+        attachments: violation.attachments
+          ? HandelAttachmets(
+              violation.attachments,
+              req.protocol,
+              req.get('host'),
+            )
+          : undefined,
+      }
     })
+  }
+  res.json({
+    sucess: true,
+    data: newData,
+  })
 })
 
-const getViolationsType = asyncHandler(async (req:Request , res:Response)=> {
-  const data = await executeQuery("SELECT * FROM violation_type");
+const getViolationsType = asyncHandler(async (req: Request, res: Response) => {
+  const data = await executeQuery('SELECT * FROM violation_type')
   res.status(200).json(data.data)
 })
 
-const getSpesificViolation = asyncHandler(async (req: Request, res: Response) => {
-  const id = req.query.id;
-  const result = await executeQuery(
-    `SELECT 
+const getSpesificViolation = asyncHandler(
+  async (req: Request, res: Response) => {
+    const id = req.query.id
+    const result = await executeQuery(
+      `SELECT 
       p.national_id AS vehicle_owner_id,
       v.plate AS vehicle_plate, 
       p.full_name AS vehicle_owner_name, 
@@ -761,60 +778,143 @@ const getSpesificViolation = asyncHandler(async (req: Request, res: Response) =>
     JOIN violation_type vt ON vio.type = vt.ID 
     JOIN police_users pu ON vio.police_id = pu.id 
     WHERE vio.id = ?;`,
-    [id]
-  );
+      [id],
+    )
 
-  const data = result.data?.map((row: any) => ({
-    ...row,
-    violation_date: getFullDate(row.violation_date)
-  }));
+    const data = result.data?.map((row: any) => ({
+      ...row,
+      violation_date: getFullDate(row.violation_date),
+    }))
 
-  res.json(data ? data[0] : data);
-});
+    res.json(data ? data[0] : data)
+  },
+)
 
+const createViolationForAdmin = asyncHandler(
+  async (req: Request, res: Response) => {
+    let attachmentPaths: string[] = []
 
-
-const createViolationForAdmin = asyncHandler(async (req: Request, res: Response) => {
-      let attachmentPaths: string[] = []
-  
-      if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-        const savedFiles = await saveUploadedFiles(req)
-        attachmentPaths = savedFiles.map((filename) => `${filename}`)
-        const query = `
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      const savedFiles = await saveUploadedFiles(req)
+      attachmentPaths = savedFiles.map((filename) => `${filename}`)
+      const query = `
           INSERT INTO violations 
           (police_id, plate_id, location, type, description, attachments , status )
           VALUES (?, ?, ?, ?, ?, ?,?)
         `
-        const values = [
-          req.body.police_id,
-          req.body.plate_id,
-          req.body.location,
-          req.body.type,
-          req.body.description,
-          JSON.stringify(attachmentPaths),
-          'under_review',
-        ]
-        await executeQuery(query, values)
-      } else {
-        const query = `
+      const values = [
+        req.body.police_id,
+        req.body.plate_id,
+        req.body.location,
+        req.body.type,
+        req.body.description,
+        JSON.stringify(attachmentPaths),
+        'under_review',
+      ]
+      await executeQuery(query, values)
+    } else {
+      const query = `
               INSERT INTO violations 
               (police_id, plate_id, location, type, description , status )
               VALUES (?, ?, ?, ?, ?,?)
           `
-        const values = [
-          req.body.police_id,
-          req.body.plate_id,
-          req.body.location,
-          req.body.type,
-          req.body.description,
-          'under_review',
-        ]
-        await executeQuery(query, values)
-      }
-  
-      res.status(201).json({ success: true, message: 'Ticket created' })
-})
+      const values = [
+        req.body.police_id,
+        req.body.plate_id,
+        req.body.location,
+        req.body.type,
+        req.body.description,
+        'under_review',
+      ]
+      await executeQuery(query, values)
+    }
 
+    res.status(201).json({ success: true, message: 'Ticket created' })
+  },
+)
+
+const deleteViolationByAdmin = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    if (!id) {
+      res.status(400).json({ message: 'Violation ID is required' })
+      return
+    }
+
+    const query = 'DELETE FROM violations WHERE id = ?'
+    const result = await executeNonQuery(query, [id])
+
+    if (result.affectedRows === 0) {
+      res.status(404).json({ message: 'Violation not found' })
+      return
+    }
+
+    res.status(200).json({ message: 'Violation deleted successfully' })
+  },
+)
+
+const updateViolationByAdmin = asyncHandler(
+  async (req: Request, res: Response) => {
+    const id = Number(req.params.id)
+    const { status } = req.body
+
+    if (!id || !status) {
+      res.status(400).json({ message: 'Violation ID and status are required' })
+      return
+    }
+
+    if (isNaN(id)) {
+      res.status(400).json({ message: 'Violation ID must be a valid number' })
+      return
+    }
+    const validStatuses = ['paied', 'unpaied', 'under_review']
+    if (!validStatuses.includes(status)) {
+      res.status(400).json({ message: 'Invalid status value' })
+      return
+    }
+
+    const query = 'UPDATE violations SET status = ? WHERE id = ?'
+    const result = await executeNonQuery(query, [status, id])
+
+    if (result.affectedRows === 0) {
+      res
+        .status(404)
+        .json({ message: 'Violation not found or already has this status' })
+      return
+    }
+
+    res.status(200).json({ message: 'Violation status updated successfully' })
+  },
+)
+const getAllVheciles = asyncHandler(async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1
+  const limit = parseInt(req.query.limit as string) || 10
+  const offset = (page - 1) * limit
+
+  const countQuery = `SELECT COUNT(*) AS total FROM vehicle`
+  const countResult = await executeQuery<ResponseCounted>(countQuery, [])
+  let total = 0
+  if (countResult && countResult.data) {
+    total = countResult.data[0].total
+  }
+
+  const dataQuery = `
+    SELECT * FROM vehicle
+    LIMIT ? OFFSET ?
+  `
+  const data = await executeQuery(dataQuery, [limit, offset])
+
+  res.json({
+    data: data.data,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  })
+})
 
 export {
   createAdmin,
@@ -831,5 +931,8 @@ export {
   getAllViolations,
   getViolationsType,
   getSpesificViolation,
-  createViolationForAdmin
+  createViolationForAdmin,
+  deleteViolationByAdmin,
+  updateViolationByAdmin,
+  getAllVheciles,
 }

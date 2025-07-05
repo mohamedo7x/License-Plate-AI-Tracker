@@ -89,13 +89,18 @@ export async function isAdmin(adminId: number): Promise<boolean> {
   return checkAdminPrivilege(adminId, 'admin')
 }
 
-export function generateAdminJWTToken(admin: AdminUser , req:Request): string {
+export function generateAdminJWTToken(admin: AdminUser, req: Request): string {
   return jwt.sign(
     {
       id: admin.id,
       email: admin.email,
       role: admin.role,
-      img_profile:req.protocol +'://' +req.get('host') +'/uploads/images/admin_users/' +admin.img_profile,
+      img_profile:
+        req.protocol +
+        '://' +
+        req.get('host') +
+        '/uploads/images/admin_users/' +
+        admin.img_profile,
     },
     JWT_SECRET,
     { expiresIn: '24h' },

@@ -12,6 +12,7 @@ import {
   deleteUser,
   updateUser,
   getAllViolations,
+  getAllVheciles,
 } from '../controller/admin.controller'
 import {
   validateAdminToken,
@@ -138,7 +139,5 @@ router
     updateUser,
   )
 
-
-
-
+router.get('/vehciles/get', validateAdminToken, getAllVheciles)
 export default router

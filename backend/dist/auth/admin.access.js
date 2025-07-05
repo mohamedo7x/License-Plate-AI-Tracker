@@ -90,10 +90,15 @@ function isAdmin(adminId) {
         return checkAdminPrivilege(adminId, 'admin');
     });
 }
-function generateAdminJWTToken(admin) {
+function generateAdminJWTToken(admin, req) {
     return jsonwebtoken_1.default.sign({
         id: admin.id,
         email: admin.email,
         role: admin.role,
+        img_profile: req.protocol +
+            '://' +
+            req.get('host') +
+            '/uploads/images/admin_users/' +
+            admin.img_profile,
     }, JWT_SECRET, { expiresIn: '24h' });
 }

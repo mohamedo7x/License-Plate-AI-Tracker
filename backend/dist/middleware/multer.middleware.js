@@ -31,12 +31,13 @@ const uploadMiddleware = (0, multer_1.default)({
     storage,
     fileFilter,
     limits: {
-        fileSize: 10 * 1024 * 1024, // 10 MB
+        fileSize: 50 * 1024 * 1024, // 50 MB
     },
 });
 exports.uploadFile = uploadMiddleware.single('img_profile');
 exports.uploadMultiFiles = uploadMiddleware.array('attachment');
 const getUploadDestination = (url) => {
+    console.log(url);
     if (url.includes('/police')) {
         return path_1.default.join(__dirname, '..', 'uploads', 'images', 'police_users');
     }
@@ -44,6 +45,9 @@ const getUploadDestination = (url) => {
         return path_1.default.join(__dirname, '..', 'uploads', 'images', 'admin_users');
     }
     if (url.includes('/violation')) {
+        return path_1.default.join(__dirname, '..', 'uploads', 'images', 'violation_ticket');
+    }
+    if (url.includes('/custome/createViolation')) {
         return path_1.default.join(__dirname, '..', 'uploads', 'images', 'violation_ticket');
     }
     throw new Error('Invalid upload destination');

@@ -1,3 +1,4 @@
+import { RowDataPacket } from 'mysql2'
 import { AdminUser } from './admin_user.model'
 
 export interface AdminResponse {
@@ -20,4 +21,7 @@ export interface AdminListResponse {
     limit: number
     totalPages: number
   }
+}
+export interface ResponseCounted extends RowDataPacket {
+  total: number
 }

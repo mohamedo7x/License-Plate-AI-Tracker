@@ -8,6 +8,12 @@ const validateRequest_1 = require("../middleware/validateRequest");
 const router = (0, express_1.Router)();
 /**
  * @route   GET /api/person/admin
+ * @desc    Get all wanted persons
+ * @access  Private (Admin only)
+ **/
+router.route('/get/wanted').get(admin_middleware_1.validateAdminToken, admin_person_controller_1.getAllWantedPersons);
+/**
+ * @route   GET /api/person/admin
  * @desc    get Person Using ID
  * @access  Private ( Admin only)
  **/

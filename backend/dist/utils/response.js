@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HandelViolations = exports.generateActivitesCard = exports.generateUrgentCard = exports.generateDescriptionForNotification = void 0;
+exports.HandelAttachmets = exports.HandelViolations = exports.generateActivitesCard = exports.generateUrgentCard = exports.generateDescriptionForNotification = void 0;
 const dateFormat_util_1 = require("./dateFormat.util");
 const orm_util_1 = require("./orm.util");
 const generateDescriptionForNotification = (typeOfNotification, reportId = null) => {
@@ -156,3 +156,25 @@ WHERE v.police_id = ?`, [police_id]);
     }
 });
 exports.HandelViolations = HandelViolations;
+const HandelAttachmets = (attachments, protocol, host) => {
+    const baseUrl = `${protocol}://${host}/uploads/images/violation_ticket/`;
+    if (!attachments)
+        return [];
+    let files = [];
+    if (typeof attachments === 'string') {
+        try {
+            files = JSON.parse(attachments);
+            if (!Array.isArray(files)) {
+                files = attachments.split(',');
+            }
+        }
+        catch (_a) {
+            files = attachments.split(',');
+        }
+    }
+    else if (Array.isArray(attachments)) {
+        files = attachments;
+    }
+    return files.map((file) => baseUrl + file.trim());
+};
+exports.HandelAttachmets = HandelAttachmets;

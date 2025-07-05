@@ -43,7 +43,7 @@ io.use((socket, next) => {
         next(new Error('Authentication token is required'));
         return;
     }
-    const jwtSecret = process.env.JWT_SECRET;
+    const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
     if (!jwtSecret) {
         next(new Error('JWT secret is not defined'));
         return;
@@ -87,13 +87,16 @@ app.use((req, res, next) => {
     res.on('finish', () => {
         const endTime = new Date();
         const responseTime = endTime.getTime() - startTime.getTime();
+        const user = req.user;
+        console.log(user);
         const logData = {
             method: req.method,
-            url: req.url,
+            url: req.baseUrl,
             status: res.statusCode,
             responseTime: `${responseTime}ms`,
             userAgent: req.get('user-agent'),
             ip: req.ip,
+            user: (user === null || user === void 0 ? void 0 : user.name) || 'ADMIN',
         };
         if (req.method !== 'GET' && req.body && Object.keys(req.body).length > 0) {
             logData.requestBody = req.body;

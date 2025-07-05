@@ -45,7 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllViolations = exports.deleteUser = exports.updateUser = exports.getUser = exports.getAllUsers = exports.createUser = exports.loginAdmin = exports.deleteAdmin = exports.updateAdmin = exports.getAllAdmins = exports.getAdmin = exports.createAdmin = void 0;
+exports.getAllVheciles = exports.updateViolationByAdmin = exports.deleteViolationByAdmin = exports.createViolationForAdmin = exports.getSpesificViolation = exports.getViolationsType = exports.getAllViolations = exports.deleteUser = exports.updateUser = exports.getUser = exports.getAllUsers = exports.createUser = exports.loginAdmin = exports.deleteAdmin = exports.updateAdmin = exports.getAllAdmins = exports.getAdmin = exports.createAdmin = void 0;
 const asyncHandler_1 = __importDefault(require("../middleware/asyncHandler"));
 const orm_util_1 = require("../utils/orm.util");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -55,6 +55,7 @@ const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 const multer_middleware_1 = require("../middleware/multer.middleware");
 const response_1 = require("../utils/response");
+const dateFormat_util_1 = require("../utils/dateFormat.util");
 const createAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password_hash, role } = req.body;
     const hashedPassword = yield bcrypt_1.default.hash(password_hash || '', parseInt(process.env.SALT_PASSWORD || '10'));
@@ -170,12 +171,16 @@ exports.getAllAdmins = getAllAdmins;
 const updateAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id } = req.params;
-    const { name, email, status, password } = req.body;
+    const { name, email, status, password, role } = req.body;
     const updates = [];
     const values = [];
     if (name !== undefined) {
         updates.push('name = ?');
         values.push(name);
+    }
+    if (role !== undefined) {
+        updates.push('role = ?');
+        values.push(role);
     }
     if (password !== undefined) {
         updates.push('password_hash = ?');
@@ -288,7 +293,7 @@ const loginAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
         new Date(),
         admin.id,
     ]);
-    const token = (0, admin_access_1.generateAdminJWTToken)(admin);
+    const token = (0, admin_access_1.generateAdminJWTToken)(admin, req);
     res.json({
         message: 'Login successful',
         token,
@@ -438,7 +443,7 @@ const deleteUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
                 fs.unlinkSync(img_path);
             }
         }
-        const result = yield (0, orm_util_1.executeNonQuery)('DELETE FROM police_users WHERE id = ?', [id]);
+        const result = yield (0, orm_util_1.executeNonQuery)('UPDATE police_users SET active = 0 WHERE id = ?', [id]);
         if (result.success) {
             res.json({ message: 'Police User deleted successfully' });
         }
@@ -546,13 +551,164 @@ const updateUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
 }));
 exports.updateUser = updateUser;
 const getAllViolations = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const data = yield (0, orm_util_1.executeQuery)("SELECT v.id , v.plate_id , v.location , vt.name , v.status FROM violations v JOIN violation_type vt ON vt.ID = v.type LIMIT  ? OFFSET  ?;", [limit, offset]);
+    const data = yield (0, orm_util_1.executeQuery)('SELECT v.id , v.plate_id , v.location , vt.name , v.status , v.attachments, v.description FROM violations v JOIN violation_type vt ON vt.ID = v.type LIMIT  ? OFFSET  ?;', [limit, offset]);
+    let newData;
+    if (data && data.data) {
+        newData = (_a = data.data) === null || _a === void 0 ? void 0 : _a.map((violation) => {
+            return Object.assign(Object.assign({}, violation), { attachments: violation.attachments
+                    ? (0, response_1.HandelAttachmets)(violation.attachments, req.protocol, req.get('host'))
+                    : undefined });
+        });
+    }
     res.json({
         sucess: true,
-        data: data.data
+        data: newData,
     });
 }));
 exports.getAllViolations = getAllViolations;
+const getViolationsType = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield (0, orm_util_1.executeQuery)('SELECT * FROM violation_type');
+    res.status(200).json(data.data);
+}));
+exports.getViolationsType = getViolationsType;
+const getSpesificViolation = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const id = req.query.id;
+    const result = yield (0, orm_util_1.executeQuery)(`SELECT 
+      p.national_id AS vehicle_owner_id,
+      v.plate AS vehicle_plate, 
+      p.full_name AS vehicle_owner_name, 
+      p.address AS owner_location, 
+      v.brand AS vehicle_brand, 
+      vio.id AS violation_id, 
+      vt.name AS violation_type_name, 
+      vio.create_at AS violation_date, 
+      vio.location AS violation_location, 
+      pu.name AS officer_name, 
+      pu.id AS officer_id, 
+      vio.status AS violation_status, 
+      vio.description AS violation_description 
+    FROM violations vio 
+    JOIN vehicle v ON vio.plate_id = v.plate 
+    JOIN vehicle_license vl ON v.plate = vl.vehicle_plate 
+    JOIN driver_license dl ON vl.driving_license_id = dl.number 
+    JOIN person p ON dl.driver_id = p.national_id 
+    JOIN violation_type vt ON vio.type = vt.ID 
+    JOIN police_users pu ON vio.police_id = pu.id 
+    WHERE vio.id = ?;`, [id]);
+    const data = (_a = result.data) === null || _a === void 0 ? void 0 : _a.map((row) => (Object.assign(Object.assign({}, row), { violation_date: (0, dateFormat_util_1.getFullDate)(row.violation_date) })));
+    res.json(data ? data[0] : data);
+}));
+exports.getSpesificViolation = getSpesificViolation;
+const createViolationForAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let attachmentPaths = [];
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+        const savedFiles = yield (0, multer_middleware_1.saveUploadedFiles)(req);
+        attachmentPaths = savedFiles.map((filename) => `${filename}`);
+        const query = `
+          INSERT INTO violations 
+          (police_id, plate_id, location, type, description, attachments , status )
+          VALUES (?, ?, ?, ?, ?, ?,?)
+        `;
+        const values = [
+            req.body.police_id,
+            req.body.plate_id,
+            req.body.location,
+            req.body.type,
+            req.body.description,
+            JSON.stringify(attachmentPaths),
+            'under_review',
+        ];
+        yield (0, orm_util_1.executeQuery)(query, values);
+    }
+    else {
+        const query = `
+              INSERT INTO violations 
+              (police_id, plate_id, location, type, description , status )
+              VALUES (?, ?, ?, ?, ?,?)
+          `;
+        const values = [
+            req.body.police_id,
+            req.body.plate_id,
+            req.body.location,
+            req.body.type,
+            req.body.description,
+            'under_review',
+        ];
+        yield (0, orm_util_1.executeQuery)(query, values);
+    }
+    res.status(201).json({ success: true, message: 'Ticket created' });
+}));
+exports.createViolationForAdmin = createViolationForAdmin;
+const deleteViolationByAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ message: 'Violation ID is required' });
+        return;
+    }
+    const query = 'DELETE FROM violations WHERE id = ?';
+    const result = yield (0, orm_util_1.executeNonQuery)(query, [id]);
+    if (result.affectedRows === 0) {
+        res.status(404).json({ message: 'Violation not found' });
+        return;
+    }
+    res.status(200).json({ message: 'Violation deleted successfully' });
+}));
+exports.deleteViolationByAdmin = deleteViolationByAdmin;
+const updateViolationByAdmin = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = Number(req.params.id);
+    const { status } = req.body;
+    if (!id || !status) {
+        res.status(400).json({ message: 'Violation ID and status are required' });
+        return;
+    }
+    if (isNaN(id)) {
+        res.status(400).json({ message: 'Violation ID must be a valid number' });
+        return;
+    }
+    const validStatuses = ['paied', 'unpaied', 'under_review'];
+    if (!validStatuses.includes(status)) {
+        res.status(400).json({ message: 'Invalid status value' });
+        return;
+    }
+    const query = 'UPDATE violations SET status = ? WHERE id = ?';
+    const result = yield (0, orm_util_1.executeNonQuery)(query, [status, id]);
+    if (result.affectedRows === 0) {
+        res
+            .status(404)
+            .json({ message: 'Violation not found or already has this status' });
+        return;
+    }
+    res.status(200).json({ message: 'Violation status updated successfully' });
+}));
+exports.updateViolationByAdmin = updateViolationByAdmin;
+const getAllVheciles = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const countQuery = `SELECT COUNT(*) AS total FROM vehicle`;
+    const countResult = yield (0, orm_util_1.executeQuery)(countQuery, []);
+    let total = 0;
+    if (countResult && countResult.data) {
+        total = countResult.data[0].total;
+    }
+    const dataQuery = `
+    SELECT * FROM vehicle
+    LIMIT ? OFFSET ?
+  `;
+    const data = yield (0, orm_util_1.executeQuery)(dataQuery, [limit, offset]);
+    res.json({
+        data: data.data,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        },
+    });
+}));
+exports.getAllVheciles = getAllVheciles;

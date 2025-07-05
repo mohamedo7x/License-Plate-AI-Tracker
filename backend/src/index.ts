@@ -97,15 +97,18 @@ app.use((req, res, next) => {
       requestBody?: any
       requestQuery?: any
       requestParams?: any
+      user?: string
     }
-
+    const user = (req as any).user
+    console.log(user)
     const logData: LogData = {
       method: req.method,
-      url: req.url,
+      url: req.baseUrl,
       status: res.statusCode,
       responseTime: `${responseTime}ms`,
       userAgent: req.get('user-agent'),
       ip: req.ip,
+      user: user?.name || 'ADMIN',
     }
 
     if (req.method !== 'GET' && req.body && Object.keys(req.body).length > 0) {
