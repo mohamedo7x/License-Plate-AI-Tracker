@@ -18,12 +18,7 @@ const router = Router()
  * @desc    Get All violations
  * @access  Private ( Admin )
  */
-router
-  .route('/getSpesific/:id')
-  .get(
-    validateAdminToken,
-    getSpesificViolation
-  )
+router.route('/getSpesific/:id').get(validateAdminToken, getSpesificViolation)
 /**
  * @route   GET /api/custome/getAllViolations
  * @desc    Get All violations

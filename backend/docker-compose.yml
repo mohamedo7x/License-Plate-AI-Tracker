@@ -19,6 +19,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - JWT_JWT_SECRET=your-secret-key
+      - SALT_PASSWORD=10
     volumes:
       - ./src:/usr/src/app/src
       - ./package.json:/usr/src/app/package.json
