@@ -57,8 +57,7 @@ export const loginPoliceUser = asyncHandler(
           .json({ message: 'رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.' })
         return
       }
-
-      const token = generatePoliceUserJWTToken(policeUser)
+      const token = generatePoliceUserJWTToken(policeUser, req)
       await executeNonQuery(
         'UPDATE police_users SET last_login = ? WHERE id = ?',
         [new Date(), policeUser.id],
@@ -265,7 +264,7 @@ export const getActivites = asyncHandler(
     vt.name AS "violation_type",
     v.description,
     va.name as "violation_action",
-    v.create_at,
+    v.created_at,
     veh.name AS "vehicle_name",
     veh.brand,
     veh.type,

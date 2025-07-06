@@ -100,7 +100,6 @@ app.use((req, res, next) => {
       user?: string
     }
     const user = (req as any).user
-    console.log(user)
     const logData: LogData = {
       method: req.method,
       url: req.baseUrl,

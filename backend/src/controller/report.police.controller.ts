@@ -96,7 +96,6 @@ export const CreateReport = asyncHandler(
 
 export const getAllReportTypes = asyncHandler(
   async (req: Request, res: Response) => {
-    console.log('getAllReportTypes')
     const result = await executeQuery('SELECT * FROM report_type', [])
     if (result.success && result.data) {
       res.status(200).json({
