@@ -32,4 +32,5 @@ route.use('/home', HomeRoute)
 route.use('/wanted', validateAdminToken, WantedRouteForAdmin)
 
 route.use('/user', userRoute)
+
 export default route

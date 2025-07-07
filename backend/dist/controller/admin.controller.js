@@ -41,11 +41,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllVheciles = exports.updateViolationByAdmin = exports.deleteViolationByAdmin = exports.createViolationForAdmin = exports.getSpesificViolation = exports.getViolationsType = exports.getAllViolations = exports.deleteUser = exports.updateUser = exports.getUser = exports.getAllUsers = exports.createUser = exports.loginAdmin = exports.deleteAdmin = exports.updateAdmin = exports.getAllAdmins = exports.getAdmin = exports.createAdmin = void 0;
+exports.changeUserObjectionStatus = exports.changeUserReportStatus = exports.getAllUsersObjections = exports.getAllUsersReports = exports.getAllUsersAccounts = exports.getAllVheciles = exports.updateViolationByAdmin = exports.deleteViolationByAdmin = exports.createViolationForAdmin = exports.getSpesificViolation = exports.getViolationsType = exports.getAllViolations = exports.deleteUser = exports.updateUser = exports.getUser = exports.getAllUsers = exports.createUser = exports.loginAdmin = exports.deleteAdmin = exports.updateAdmin = exports.getAllAdmins = exports.getAdmin = exports.createAdmin = void 0;
 const asyncHandler_1 = __importDefault(require("../middleware/asyncHandler"));
 const orm_util_1 = require("../utils/orm.util");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -573,8 +584,8 @@ const getAllViolations = (0, asyncHandler_1.default)((req, res) => __awaiter(voi
                 total: countResult.data[0].total,
                 totalPages: Math.ceil(countResult.data[0].total / limit),
                 page: page,
-                limit: limit
-            }
+                limit: limit,
+            },
         });
 }));
 exports.getAllViolations = getAllViolations;
@@ -723,3 +734,142 @@ const getAllVheciles = (0, asyncHandler_1.default)((req, res) => __awaiter(void 
     });
 }));
 exports.getAllVheciles = getAllVheciles;
+const getAllUsersAccounts = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    try {
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
+        const offset = (page - 1) * limit;
+        const usersResult = yield (0, orm_util_1.executeQuery)("SELECT * FROM user_accounts LIMIT ? OFFSET ?", [limit, offset]);
+        const users = (usersResult === null || usersResult === void 0 ? void 0 : usersResult.data) || [];
+        const sanitizedUsers = users.map((user) => {
+            const { password } = user, safeUser = __rest(user, ["password"]);
+            return safeUser;
+        });
+        const countResult = yield (0, orm_util_1.executeQuery)("SELECT COUNT(*) AS total FROM user_accounts");
+        const total = ((_b = (_a = countResult === null || countResult === void 0 ? void 0 : countResult.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.total) || 0;
+        const totalPages = Math.ceil(total / limit);
+        res.status(200).json({
+            success: true,
+            message: 'Users fetched successfully.',
+            data: sanitizedUsers,
+            pagination: { page,
+                limit,
+                total,
+                totalPages }
+        });
+    }
+    catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while fetching user accounts.',
+        });
+    }
+}));
+exports.getAllUsersAccounts = getAllUsersAccounts;
+const getAllUsersReports = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const offset = (page - 1) * limit;
+    const usersResult = yield (0, orm_util_1.executeQuery)("SELECT * FROM user_report LIMIT ? OFFSET ?", [limit, offset]);
+    const countResult = yield (0, orm_util_1.executeQuery)("SELECT COUNT(*) AS total FROM user_report");
+    const total = ((_b = (_a = countResult === null || countResult === void 0 ? void 0 : countResult.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.total) || 0;
+    const totalPages = Math.ceil(total / limit);
+    const data = (_c = usersResult.data) === null || _c === void 0 ? void 0 : _c.map((row) => (Object.assign(Object.assign({}, row), { attachment: row.attachment
+            ? (0, response_1.HandelAttachmets)(row.attachment, req.protocol, req.get('host'), 'user_report')
+            : undefined })));
+    res.status(200).json({
+        success: true,
+        message: 'reports fetched successfully.',
+        data: data,
+        pagination: { page,
+            limit,
+            total,
+            totalPages }
+    });
+}));
+exports.getAllUsersReports = getAllUsersReports;
+const getAllUsersObjections = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const offset = (page - 1) * limit;
+    const usersResult = yield (0, orm_util_1.executeQuery)("SELECT * FROM user_objections LIMIT ? OFFSET ?", [limit, offset]);
+    const countResult = yield (0, orm_util_1.executeQuery)("SELECT COUNT(*) AS total FROM user_objections");
+    const total = ((_b = (_a = countResult === null || countResult === void 0 ? void 0 : countResult.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.total) || 0;
+    const totalPages = Math.ceil(total / limit);
+    res.status(200).json({
+        success: true,
+        message: 'objections fetched successfully.',
+        data: usersResult.data,
+        pagination: { page,
+            limit,
+            total,
+            totalPages }
+    });
+}));
+exports.getAllUsersObjections = getAllUsersObjections;
+const changeUserReportStatus = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const newStatus = req.body.status;
+    const isReportFound = yield (0, orm_util_1.executeSingleQuery)("SELECT COUNT(*) as total FROM user_report WHERE id = ?", [id]);
+    if (isReportFound && isReportFound.data) {
+        console.log(isReportFound.data);
+        if (isReportFound.data[0].total === 0) {
+            res.status(404).json({
+                status: false,
+                message: `Report Not Found With ID ${id}`
+            });
+            return;
+        }
+    }
+    const data = yield (0, orm_util_1.executeQuery)("UPDATE user_report SET status = ? WHERE id = ?", [newStatus, id]);
+    if (data.success) {
+        res.status(200).json({
+            success: true,
+            message: 'Status updated successfully.',
+            data: data.data,
+        });
+    }
+    else {
+        res.status(200).json({
+            success: false,
+            message: 'No changes were made. The status might already be set to the specified value.',
+            data: data.data,
+        });
+    }
+}));
+exports.changeUserReportStatus = changeUserReportStatus;
+const changeUserObjectionStatus = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const newStatus = req.body.status;
+    const isObjectionExisits = yield (0, orm_util_1.executeSingleQuery)("SELECT COUNT(*) as total FROM user_objections WHERE id = ?", [id]);
+    if (isObjectionExisits && isObjectionExisits.data) {
+        console.log(isObjectionExisits.data);
+        if (isObjectionExisits.data[0].total === 0) {
+            res.status(404).json({
+                status: false,
+                message: `Objection Not Found With ID ${id}`
+            });
+            return;
+        }
+    }
+    const data = yield (0, orm_util_1.executeQuery)("UPDATE user_objections SET status = ? WHERE id = ?", [newStatus, id]);
+    if (data.success) {
+        res.status(200).json({
+            success: true,
+            message: 'Status updated successfully.',
+            data: data.data,
+        });
+    }
+    else {
+        res.status(200).json({
+            success: false,
+            message: 'No changes were made. The status might already be set to the specified value.',
+            data: data.data,
+        });
+    }
+}));
+exports.changeUserObjectionStatus = changeUserObjectionStatus;

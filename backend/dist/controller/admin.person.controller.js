@@ -106,7 +106,7 @@ exports.getPersons = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0,
                 total: countResult.data[0].total,
                 totalPages: Math.ceil(countResult.data[0].total / limit),
                 page: page,
-                limit: limit
+                limit: limit,
             },
         });
 }));

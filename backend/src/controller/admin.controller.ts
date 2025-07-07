@@ -931,6 +931,184 @@ const getAllVheciles = asyncHandler(async (req: Request, res: Response) => {
     },
   })
 })
+const getAllUsersAccounts = asyncHandler(
+  async (req: Request, res: Response) => {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1
+      const limit = parseInt(req.query.limit as string, 10) || 10
+      const offset = (page - 1) * limit
+
+      const usersResult = await executeQuery(
+        'SELECT * FROM user_accounts LIMIT ? OFFSET ?',
+        [limit, offset],
+      )
+      const users = usersResult?.data || []
+
+      const sanitizedUsers = users.map((user: any) => {
+        const { password, ...safeUser } = user
+        return safeUser
+      })
+
+      const countResult = await executeQuery(
+        'SELECT COUNT(*) AS total FROM user_accounts',
+      )
+      const total = countResult?.data?.[0]?.total || 0
+      const totalPages = Math.ceil(total / limit)
+
+      res.status(200).json({
+        success: true,
+        message: 'Users fetched successfully.',
+        data: sanitizedUsers,
+        pagination: { page, limit, total, totalPages },
+      })
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      res.status(500).json({
+        success: false,
+        message: 'An error occurred while fetching user accounts.',
+      })
+    }
+  },
+)
+
+const getAllUsersReports = asyncHandler(async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string, 10) || 1
+  const limit = parseInt(req.query.limit as string, 10) || 10
+  const offset = (page - 1) * limit
+
+  const usersResult = await executeQuery(
+    'SELECT * FROM user_report LIMIT ? OFFSET ?',
+    [limit, offset],
+  )
+
+  const countResult = await executeQuery(
+    'SELECT COUNT(*) AS total FROM user_report',
+  )
+  const total = countResult?.data?.[0]?.total || 0
+  const totalPages = Math.ceil(total / limit)
+
+  const data = usersResult.data?.map((row: any) => ({
+    ...row,
+    attachment: row.attachment
+      ? HandelAttachmets(
+          row.attachment,
+          req.protocol,
+          req.get('host'),
+          'user_report',
+        )
+      : undefined,
+  }))
+
+  res.status(200).json({
+    success: true,
+    message: 'reports fetched successfully.',
+    data: data,
+    pagination: { page, limit, total, totalPages },
+  })
+})
+
+const getAllUsersObjections = asyncHandler(
+  async (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string, 10) || 1
+    const limit = parseInt(req.query.limit as string, 10) || 10
+    const offset = (page - 1) * limit
+
+    const usersResult = await executeQuery(
+      'SELECT * FROM user_objections LIMIT ? OFFSET ?',
+      [limit, offset],
+    )
+
+    const countResult = await executeQuery(
+      'SELECT COUNT(*) AS total FROM user_objections',
+    )
+    const total = countResult?.data?.[0]?.total || 0
+    const totalPages = Math.ceil(total / limit)
+
+    res.status(200).json({
+      success: true,
+      message: 'objections fetched successfully.',
+      data: usersResult.data,
+      pagination: { page, limit, total, totalPages },
+    })
+  },
+)
+
+const changeUserReportStatus = asyncHandler(
+  async (req: Request, res: Response) => {
+    const id = req.params.id
+    const newStatus = req.body.status
+    const isReportFound = await executeSingleQuery(
+      'SELECT COUNT(*) as total FROM user_report WHERE id = ?',
+      [id],
+    )
+    if (isReportFound && isReportFound.data) {
+      console.log(isReportFound.data)
+      if (isReportFound.data[0].total === 0) {
+        res.status(404).json({
+          status: false,
+          message: `Report Not Found With ID ${id}`,
+        })
+        return
+      }
+    }
+    const data = await executeQuery(
+      'UPDATE user_report SET status = ? WHERE id = ?',
+      [newStatus, id],
+    )
+    if (data.success) {
+      res.status(200).json({
+        success: true,
+        message: 'Status updated successfully.',
+        data: data.data,
+      })
+    } else {
+      res.status(200).json({
+        success: false,
+        message:
+          'No changes were made. The status might already be set to the specified value.',
+        data: data.data,
+      })
+    }
+  },
+)
+const changeUserObjectionStatus = asyncHandler(
+  async (req: Request, res: Response) => {
+    const id = req.params.id
+    const newStatus = req.body.status
+    const isObjectionExisits = await executeSingleQuery(
+      'SELECT COUNT(*) as total FROM user_objections WHERE id = ?',
+      [id],
+    )
+    if (isObjectionExisits && isObjectionExisits.data) {
+      console.log(isObjectionExisits.data)
+      if (isObjectionExisits.data[0].total === 0) {
+        res.status(404).json({
+          status: false,
+          message: `Objection Not Found With ID ${id}`,
+        })
+        return
+      }
+    }
+    const data = await executeQuery(
+      'UPDATE user_objections SET status = ? WHERE id = ?',
+      [newStatus, id],
+    )
+    if (data.success) {
+      res.status(200).json({
+        success: true,
+        message: 'Status updated successfully.',
+        data: data.data,
+      })
+    } else {
+      res.status(200).json({
+        success: false,
+        message:
+          'No changes were made. The status might already be set to the specified value.',
+        data: data.data,
+      })
+    }
+  },
+)
 
 export {
   createAdmin,
@@ -951,4 +1129,9 @@ export {
   deleteViolationByAdmin,
   updateViolationByAdmin,
   getAllVheciles,
+  getAllUsersAccounts,
+  getAllUsersReports,
+  getAllUsersObjections,
+  changeUserReportStatus,
+  changeUserObjectionStatus,
 }

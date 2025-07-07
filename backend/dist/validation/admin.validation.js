@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createViolationAdmin = exports.updateAdminValidation = exports.loginAdminValidation = exports.createAdminValidation = void 0;
+exports.changeStatusObjection = exports.changeStatusReport = exports.createViolationAdmin = exports.updateAdminValidation = exports.loginAdminValidation = exports.createAdminValidation = void 0;
 const express_validator_1 = require("express-validator");
 exports.createAdminValidation = [
     (0, express_validator_1.body)('name')
@@ -116,4 +116,20 @@ exports.createViolationAdmin = [
         .optional()
         .isString()
         .withMessage('Attachment must be a string'),
+];
+exports.changeStatusReport = [
+    (0, express_validator_1.param)('id')
+        .isInt({ gt: 0 })
+        .withMessage('Report ID must be a positive integer'),
+    (0, express_validator_1.body)('status')
+        .isIn(['pending', 'accepted', 'rejected'])
+        .withMessage('Status must be one of: pending, accepted, or rejected'),
+];
+exports.changeStatusObjection = [
+    (0, express_validator_1.param)('id')
+        .isInt({ gt: 0 })
+        .withMessage('Report ID must be a positive integer'),
+    (0, express_validator_1.body)('status')
+        .isIn(['pending', 'under_review', 'resolved', 'rejected', 'closed'])
+        .withMessage("Status must be one of: 'pending', 'under_review', 'resolved', 'rejected', or 'closed'"),
 ];

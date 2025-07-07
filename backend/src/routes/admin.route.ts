@@ -13,6 +13,11 @@ import {
   updateUser,
   getAllViolations,
   getAllVheciles,
+  getAllUsersAccounts,
+  getAllUsersReports,
+  getAllUsersObjections,
+  changeUserReportStatus,
+  changeUserObjectionStatus,
 } from '../controller/admin.controller'
 import {
   validateAdminToken,
@@ -20,6 +25,8 @@ import {
 } from '../middleware/admin.middleware'
 import { uploadFile } from '../middleware/multer.middleware'
 import {
+  changeStatusObjection,
+  changeStatusReport,
   createAdminValidation,
   loginAdminValidation,
   updateAdminValidation,
@@ -140,4 +147,28 @@ router
   )
 
 router.get('/vehciles/get', validateAdminToken, getAllVheciles)
+
+router.get('/accounts/users', validateAdminToken, getAllUsersAccounts)
+router.get('/accounts/users/reports', validateAdminToken, getAllUsersReports)
+router.get(
+  '/accounts/users/objection',
+  validateAdminToken,
+  getAllUsersObjections,
+)
+
+router.put(
+  '/accounts/users/reports/:id',
+  validateAdminToken,
+  changeStatusReport,
+  validateRequest,
+  changeUserReportStatus,
+)
+router.put(
+  '/accounts/users/objection/:id',
+  validateAdminToken,
+  changeStatusObjection,
+  validateRequest,
+  changeUserObjectionStatus,
+)
+
 export default router
