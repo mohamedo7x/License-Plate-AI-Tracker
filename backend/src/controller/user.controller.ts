@@ -244,12 +244,10 @@ export const generateObjection = asyncHandler(
     )
     if (userdata && userdata.data) {
       if (userdata.data[0].total === 0) {
-        res
-          .status(404)
-          .json({
-            message:
-              'No objection found for the provided ID, or your report has not been reviewed yet.',
-          })
+        res.status(404).json({
+          message:
+            'No objection found for the provided ID, or your report has not been reviewed yet.',
+        })
         return
       }
     }

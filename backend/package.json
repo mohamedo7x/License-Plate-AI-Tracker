@@ -8,7 +8,8 @@
     "start:devf": "nodemon --legacy-watch src/server.ts",
     "start:prod": "node dist/server.js",
     "build": "tsc --project .",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "d":"npm run build && npm run format"
   },
   "author": "",
   "license": "ISC",
