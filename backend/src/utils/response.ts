@@ -4,6 +4,7 @@ import { PoliceUserRow } from '../controller/admin.controller'
 import { executeQuery, executeSingleQuery } from './orm.util'
 import { violation } from '../model/police_user.response.model'
 import { HomePage } from '../controller/Home.controller'
+import { VehicleResponse } from '../model/user.model'
 
 export const generateDescriptionForNotification = (
   typeOfNotification: string,
@@ -234,3 +235,4 @@ export const HandelStatistics = (items: HomePage | undefined) => {
     under_investigation,
   }
 }
+
