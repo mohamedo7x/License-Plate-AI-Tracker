@@ -3,12 +3,9 @@ import { IUser } from '../model/default.user'
 import { RowDataPacket } from 'mysql2'
 import { extractJWTToken, validateJWTToken } from './police_user.access'
 import { ForbiddenError, UnauthorizedError } from '../middleware/errorHandler'
-import { NextFunction , Request , Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
-
-
-
 
 export const validateUserToken = (
   req: Request,
@@ -33,7 +30,7 @@ export const validateUserToken = (
   }
 }
 
-export const generateUserJWTToken = (user: IUser ): string => {
+export const generateUserJWTToken = (user: IUser): string => {
   const tokenData = {
     id: user.national_id,
   }

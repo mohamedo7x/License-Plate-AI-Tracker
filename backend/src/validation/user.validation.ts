@@ -24,7 +24,6 @@ export const validateUser = [
 ]
 
 export const validateUserLogin = [
-
   body('email')
     .notEmpty()
     .withMessage('Email is required.')
@@ -39,3 +38,41 @@ export const validateUserLogin = [
     .withMessage('Password must be between 5 and 20 characters.'),
 ]
 
+export const userReportValidation = [
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('Name is required.')
+    .isLength({ max: 100 })
+    .withMessage('Name must be at most 100 characters.'),
+
+  body('phone').trim().notEmpty().withMessage('Phone is required.'),
+
+  body('address')
+    .trim()
+    .notEmpty()
+    .withMessage('Address is required.')
+    .isLength({ max: 255 })
+    .withMessage('Address must be at most 255 characters.'),
+
+  body('date')
+    .trim()
+    .notEmpty()
+    .withMessage('Date is required.')
+    .isISO8601()
+    .withMessage('Date must be in a valid ISO 8601 format (e.g. YYYY-MM-DD).'),
+
+  body('vehcile_types')
+    .trim()
+    .notEmpty()
+    .withMessage('Vehicle types are required.')
+    .isLength({ max: 300 })
+    .withMessage('Vehicle types must be at most 300 characters.'),
+
+  body('description').trim().notEmpty().withMessage('Description is required.'),
+
+  body('attachment')
+    .optional()
+    .isString()
+    .withMessage('Attachment must be a string'),
+]

@@ -769,6 +769,7 @@ const getSpesificViolation = asyncHandler(
       pu.name AS officer_name, 
       pu.id AS officer_id, 
       vio.status AS violation_status, 
+      vio.attachments as attachments,
       vio.description AS violation_description 
     FROM violations vio 
     JOIN vehicle v ON vio.plate_id = v.plate 
@@ -784,6 +785,9 @@ const getSpesificViolation = asyncHandler(
     const data = result.data?.map((row: any) => ({
       ...row,
       violation_date: getFullDate(row.violation_date),
+      attachments: row.attachments
+        ? HandelAttachmets(row.attachments, req.protocol, req.get('host'))
+        : undefined,
     }))
 
     res.json(data ? data[0] : data)
