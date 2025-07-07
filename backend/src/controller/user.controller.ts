@@ -74,3 +74,69 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   }
 
 })
+export const searchVehcile = asyncHandler(async (req :Request , res :Response) => {
+  const {id} = req.params;
+  if (!id) {
+    res.status(400).json({
+      error: "Missing required parameter: 'id'. Please include a valid ID in the request URL.",
+      
+    });
+    return;
+  }
+// const data = await executeSingleQuery<VehicleResponse>(
+//   `SELECT 
+//      v.*,
+//      EXISTS (
+//        SELECT 1 
+//        FROM wanted_vehicle w 
+//        WHERE w.plate = v.plate
+//      ) AS is_wanted,
+//      (
+//        SELECT JSON_ARRAYAGG(
+//          JSON_OBJECT(
+//            'id', vio.id,
+//            'location', vio.location,
+//            'type', vio.type,
+//            'status', vio.status,
+//            'action', vio.action,
+//            'description', vio.description,
+//            'created_at', vio.created_at
+//          )
+//        )
+//        FROM violations vio
+//        WHERE vio.plate_id = v.plate
+//      ) AS violations
+//    FROM vehicle v
+//    WHERE v.plate = ?`,
+//   [id]
+// );
+
+const result = await executeSingleQuery(`
+SELECT 
+  v.plate,
+  CASE 
+    WHEN wv.plate IS NOT NULL THEN TRUE 
+    ELSE FALSE 
+  END AS is_wanted,
+  IF(COUNT(vio.id) > 0,
+    JSON_ARRAYAGG(
+      JSON_OBJECT(
+        'violation_id', vio.id,
+        'location', IFNULL(vio.location, ''),
+        'description', IFNULL(vio.description, ''),
+        'status', IFNULL(vio.status, ''),
+        'type_name', IFNULL(vt.name, '')
+      )
+    ),
+    JSON_ARRAY()
+  ) AS violations
+FROM vehicle v
+LEFT JOIN wanted_vehicle wv ON v.plate = wv.plate
+LEFT JOIN violations vio ON v.plate = vio.plate_id
+LEFT JOIN violation_type vt ON vio.type = vt.ID
+WHERE v.plate = ?
+GROUP BY v.plate, is_wanted;
+`, [id]);
+
+  res.json(result)
+})
