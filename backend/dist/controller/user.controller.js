@@ -144,7 +144,6 @@ GROUP BY v.plate, is_wanted;
     res.json(result);
 }));
 exports.createReport = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, phone, national_id, address, date, vehcile_types, description, } = req.body;
     const user = req.user_data;
     let attachmentPaths = [];
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
@@ -178,11 +177,12 @@ exports.createReport = (0, asyncHandler_1.default)((req, res) => __awaiter(void 
 exports.getReport = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id } = req.params;
+    const user = req.user_data;
     if (!id) {
         res.status(400).json({ message: 'Report ID is required in URL params.' });
         return;
     }
-    const result = yield (0, orm_util_1.executeSingleQuery)('SELECT * FROM user_report WHERE id = ?', [id]);
+    const result = yield (0, orm_util_1.executeSingleQuery)('SELECT * FROM user_report WHERE id = ? AND national_id = ?', [id, user.id]);
     const data = (_a = result.data) === null || _a === void 0 ? void 0 : _a.map((row) => (Object.assign(Object.assign({}, row), { attachment: row.attachment
             ? (0, response_1.HandelAttachmets)(row.attachment, req.protocol, req.get('host'), 'user_report')
             : undefined })));
@@ -197,20 +197,18 @@ exports.generateObjection = (0, asyncHandler_1.default)((req, res) => __awaiter(
     const { report_id, description } = req.body;
     const user = req.user_data;
     const data = yield (0, orm_util_1.executeSingleQuery)("SELECT COUNT(*) as total FROM user_objections WHERE id = ? AND national_id = ? AND status = 'pending'  ", [report_id, user.id]);
-    const userdata = yield (0, orm_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM user_report WHERE id = ?', [report_id]);
+    const userdata = yield (0, orm_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM user_report WHERE id = ? AND status = "rejected" ', [report_id]);
     if (userdata && userdata.data) {
         if (userdata.data[0].total === 0) {
             res
                 .status(404)
-                .json({ message: 'No objection found with the provided ID.' });
+                .json({ message: 'No objection found for the provided ID, or your report has not been reviewed yet.' });
             return;
         }
     }
     if (data && data.data) {
         if (data.data[0].total > 0) {
-            res
-                .status(401)
-                .json({
+            res.status(401).json({
                 message: 'You have exceeded the maximum number of allowed objections.',
             });
             return;

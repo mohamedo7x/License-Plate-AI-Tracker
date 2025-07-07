@@ -1,4 +1,4 @@
-import { body } from 'express-validator'
+import { body, param } from 'express-validator'
 
 export const createAdminValidation = [
   body('name')
@@ -131,4 +131,26 @@ export const createViolationAdmin = [
     .optional()
     .isString()
     .withMessage('Attachment must be a string'),
+]
+
+export const changeStatusReport = [
+  param('id')
+    .isInt({ gt: 0 })
+    .withMessage('Report ID must be a positive integer'),
+
+  body('status')
+    .isIn(['pending', 'accepted', 'rejected'])
+    .withMessage('Status must be one of: pending, accepted, or rejected'),
+]
+
+export const changeStatusObjection = [
+  param('id')
+    .isInt({ gt: 0 })
+    .withMessage('Report ID must be a positive integer'),
+
+  body('status')
+    .isIn(['pending', 'under_review', 'resolved', 'rejected', 'closed'])
+    .withMessage(
+      "Status must be one of: 'pending', 'under_review', 'resolved', 'rejected', or 'closed'",
+    ),
 ]

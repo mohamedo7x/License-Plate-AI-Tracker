@@ -165,15 +165,6 @@ GROUP BY v.plate, is_wanted;
 
 export const createReport = asyncHandler(
   async (req: Request, res: Response) => {
-    const {
-      name,
-      phone,
-      national_id,
-      address,
-      date,
-      vehcile_types,
-      description,
-    } = req.body
     const user = (req as any).user_data
 
     let attachmentPaths: string[] = []
@@ -210,13 +201,14 @@ export const createReport = asyncHandler(
 
 export const getReport = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params
+  const user = (req as any).user_data
   if (!id) {
     res.status(400).json({ message: 'Report ID is required in URL params.' })
     return
   }
   const result = await executeSingleQuery(
-    'SELECT * FROM user_report WHERE id = ?',
-    [id],
+    'SELECT * FROM user_report WHERE id = ? AND national_id = ?',
+    [id, user.id],
   )
 
   const data = result.data?.map((row: any) => ({
@@ -247,14 +239,17 @@ export const generateObjection = asyncHandler(
       [report_id, user.id],
     )
     const userdata = await executeSingleQuery(
-      'SELECT COUNT(*) as total FROM user_report WHERE id = ?',
+      'SELECT COUNT(*) as total FROM user_report WHERE id = ? AND status = "rejected" ',
       [report_id],
     )
     if (userdata && userdata.data) {
       if (userdata.data[0].total === 0) {
         res
           .status(404)
-          .json({ message: 'No objection found with the provided ID.' })
+          .json({
+            message:
+              'No objection found for the provided ID, or your report has not been reviewed yet.',
+          })
         return
       }
     }

@@ -79,4 +79,9 @@ router
     .route('/police/user/:id')
     .put(admin_middleware_1.validateAdminToken, multer_middleware_1.uploadFile, police_validation_1.updatePoliceUserValidation, validateRequest_1.validateRequest, admin_controller_1.updateUser);
 router.get('/vehciles/get', admin_middleware_1.validateAdminToken, admin_controller_1.getAllVheciles);
+router.get('/accounts/users', admin_middleware_1.validateAdminToken, admin_controller_1.getAllUsersAccounts);
+router.get('/accounts/users/reports', admin_middleware_1.validateAdminToken, admin_controller_1.getAllUsersReports);
+router.get('/accounts/users/objection', admin_middleware_1.validateAdminToken, admin_controller_1.getAllUsersObjections);
+router.put('/accounts/users/reports/:id', admin_middleware_1.validateAdminToken, admin_validation_1.changeStatusReport, validateRequest_1.validateRequest, admin_controller_1.changeUserReportStatus);
+router.put('/accounts/users/objection/:id', admin_middleware_1.validateAdminToken, admin_validation_1.changeStatusObjection, validateRequest_1.validateRequest, admin_controller_1.changeUserObjectionStatus);
 exports.default = router;
