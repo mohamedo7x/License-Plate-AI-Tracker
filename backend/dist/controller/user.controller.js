@@ -202,7 +202,9 @@ exports.generateObjection = (0, asyncHandler_1.default)((req, res) => __awaiter(
         if (userdata.data[0].total === 0) {
             res
                 .status(404)
-                .json({ message: 'No objection found for the provided ID, or your report has not been reviewed yet.' });
+                .json({
+                message: 'No objection found for the provided ID, or your report has not been reviewed yet.',
+            });
             return;
         }
     }

@@ -740,23 +740,20 @@ const getAllUsersAccounts = (0, asyncHandler_1.default)((req, res) => __awaiter(
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 10;
         const offset = (page - 1) * limit;
-        const usersResult = yield (0, orm_util_1.executeQuery)("SELECT * FROM user_accounts LIMIT ? OFFSET ?", [limit, offset]);
+        const usersResult = yield (0, orm_util_1.executeQuery)('SELECT * FROM user_accounts LIMIT ? OFFSET ?', [limit, offset]);
         const users = (usersResult === null || usersResult === void 0 ? void 0 : usersResult.data) || [];
         const sanitizedUsers = users.map((user) => {
             const { password } = user, safeUser = __rest(user, ["password"]);
             return safeUser;
         });
-        const countResult = yield (0, orm_util_1.executeQuery)("SELECT COUNT(*) AS total FROM user_accounts");
+        const countResult = yield (0, orm_util_1.executeQuery)('SELECT COUNT(*) AS total FROM user_accounts');
         const total = ((_b = (_a = countResult === null || countResult === void 0 ? void 0 : countResult.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.total) || 0;
         const totalPages = Math.ceil(total / limit);
         res.status(200).json({
             success: true,
             message: 'Users fetched successfully.',
             data: sanitizedUsers,
-            pagination: { page,
-                limit,
-                total,
-                totalPages }
+            pagination: { page, limit, total, totalPages },
         });
     }
     catch (error) {
@@ -773,8 +770,8 @@ const getAllUsersReports = (0, asyncHandler_1.default)((req, res) => __awaiter(v
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 10;
     const offset = (page - 1) * limit;
-    const usersResult = yield (0, orm_util_1.executeQuery)("SELECT * FROM user_report LIMIT ? OFFSET ?", [limit, offset]);
-    const countResult = yield (0, orm_util_1.executeQuery)("SELECT COUNT(*) AS total FROM user_report");
+    const usersResult = yield (0, orm_util_1.executeQuery)('SELECT * FROM user_report LIMIT ? OFFSET ?', [limit, offset]);
+    const countResult = yield (0, orm_util_1.executeQuery)('SELECT COUNT(*) AS total FROM user_report');
     const total = ((_b = (_a = countResult === null || countResult === void 0 ? void 0 : countResult.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.total) || 0;
     const totalPages = Math.ceil(total / limit);
     const data = (_c = usersResult.data) === null || _c === void 0 ? void 0 : _c.map((row) => (Object.assign(Object.assign({}, row), { attachment: row.attachment
@@ -784,10 +781,7 @@ const getAllUsersReports = (0, asyncHandler_1.default)((req, res) => __awaiter(v
         success: true,
         message: 'reports fetched successfully.',
         data: data,
-        pagination: { page,
-            limit,
-            total,
-            totalPages }
+        pagination: { page, limit, total, totalPages },
     });
 }));
 exports.getAllUsersReports = getAllUsersReports;
@@ -796,36 +790,33 @@ const getAllUsersObjections = (0, asyncHandler_1.default)((req, res) => __awaite
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 10;
     const offset = (page - 1) * limit;
-    const usersResult = yield (0, orm_util_1.executeQuery)("SELECT * FROM user_objections LIMIT ? OFFSET ?", [limit, offset]);
-    const countResult = yield (0, orm_util_1.executeQuery)("SELECT COUNT(*) AS total FROM user_objections");
+    const usersResult = yield (0, orm_util_1.executeQuery)('SELECT * FROM user_objections LIMIT ? OFFSET ?', [limit, offset]);
+    const countResult = yield (0, orm_util_1.executeQuery)('SELECT COUNT(*) AS total FROM user_objections');
     const total = ((_b = (_a = countResult === null || countResult === void 0 ? void 0 : countResult.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.total) || 0;
     const totalPages = Math.ceil(total / limit);
     res.status(200).json({
         success: true,
         message: 'objections fetched successfully.',
         data: usersResult.data,
-        pagination: { page,
-            limit,
-            total,
-            totalPages }
+        pagination: { page, limit, total, totalPages },
     });
 }));
 exports.getAllUsersObjections = getAllUsersObjections;
 const changeUserReportStatus = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const newStatus = req.body.status;
-    const isReportFound = yield (0, orm_util_1.executeSingleQuery)("SELECT COUNT(*) as total FROM user_report WHERE id = ?", [id]);
+    const isReportFound = yield (0, orm_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM user_report WHERE id = ?', [id]);
     if (isReportFound && isReportFound.data) {
         console.log(isReportFound.data);
         if (isReportFound.data[0].total === 0) {
             res.status(404).json({
                 status: false,
-                message: `Report Not Found With ID ${id}`
+                message: `Report Not Found With ID ${id}`,
             });
             return;
         }
     }
-    const data = yield (0, orm_util_1.executeQuery)("UPDATE user_report SET status = ? WHERE id = ?", [newStatus, id]);
+    const data = yield (0, orm_util_1.executeQuery)('UPDATE user_report SET status = ? WHERE id = ?', [newStatus, id]);
     if (data.success) {
         res.status(200).json({
             success: true,
@@ -845,18 +836,18 @@ exports.changeUserReportStatus = changeUserReportStatus;
 const changeUserObjectionStatus = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const newStatus = req.body.status;
-    const isObjectionExisits = yield (0, orm_util_1.executeSingleQuery)("SELECT COUNT(*) as total FROM user_objections WHERE id = ?", [id]);
+    const isObjectionExisits = yield (0, orm_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM user_objections WHERE id = ?', [id]);
     if (isObjectionExisits && isObjectionExisits.data) {
         console.log(isObjectionExisits.data);
         if (isObjectionExisits.data[0].total === 0) {
             res.status(404).json({
                 status: false,
-                message: `Objection Not Found With ID ${id}`
+                message: `Objection Not Found With ID ${id}`,
             });
             return;
         }
     }
-    const data = yield (0, orm_util_1.executeQuery)("UPDATE user_objections SET status = ? WHERE id = ?", [newStatus, id]);
+    const data = yield (0, orm_util_1.executeQuery)('UPDATE user_objections SET status = ? WHERE id = ?', [newStatus, id]);
     if (data.success) {
         res.status(200).json({
             success: true,
