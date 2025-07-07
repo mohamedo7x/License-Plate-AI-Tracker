@@ -30,7 +30,7 @@ import { getFullDate, getRealTime } from '../utils/dateFormat.util'
 
 interface AdminUserRow extends AdminUser, RowDataPacket {}
 
-interface CountResult extends RowDataPacket {
+export interface CountResult extends RowDataPacket {
   total: number
 }
 
@@ -721,6 +721,11 @@ const getAllViolations = asyncHandler(async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1
   const limit = parseInt(req.query.limit as string) || 10
   const offset = (page - 1) * limit
+
+  const countResult = await executeSingleQuery<CountResult>(
+    'SELECT COUNT(*) as total FROM violations',
+  )
+
   const data = await executeQuery(
     'SELECT v.id , v.plate_id , v.location , vt.name , v.status , v.attachments, v.description FROM violations v JOIN violation_type vt ON vt.ID = v.type LIMIT  ? OFFSET  ?;',
     [limit, offset],
@@ -741,10 +746,17 @@ const getAllViolations = asyncHandler(async (req: Request, res: Response) => {
       }
     })
   }
-  res.json({
-    sucess: true,
-    data: newData,
-  })
+  if (countResult && countResult.data)
+    res.json({
+      sucess: true,
+      data: newData,
+      pagination: {
+        total: countResult.data[0].total,
+        totalPages: Math.ceil(countResult.data[0].total / limit),
+        page: page,
+        limit: limit,
+      },
+    })
 })
 
 const getViolationsType = asyncHandler(async (req: Request, res: Response) => {

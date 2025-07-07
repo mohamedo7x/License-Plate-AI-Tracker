@@ -88,7 +88,6 @@ app.use((req, res, next) => {
         const endTime = new Date();
         const responseTime = endTime.getTime() - startTime.getTime();
         const user = req.user;
-        console.log(user);
         const logData = {
             method: req.method,
             url: req.baseUrl,

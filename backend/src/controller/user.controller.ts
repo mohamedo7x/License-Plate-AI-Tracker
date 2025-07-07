@@ -9,6 +9,7 @@ import bcrypt from 'bcrypt'
 import { generateUserJWTToken } from '../auth/user.access'
 import { IUser } from '../model/default.user'
 import { saveUploadedFiles } from '../middleware/multer.middleware'
+import { HandelAttachmets } from '../utils/response'
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { national_id, email, password } = req.body
@@ -204,5 +205,72 @@ export const createReport = asyncHandler(
     }
 
     res.status(201).json({ success: true, message: 'Report created' })
+  },
+)
+
+export const getReport = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params
+  if (!id) {
+    res.status(400).json({ message: 'Report ID is required in URL params.' })
+    return
+  }
+  const result = await executeSingleQuery(
+    'SELECT * FROM user_report WHERE id = ?',
+    [id],
+  )
+
+  const data = result.data?.map((row: any) => ({
+    ...row,
+    attachment: row.attachment
+      ? HandelAttachmets(
+          row.attachment,
+          req.protocol,
+          req.get('host'),
+          'user_report',
+        )
+      : undefined,
+  }))
+
+  if (result && result.data) {
+    res.status(200).json(data)
+  } else {
+    res.status(200).json({})
+  }
+})
+
+export const generateObjection = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { report_id, description } = req.body
+    const user = (req as any).user_data
+    const data = await executeSingleQuery(
+      "SELECT COUNT(*) as total FROM user_objections WHERE id = ? AND national_id = ? AND status = 'pending'  ",
+      [report_id, user.id],
+    )
+    const userdata = await executeSingleQuery(
+      'SELECT COUNT(*) as total FROM user_report WHERE id = ?',
+      [report_id],
+    )
+    if (userdata && userdata.data) {
+      if (userdata.data[0].total === 0) {
+        res
+          .status(404)
+          .json({ message: 'No objection found with the provided ID.' })
+        return
+      }
+    }
+    if (data && data.data) {
+      if (data.data[0].total > 0) {
+        res.status(401).json({
+          message:
+            'You have exceeded the maximum number of allowed objections.',
+        })
+        return
+      }
+    }
+    const result = await executeNonQuery(
+      'INSERT INTO user_objections (report_id ,national_id,description, status) VALUES (?,?,?,?)',
+      [report_id, user.id, description, 'pending'],
+    )
+    res.json({ message: 'objection created' })
   },
 )

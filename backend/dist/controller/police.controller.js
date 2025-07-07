@@ -62,7 +62,7 @@ exports.loginPoliceUser = (0, asyncHandler_1.default)((req, res) => __awaiter(vo
                 .json({ message: 'رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.' });
             return;
         }
-        const token = (0, police_user_access_1.generatePoliceUserJWTToken)(policeUser);
+        const token = (0, police_user_access_1.generatePoliceUserJWTToken)(policeUser, req);
         yield (0, orm_util_1.executeNonQuery)('UPDATE police_users SET last_login = ? WHERE id = ?', [new Date(), policeUser.id]);
         const query = 'UPDATE police_users SET online = 1 WHERE id = ?';
         yield (0, orm_util_1.executeNonQuery)(query, [policeUser.id]);
@@ -219,7 +219,7 @@ exports.getActivites = (0, asyncHandler_1.default)((req, res) => __awaiter(void 
     vt.name AS "violation_type",
     v.description,
     va.name as "violation_action",
-    v.create_at,
+    v.created_at,
     veh.name AS "vehicle_name",
     veh.brand,
     veh.type,

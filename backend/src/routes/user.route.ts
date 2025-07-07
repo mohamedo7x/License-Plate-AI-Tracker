@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import {
   createReport,
+  generateObjection,
+  getReport,
   login,
   register,
   searchVehcile,
@@ -9,6 +11,7 @@ import {
   userReportValidation,
   validateUser,
   validateUserLogin,
+  validateUserObjection,
 } from '../validation/user.validation'
 import { validateRequest } from '../middleware/validateRequest'
 import { validateUserToken } from '../auth/user.access'
@@ -28,5 +31,14 @@ route.post(
   userReportValidation,
   validateRequest,
   createReport,
+)
+route.get('/report/:id', validateUserToken, getReport)
+
+route.post(
+  '/objection',
+  validateUserToken,
+  validateUserObjection,
+  validateRequest,
+  generateObjection,
 )
 export default route

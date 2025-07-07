@@ -18,15 +18,26 @@ const asyncHandler_1 = __importDefault(require("../middleware/asyncHandler"));
 const dateFormat_util_1 = require("../utils/dateFormat.util");
 const reportScore_1 = require("../utils/reportScore");
 exports.getAllReports = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield (0, orm_util_1.executeQuery)('SELECT rp.id AS report_id , pu.id AS police_id , pu.name AS officer_name, rp.title, rp.description, rp.status, rp.date, rt.name AS report_name, rt.point AS SCORE FROM reports AS rp INNER JOIN police_reports AS pr ON rp.id = pr.report_id INNER JOIN report_type AS rt ON rp.type = rt.id INNER JOIN police_users AS pu ON pu.id = pr.police_id;');
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const result = yield (0, orm_util_1.executeQuery)('SELECT rp.id AS report_id , pu.id AS police_id , pu.name AS officer_name, rp.title, rp.description, rp.status, rp.date, rt.name AS report_name, rt.point AS SCORE FROM reports AS rp INNER JOIN police_reports AS pr ON rp.id = pr.report_id INNER JOIN report_type AS rt ON rp.type = rt.id INNER JOIN police_users AS pu ON pu.id = pr.police_id LIMIT ? OFFSET ?;', [limit, offset]);
+    const countResult = yield (0, orm_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM reports');
     if (result.success && result.data) {
         const userData = result.data.map((report) => {
             return Object.assign(Object.assign({}, report), { date: (0, dateFormat_util_1.getFullDate)(report.date), SCORE: (0, reportScore_1.reportScore)(report.SCORE) });
         });
-        res.status(200).json({
-            success: true,
-            data: userData || [],
-        });
+        if (countResult && countResult.data)
+            res.status(200).json({
+                success: true,
+                data: userData || [],
+                pagination: {
+                    total: countResult.data[0].total,
+                    page,
+                    limit,
+                    totalPages: Math.ceil(countResult.data[0].total / limit),
+                },
+            });
     }
 }));
 // return ALL police Officer Viloations

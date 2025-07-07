@@ -1,7 +1,8 @@
 import asyncHandler from '../middleware/asyncHandler'
 import { Request, Response } from 'express'
-import { executeQuery } from '../utils/orm.util'
+import { executeQuery, executeSingleQuery } from '../utils/orm.util'
 import { formatDate, formatDateV2 } from '../utils/dateFormat.util'
+import { CountResult } from './admin.controller'
 
 export const getPersonByID = asyncHandler(
   async (req: Request, res: Response) => {
@@ -87,7 +88,9 @@ export const getPersons = asyncHandler(async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1
   const limit = parseInt(req.query.limit as string) || 10
   const offset = (page - 1) * limit
-
+  const countResult = await executeSingleQuery<CountResult>(
+    'SELECT COUNT(*) as total FROM person',
+  )
   const query = 'SELECT * FROM person LIMIT ? OFFSET ?'
   const persons = await executeQuery(query, [limit, offset])
 
@@ -102,12 +105,17 @@ export const getPersons = asyncHandler(async (req: Request, res: Response) => {
         }
       })
     : []
-  res.status(200).json({
-    success: true,
-    page: page,
-    limit: limit,
-    data: PersonsData,
-  })
+  if (countResult && countResult.data)
+    res.status(200).json({
+      success: true,
+      data: PersonsData,
+      pagination: {
+        total: countResult.data[0].total,
+        totalPages: Math.ceil(countResult.data[0].total / limit),
+        page: page,
+        limit: limit,
+      },
+    })
 })
 
 export const getAllWantedPersons = asyncHandler(

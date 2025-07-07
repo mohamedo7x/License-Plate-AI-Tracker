@@ -50,6 +50,9 @@ const getUploadDestination = (url) => {
     if (url.includes('/custome/createViolation')) {
         return path_1.default.join(__dirname, '..', 'uploads', 'images', 'violation_ticket');
     }
+    if (url.includes('/user/report')) {
+        return path_1.default.join(__dirname, '..', 'uploads', 'images', 'user_report');
+    }
     throw new Error('Invalid upload destination');
 };
 const saveUploadedFile = (req) => __awaiter(void 0, void 0, void 0, function* () {

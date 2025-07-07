@@ -76,3 +76,14 @@ export const userReportValidation = [
     .isString()
     .withMessage('Attachment must be a string'),
 ]
+export const validateUserObjection = [
+  body('report_id')
+    .isNumeric()
+    .withMessage('report_id must contain only numbers'),
+
+  body('description')
+    .isString()
+    .withMessage('description must be a string')
+    .notEmpty()
+    .withMessage('description is required'),
+]
