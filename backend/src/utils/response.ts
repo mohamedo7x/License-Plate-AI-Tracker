@@ -235,4 +235,3 @@ export const HandelStatistics = (items: HomePage | undefined) => {
     under_investigation,
   }
 }
-

@@ -1,9 +1,14 @@
 import asyncHandler from '../middleware/asyncHandler'
 import { Request, Response } from 'express'
-import { executeSingleQuery , executeNonQuery, executeQuery } from '../utils/orm.util'
+import {
+  executeSingleQuery,
+  executeNonQuery,
+  executeQuery,
+} from '../utils/orm.util'
 import bcrypt from 'bcrypt'
 import { generateUserJWTToken } from '../auth/user.access'
 import { IUser } from '../model/default.user'
+import { saveUploadedFiles } from '../middleware/multer.middleware'
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { national_id, email, password } = req.body
@@ -19,7 +24,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   const isNationalIdExsits = fetchNationalIdData.data?.length
   if (isUserExists === 1) {
     res.status(409).json({
-      sucess:false,
+      sucess: false,
       message:
         'A user with the provided credentials already exists. Please use a different national ID or email, or proceed to login if you already have an account.',
     })
@@ -27,91 +32,104 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   }
   if (!isNationalIdExsits) {
     res.status(404).json({
-      sucess:false,
+      sucess: false,
       message:
         'No user found with the provided national ID. Please verify the number and try again.',
     })
     return
   }
- const hash_password = await bcrypt.hash(password,parseInt(process.env.SALT_PASSWORD || '10'),)
-  const result = await executeNonQuery("INSERT INTO user_accounts (national_id , email,password) VALUES (?,?,?)",[national_id, email , hash_password])
+  const hash_password = await bcrypt.hash(
+    password,
+    parseInt(process.env.SALT_PASSWORD || '10'),
+  )
+  const result = await executeNonQuery(
+    'INSERT INTO user_accounts (national_id , email,password) VALUES (?,?,?)',
+    [national_id, email, hash_password],
+  )
   if (result.success) {
-   res.status(201).json({
-    sucess:true,
-    message: 'User account has been successfully created.',
-  });
-}
-  
+    res.status(201).json({
+      sucess: true,
+      message: 'User account has been successfully created.',
+    })
+  }
 })
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
-  const {email , password} = req.body;
-  const userData = await executeSingleQuery<IUser>("SELECT * FROM user_accounts WHERE email = ?", [email ]);
+  const { email, password } = req.body
+  const userData = await executeSingleQuery<IUser>(
+    'SELECT * FROM user_accounts WHERE email = ?',
+    [email],
+  )
   if (userData.data?.length === 0) {
-   res.status(401).json({
-    sucess:false,
-    message: 'Invalid email or password. Please check your credentials and try again.',
-  });
-  return;
-  }
-  const user_password = userData.data ? userData.data[0].password : new Error('Somthing Happend');
-  const correct_password = await bcrypt.compare(password ,user_password);
-
-  if(!correct_password){
     res.status(401).json({
-      sucess:false,
-    message: 'Invalid email or password. Please check your credentials and try again.',
-  });
-  return;
+      sucess: false,
+      message:
+        'Invalid email or password. Please check your credentials and try again.',
+    })
+    return
   }
-  if(userData && userData.data){
-    const user:IUser[] = userData.data;
-    const token = generateUserJWTToken(user[0]);
+  const user_password = userData.data
+    ? userData.data[0].password
+    : new Error('Somthing Happend')
+  const correct_password = await bcrypt.compare(password, user_password)
+
+  if (!correct_password) {
+    res.status(401).json({
+      sucess: false,
+      message:
+        'Invalid email or password. Please check your credentials and try again.',
+    })
+    return
+  }
+  if (userData && userData.data) {
+    const user: IUser[] = userData.data
+    const token = generateUserJWTToken(user[0])
     res.status(200).json({
-      sucess:true,
+      sucess: true,
       token,
     })
   }
-
 })
-export const searchVehcile = asyncHandler(async (req :Request , res :Response) => {
-  const {id} = req.params;
-  if (!id) {
-    res.status(400).json({
-      error: "Missing required parameter: 'id'. Please include a valid ID in the request URL.",
-      
-    });
-    return;
-  }
-// const data = await executeSingleQuery<VehicleResponse>(
-//   `SELECT 
-//      v.*,
-//      EXISTS (
-//        SELECT 1 
-//        FROM wanted_vehicle w 
-//        WHERE w.plate = v.plate
-//      ) AS is_wanted,
-//      (
-//        SELECT JSON_ARRAYAGG(
-//          JSON_OBJECT(
-//            'id', vio.id,
-//            'location', vio.location,
-//            'type', vio.type,
-//            'status', vio.status,
-//            'action', vio.action,
-//            'description', vio.description,
-//            'created_at', vio.created_at
-//          )
-//        )
-//        FROM violations vio
-//        WHERE vio.plate_id = v.plate
-//      ) AS violations
-//    FROM vehicle v
-//    WHERE v.plate = ?`,
-//   [id]
-// );
+export const searchVehcile = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params
+    if (!id) {
+      res.status(400).json({
+        error:
+          "Missing required parameter: 'id'. Please include a valid ID in the request URL.",
+      })
+      return
+    }
+    // const data = await executeSingleQuery<VehicleResponse>(
+    //   `SELECT
+    //      v.*,
+    //      EXISTS (
+    //        SELECT 1
+    //        FROM wanted_vehicle w
+    //        WHERE w.plate = v.plate
+    //      ) AS is_wanted,
+    //      (
+    //        SELECT JSON_ARRAYAGG(
+    //          JSON_OBJECT(
+    //            'id', vio.id,
+    //            'location', vio.location,
+    //            'type', vio.type,
+    //            'status', vio.status,
+    //            'action', vio.action,
+    //            'description', vio.description,
+    //            'created_at', vio.created_at
+    //          )
+    //        )
+    //        FROM violations vio
+    //        WHERE vio.plate_id = v.plate
+    //      ) AS violations
+    //    FROM vehicle v
+    //    WHERE v.plate = ?`,
+    //   [id]
+    // );
 
-const result = await executeSingleQuery(`
+    const result = await executeSingleQuery(
+      `
 SELECT 
   v.plate,
   CASE 
@@ -136,7 +154,55 @@ LEFT JOIN violations vio ON v.plate = vio.plate_id
 LEFT JOIN violation_type vt ON vio.type = vt.ID
 WHERE v.plate = ?
 GROUP BY v.plate, is_wanted;
-`, [id]);
+`,
+      [id],
+    )
 
-  res.json(result)
-})
+    res.json(result)
+  },
+)
+
+export const createReport = asyncHandler(
+  async (req: Request, res: Response) => {
+    const {
+      name,
+      phone,
+      national_id,
+      address,
+      date,
+      vehcile_types,
+      description,
+    } = req.body
+    const user = (req as any).user_data
+
+    let attachmentPaths: string[] = []
+
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      const savedFiles = await saveUploadedFiles(req)
+      attachmentPaths = savedFiles.map((filename) => `${filename}`)
+      const query = `
+            INSERT INTO user_report 
+            (name, phone, national_id, address, date, vehcile_types, description , attachment )
+            VALUES (?, ?, ?, ?, ?, ?,?,?)
+          `
+      const values = [
+        req.body.name,
+        req.body.phone,
+        user.id,
+        req.body.address,
+        req.body.date,
+        req.body.vehcile_types,
+        req.body.description,
+        JSON.stringify(attachmentPaths),
+      ]
+      await executeQuery(query, values)
+    } else {
+      res.status(401).json({
+        message: 'images not found',
+      })
+      return
+    }
+
+    res.status(201).json({ success: true, message: 'Report created' })
+  },
+)

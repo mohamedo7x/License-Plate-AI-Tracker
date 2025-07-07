@@ -44,6 +44,9 @@ const getUploadDestination = (url: string): string => {
   if (url.includes('/custome/createViolation')) {
     return path.join(__dirname, '..', 'uploads', 'images', 'violation_ticket')
   }
+  if (url.includes('/user/report')) {
+    return path.join(__dirname, '..', 'uploads', 'images', 'user_report')
+  }
   throw new Error('Invalid upload destination')
 }
 

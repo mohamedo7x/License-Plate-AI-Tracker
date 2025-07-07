@@ -1,6 +1,6 @@
-import { RowDataPacket } from "mysql2"
+import { RowDataPacket } from 'mysql2'
 
-export interface IUser extends RowDataPacket{
+export interface IUser extends RowDataPacket {
   national_id: string
   full_name?: string | null
   gender?: 'ذكر' | 'انثى' | null
