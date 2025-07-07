@@ -555,6 +555,7 @@ const getAllViolations = (0, asyncHandler_1.default)((req, res) => __awaiter(voi
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const countResult = yield (0, orm_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM violations');
     const data = yield (0, orm_util_1.executeQuery)('SELECT v.id , v.plate_id , v.location , vt.name , v.status , v.attachments, v.description FROM violations v JOIN violation_type vt ON vt.ID = v.type LIMIT  ? OFFSET  ?;', [limit, offset]);
     let newData;
     if (data && data.data) {
@@ -564,10 +565,17 @@ const getAllViolations = (0, asyncHandler_1.default)((req, res) => __awaiter(voi
                     : undefined });
         });
     }
-    res.json({
-        sucess: true,
-        data: newData,
-    });
+    if (countResult && countResult.data)
+        res.json({
+            sucess: true,
+            data: newData,
+            pagination: {
+                total: countResult.data[0].total,
+                totalPages: Math.ceil(countResult.data[0].total / limit),
+                page: page,
+                limit: limit
+            }
+        });
 }));
 exports.getAllViolations = getAllViolations;
 const getViolationsType = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -577,7 +585,7 @@ const getViolationsType = (0, asyncHandler_1.default)((req, res) => __awaiter(vo
 exports.getViolationsType = getViolationsType;
 const getSpesificViolation = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const id = req.query.id;
+    const id = req.params.id;
     const result = yield (0, orm_util_1.executeQuery)(`SELECT 
       p.national_id AS vehicle_owner_id,
       v.plate AS vehicle_plate, 
@@ -586,11 +594,12 @@ const getSpesificViolation = (0, asyncHandler_1.default)((req, res) => __awaiter
       v.brand AS vehicle_brand, 
       vio.id AS violation_id, 
       vt.name AS violation_type_name, 
-      vio.create_at AS violation_date, 
+      vio.created_at AS violation_date, 
       vio.location AS violation_location, 
       pu.name AS officer_name, 
       pu.id AS officer_id, 
       vio.status AS violation_status, 
+      vio.attachments as attachments,
       vio.description AS violation_description 
     FROM violations vio 
     JOIN vehicle v ON vio.plate_id = v.plate 
@@ -600,7 +609,9 @@ const getSpesificViolation = (0, asyncHandler_1.default)((req, res) => __awaiter
     JOIN violation_type vt ON vio.type = vt.ID 
     JOIN police_users pu ON vio.police_id = pu.id 
     WHERE vio.id = ?;`, [id]);
-    const data = (_a = result.data) === null || _a === void 0 ? void 0 : _a.map((row) => (Object.assign(Object.assign({}, row), { violation_date: (0, dateFormat_util_1.getFullDate)(row.violation_date) })));
+    const data = (_a = result.data) === null || _a === void 0 ? void 0 : _a.map((row) => (Object.assign(Object.assign({}, row), { violation_date: (0, dateFormat_util_1.getFullDate)(row.violation_date), attachments: row.attachments
+            ? (0, response_1.HandelAttachmets)(row.attachments, req.protocol, req.get('host'))
+            : undefined })));
     res.json(data ? data[0] : data);
 }));
 exports.getSpesificViolation = getSpesificViolation;

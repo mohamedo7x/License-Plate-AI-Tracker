@@ -15,6 +15,7 @@ const police_violation_route_1 = __importDefault(require("./police.violation.rou
 const admin_violations_route_1 = __importDefault(require("./admin.violations.route"));
 const Home_route_1 = __importDefault(require("./Home.route"));
 const admin_vhecile_1 = __importDefault(require("./admin.vhecile"));
+const user_route_1 = __importDefault(require("./user.route"));
 const route = (0, express_1.Router)();
 route.use(`/admin`, admin_route_1.default);
 route.use(`/reports`, admin_reports_route_1.default);
@@ -26,4 +27,5 @@ route.use('/violation', police_violation_route_1.default);
 route.use('/custome', admin_violations_route_1.default);
 route.use('/home', Home_route_1.default);
 route.use('/wanted', admin_middleware_1.validateAdminToken, admin_vhecile_1.default);
+route.use('/user', user_route_1.default);
 exports.default = route;

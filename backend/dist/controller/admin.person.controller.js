@@ -90,6 +90,7 @@ exports.getPersons = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0,
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const countResult = yield (0, orm_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM person');
     const query = 'SELECT * FROM person LIMIT ? OFFSET ?';
     const persons = yield (0, orm_util_1.executeQuery)(query, [limit, offset]);
     const PersonsData = persons.data
@@ -97,12 +98,17 @@ exports.getPersons = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0,
             return Object.assign(Object.assign({}, person), { date_of_birth: (0, dateFormat_util_1.formatDateV2)(person.date_of_birth), issue_date: (0, dateFormat_util_1.formatDateV2)(person.issue_date), expired_date: (0, dateFormat_util_1.formatDateV2)(person.expired_date), criminal_status: person.criminal_status === 1 ? 'مطلوب' : 'غير مطلوب' });
         })
         : [];
-    res.status(200).json({
-        success: true,
-        page: page,
-        limit: limit,
-        data: PersonsData,
-    });
+    if (countResult && countResult.data)
+        res.status(200).json({
+            success: true,
+            data: PersonsData,
+            pagination: {
+                total: countResult.data[0].total,
+                totalPages: Math.ceil(countResult.data[0].total / limit),
+                page: page,
+                limit: limit
+            },
+        });
 }));
 exports.getAllWantedPersons = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;

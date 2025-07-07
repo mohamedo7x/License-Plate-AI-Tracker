@@ -16,6 +16,7 @@ exports.getStatsitcsOfHome = void 0;
 const asyncHandler_1 = __importDefault(require("../middleware/asyncHandler"));
 const orm_util_1 = require("../utils/orm.util");
 const DevOperation_1 = require("../utils/DevOperation");
+const response_1 = require("../utils/response");
 exports.getStatsitcsOfHome = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const query = `SELECT
   (SELECT COUNT(*) FROM violations WHERE created_at >= NOW() - INTERVAL 30 DAY) AS Total_Violations,
@@ -66,9 +67,9 @@ ORDER BY m.month DESC;`;
     });
     res.status(200).json({
         sucess: true,
-        statsticsData: FetchedData,
+        statsticsData: (0, response_1.HandelStatistics)(FetchedData),
         barData: {}, // Not Completed
-        pieDate: { detected_violation, undetected_violation },
+        pieDate: [detected_violation, undetected_violation],
         lineChart,
     });
 }));

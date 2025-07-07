@@ -202,8 +202,9 @@ export const HandelAttachmets = (
   attachments: string | string[] | null,
   protocol: string,
   host: string | undefined,
+  fileName?: string,
 ): string[] => {
-  const baseUrl = `${protocol}://${host}/uploads/images/violation_ticket/`
+  const baseUrl = `${protocol}://${host}/uploads/images/${fileName || 'violation_ticket'}/`
 
   if (!attachments) return []
 

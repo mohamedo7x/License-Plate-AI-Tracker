@@ -78,9 +78,14 @@ const validatePoliceToken = (req, res, next) => {
     }
 };
 exports.validatePoliceToken = validatePoliceToken;
-const generatePoliceUserJWTToken = (policeUser) => {
+const generatePoliceUserJWTToken = (policeUser, req) => {
     const tokenData = {
         id: policeUser.id,
+        img_profile: req.protocol +
+            '://' +
+            req.get('host') +
+            '/uploads/images/police_users/' +
+            policeUser.img_profile,
         username: policeUser.username,
         name: policeUser.name,
         rank: policeUser.rank,

@@ -76,7 +76,6 @@ exports.CreateReport = (0, asyncHandler_1.default)((req, res) => __awaiter(void 
     }
 }));
 exports.getAllReportTypes = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('getAllReportTypes');
     const result = yield (0, orm_util_1.executeQuery)('SELECT * FROM report_type', []);
     if (result.success && result.data) {
         res.status(200).json({

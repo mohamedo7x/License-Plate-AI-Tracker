@@ -7,6 +7,12 @@ const admin_validation_1 = require("../validation/admin.validation");
 const validateRequest_1 = require("../middleware/validateRequest");
 const multer_middleware_1 = require("../middleware/multer.middleware");
 const router = (0, express_1.Router)();
+/*
+ * @route   GET /api/custome/getSpesific
+ * @desc    Get All violations
+ * @access  Private ( Admin )
+ */
+router.route('/getSpesific/:id').get(admin_middleware_1.validateAdminToken, admin_controller_1.getSpesificViolation);
 /**
  * @route   GET /api/custome/getAllViolations
  * @desc    Get All violations

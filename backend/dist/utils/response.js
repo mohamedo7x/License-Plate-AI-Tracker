@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HandelAttachmets = exports.HandelViolations = exports.generateActivitesCard = exports.generateUrgentCard = exports.generateDescriptionForNotification = void 0;
+exports.HandelStatistics = exports.HandelAttachmets = exports.HandelViolations = exports.generateActivitesCard = exports.generateUrgentCard = exports.generateDescriptionForNotification = void 0;
 const dateFormat_util_1 = require("./dateFormat.util");
 const orm_util_1 = require("./orm.util");
 const generateDescriptionForNotification = (typeOfNotification, reportId = null) => {
@@ -156,8 +156,8 @@ WHERE v.police_id = ?`, [police_id]);
     }
 });
 exports.HandelViolations = HandelViolations;
-const HandelAttachmets = (attachments, protocol, host) => {
-    const baseUrl = `${protocol}://${host}/uploads/images/violation_ticket/`;
+const HandelAttachmets = (attachments, protocol, host, fileName) => {
+    const baseUrl = `${protocol}://${host}/uploads/images/${fileName || 'violation_ticket'}/`;
     if (!attachments)
         return [];
     let files = [];
@@ -178,3 +178,14 @@ const HandelAttachmets = (attachments, protocol, host) => {
     return files.map((file) => baseUrl + file.trim());
 };
 exports.HandelAttachmets = HandelAttachmets;
+const HandelStatistics = (items) => {
+    let Total_Violations = (items === null || items === void 0 ? void 0 : items.Total_Violations) || 0;
+    let detected_violation = (items === null || items === void 0 ? void 0 : items.detected_violation) || 0;
+    let under_investigation = (items === null || items === void 0 ? void 0 : items.under_investigation) || 0;
+    return {
+        Total_Violations,
+        detected_violation,
+        under_investigation,
+    };
+};
+exports.HandelStatistics = HandelStatistics;
