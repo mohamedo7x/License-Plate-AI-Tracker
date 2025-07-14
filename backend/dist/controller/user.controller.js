@@ -200,9 +200,7 @@ exports.generateObjection = (0, asyncHandler_1.default)((req, res) => __awaiter(
     const userdata = yield (0, orm_util_1.executeSingleQuery)('SELECT COUNT(*) as total FROM user_report WHERE id = ? AND status = "rejected" ', [report_id]);
     if (userdata && userdata.data) {
         if (userdata.data[0].total === 0) {
-            res
-                .status(404)
-                .json({
+            res.status(404).json({
                 message: 'No objection found for the provided ID, or your report has not been reviewed yet.',
             });
             return;

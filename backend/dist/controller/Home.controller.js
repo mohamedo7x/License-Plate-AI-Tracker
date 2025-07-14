@@ -125,7 +125,10 @@ FROM combined_stats;`;
     res.status(200).json({
         sucess: true,
         statsticsData: (0, response_1.HandelStatistics)(FetchedData),
-        barData: { correct: JSON.parse(correct_data), false: JSON.parse(false_data) }, // Not Completed
+        barData: {
+            correct: JSON.parse(correct_data),
+            false: JSON.parse(false_data),
+        }, // Not Completed
         pieDate: [detected_violation, undetected_violation],
         lineChart,
     });
