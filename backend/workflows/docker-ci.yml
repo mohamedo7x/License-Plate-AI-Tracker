@@ -2,7 +2,7 @@ name: Build and Push Docker image
 
 on:
   push:
-    branches:
+    pull_request:
       - main
 
 jobs:
@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+    - uses: docker/setup-buildx-action@v2
 
     - name: Login to DockerHub
       uses: docker/login-action@v2
