@@ -49,7 +49,7 @@ Follow these steps to set up the development environment:
 5. **Stopping the Containers** 🛑  
    When you need to stop the services:
    ```sh
-   docker-compose -f docker-compose.yml down
+   docker pull mohamedo7x/license-plate-ai-tracker:latest
    ```
 
 ---
@@ -84,31 +84,3 @@ For a production-ready setup, use these steps:
 
 ---
 
-## ⚠️ Important Notes
-
-- **Environment:**
-
-  - Development mode runs with `NODE_ENV=development` on port `8080`.
-  - Production mode runs with `NODE_ENV=production` on port `3001`.
-
-- **Configuration:**  
-  Make sure your `.env` file (if applicable) is set up correctly before starting the services.
-
-- **Database Credentials:**  
-  The credentials are pre-configured in the respective `docker-compose` files.
-
----
-
-## Checking Logs
-
-To view logs for the backend service, run:
-
-```sh
-docker logs -f <container_id>
-```
-
-Find the container ID with:
-
-```sh
-docker ps
-```
