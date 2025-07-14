@@ -26,7 +26,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: ./backend 
+        context: ./backend
         file: ./backend/Dockerfile
-        push: ${{ github.event_name == 'push' }} 
-        tags: mohamedo7x/license-plate-ai-tracker:latest
+        push: true  
+        tags: ${{ secrets.DOCKER_USERNAME }}/license-plate-ai-tracker:latest
